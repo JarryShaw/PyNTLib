@@ -24,14 +24,6 @@ def decomposition(N=4):
 
     return solve(x,y)   #求取並返回a與b
 
-def solve(x, y):
-    if x < y:   z = x;  x = y;  y = z   #交換次序，使得x>y
-
-    a = (x + y) / 2     #x = a + b
-    b = (x - y) / 2     #y = a - b
-
-    return a, b
-
 def primeFactorisation(N, pn=0, p=[], q=[]):
     if N < 0:   pn = 1; N = -1 * N; primeFactorisation(N, pn)   #將負數轉化為正整數進行計算
     if N == 0: p.append(0); q.append(1); return p, q, pn        #N為0時的分解
@@ -58,6 +50,14 @@ def wrap(set, p, q):
 
     return p, q
 
+def solve(x, y):
+    if x < y:   z = x;  x = y;  y = z   #交換次序，使得x>y
+
+    a = (x + y) / 2     #x = a + b
+    b = (x - y) / 2     #y = a - b
+
+    return a, b
+
 def euclideanDivision(N, prmList, rst=[]):
     if N == 1:  return rst  #除盡後返回因素序列
     
@@ -75,7 +75,7 @@ def trivialDivision(N):
             return 0                #N為合數
     return 1                        #N為素數
 
-def eratosthenesSieve(N=10000):
+def eratosthenesSieve(N):
     set = [1]*(N+1)                 #用於存儲N個正整數的表格／狀態；其中，0表示篩去，1表示保留
     for index in range(2,int(math.sqrt(N))):  #篩法（平凡除法）
         ctr = 2

@@ -37,16 +37,15 @@ def bezoutEquation(a, b):
     
     return s, t
 
-def coefficient_s(q_j, s_j1=0, s_j2=1, ctr=0):
-    try:
-        s = -1 * q_j[ctr] * s_j1 + s_j2 #s_j = (-q_j) * s_j-1 + s_j-2
-    except IndexError:
-        return s_j1
+def extendedEucrideanDivision(a, b, qSet=[]):
+    q = a / b
+    r = a % b
     
-    s_j2 = s_j1
-    s_j1 = s
-    ctr += 1
-    return coefficient_s(q_j, s_j1, s_j2, ctr)
+    if r == 0:
+        return qSet                                     #(r,0) = r
+    else:
+        qSet.append(q)
+        return extendedEucrideanDivision(b, r, qSet)    #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
 def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
     try:
@@ -59,15 +58,16 @@ def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
     ctr += 1
     return coefficient_t(q_j, t_j1, t_j2, ctr)
 
-def extendedEucrideanDivision(a, b, qSet=[]):
-    q = a / b
-    r = a % b
+def coefficient_s(q_j, s_j1=0, s_j2=1, ctr=0):
+    try:
+        s = -1 * q_j[ctr] * s_j1 + s_j2 #s_j = (-q_j) * s_j-1 + s_j-2
+    except IndexError:
+        return s_j1
     
-    if r == 0:
-        return qSet                                     #(r,0) = r
-    else:
-        qSet.append(q)
-        return extendedEucrideanDivision(b, r, qSet)    #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
+    s_j2 = s_j1
+    s_j1 = s
+    ctr += 1
+    return coefficient_s(q_j, s_j1, s_j2, ctr)
 
 if __name__ == '__main__':
     while True:
