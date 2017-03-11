@@ -14,7 +14,7 @@ Homework Codes for Mathematic Fundamentals of Information Security
 
 ###2017/02/28
 
-* SKT_1-8-5  Maximum Common Factor
+* SKT_1-8-5  Greatest Common Divisor
 * SKT_1-8-6  Coprimality Test
 * SKT_1-8-7  Bézout Equation
 
