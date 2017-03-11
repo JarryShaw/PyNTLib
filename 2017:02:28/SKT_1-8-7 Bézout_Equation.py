@@ -7,11 +7,20 @@ def bezoutEquation(a=1, b=1):
     if a < b:   c = a;  a = b;  b = c   #交換a與b的次序，使得a≥b
     
     q = extendedEucrideanDivision(a,b)  #廣義歐幾里德除法，求不完全商數組q
-    print q
     s = coefficient_s(q)                #求係數s
     t = coefficient_t(q)                #求係數t
 
     return s, t
+
+def extendedEucrideanDivision(a, b, qSet=[]):
+    q = a / b
+    r = a % b
+    
+    if r == 0:
+        return qSet                                     #(r,0) = r
+    else:
+        qSet.append(q)
+        return extendedEucrideanDivision(b, r, qSet)    #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
 def coefficient_s(q_j, s_j1=0, s_j2=1, ctr=0):
     try:
@@ -34,16 +43,6 @@ def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
     t_j1 = t
     ctr += 1
     return coefficient_t(q_j, t_j1, t_j2, ctr)
-
-def extendedEucrideanDivision(a, b, qSet=[]):
-    q = a / b
-    r = a % b
-    
-    if r == 0:
-        return qSet                                     #(r,0) = r
-    else:
-        qSet.append(q)
-        return extendedEucrideanDivision(b, r, qSet)    #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
 if __name__ == '__main__':
     while True:
