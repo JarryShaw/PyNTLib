@@ -6,7 +6,7 @@
 import math
 
 def eratosthenesSieve(N=10000):
-    set = [1]*(N+1)                 #用於存儲10000個正整數的表格／狀態；其中，0表示篩去，1表示保留
+    set = [1]*(N+1)                 #用於存儲N(默认为10000）個正整數的表格／狀態；其中，0表示篩去，1表示保留
     for index in range(2,int(math.sqrt(N))):  #篩法（平凡除法）
         ctr = 2
         while index * ctr <= N:

@@ -7,10 +7,9 @@ def euclideanDivision(a=1, b=1):
     q = a / b 		#求（不完全）商
     r = a % b 		#求餘數
     if r == 0:		#判斷整除
-        print 'The result is b|a.'
+        return 1
     else:
-    	print 'The result is b∤a.'
-
+        return 0
 
 if __name__ == '__main__':
     while True:
@@ -30,4 +29,7 @@ if __name__ == '__main__':
             continue
         break
 
-    euclideanDivision(a,b)
+    if euclideanDivision(a,b):
+        print 'The result is b|a.'
+    else:
+        print 'The result is b∤a.'
