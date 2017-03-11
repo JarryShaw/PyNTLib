@@ -37,7 +37,7 @@ def bezoutEquation(a, b):
     
     return s, t
 
-def extendedEucrideanDivision(a, b, qSet=[]):
+def extendedEucrideanDivision(a, b, qSet=[0]):
     q = a / b
     r = a % b
     
