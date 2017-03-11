@@ -5,8 +5,8 @@
 
 import math
 
-def eratosthenesSieve(N=10000):
-    set = [1]*(N+1)                 #用於存儲10000個正整數的表格／狀態；其中，0表示篩去，1表示保留
+def eratosthenesSieve(N):
+    set = [1]*(N+1)                 #用於存儲N個正整數的表格／狀態；其中，0表示篩去，1表示保留
     for index in range(2,int(math.sqrt(N))):  #篩法（平凡除法）
         ctr = 2
         while index * ctr <= N:
@@ -21,10 +21,12 @@ def eratosthenesSieve(N=10000):
 
     return rst
 
-def trivialDivision(a=1, b=1):
-    max = int(math.sqrt(N))
-    set = eratosthenesSieve(max)    #得出小於√N的所有素數
-    for num in set:                 #素行判斷
+def trivialDivision(N=2):
+    if N < 0:   N = -1 * N
+    if N == 1 or N == 0:    raise ValueError
+    
+    set = eratosthenesSieve(N)    #得出小於N的所有素數
+    for num in set:                 #素性判斷
         if N % num == 0:
             return 0                #N為合數
     return 1                        #N為素數

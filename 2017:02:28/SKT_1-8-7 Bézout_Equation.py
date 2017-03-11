@@ -7,6 +7,7 @@ def bezoutEquation(a=1, b=1):
     if a < b:   c = a;  a = b;  b = c   #交換a與b的次序，使得a≥b
     
     q = extendedEucrideanDivision(a,b)  #廣義歐幾里德除法，求不完全商數組q
+    print q
     s = coefficient_s(q)                #求係數s
     t = coefficient_t(q)                #求係數t
 
