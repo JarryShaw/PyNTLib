@@ -8,7 +8,7 @@ def indefiniteEquation(a=1, b=1, c=1, apn=0, bpn=0):
     if b < 0:   b *= -1;    bpn = 1
     if c < 0:   c *= -1
 
-    mcf = maxCommonFactor(a,b)
+    mcf = GCD(a,b)
     if (c % mcf):   raise ValueError
     else:               mtp = c / mcf
     
@@ -19,22 +19,22 @@ def indefiniteEquation(a=1, b=1, c=1, apn=0, bpn=0):
     if bpn: y0 *= -1
     return x0, y0, a, b
 
-def maxCommonFactor(a, b):
+def GCD(a, b):
     if a < 0:   a = -1 * a              #將a轉為正整數進行計算
     if b < 0:   b = -1 * b              #將b轉為正整數進行計算
     if a < b:   c = a;  a = b;  b = c   #交換a與b的次序，使得a≥b
     if b == 0:  return a                #(r,0) = r
     
     r = a % b
-    return maxCommonFactor(r, b)        #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
+    return GCD(r, b)        #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
-def bezoutEquation(a, b):
+def bezoutEquation(a=1, b=1):
     if a < b:   c = a;  a = b;  b = c   #交換a與b的次序，使得a≥b
     
     q = extendedEucrideanDivision(a,b)  #廣義歐幾里德除法，求不完全商數組q
     s = coefficient_s(q)                #求係數s
     t = coefficient_t(q)                #求係數t
-    
+
     return s, t
 
 def extendedEucrideanDivision(a, b, qSet=[0]):
@@ -47,6 +47,17 @@ def extendedEucrideanDivision(a, b, qSet=[0]):
         qSet.append(q)
         return extendedEucrideanDivision(b, r, qSet)    #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
+def coefficient_s(q_j, s_j1=0, s_j2=1, ctr=0):
+    try:
+        s = -1 * q_j[ctr] * s_j1 + s_j2 #s_j = (-q_j) * s_j-1 + s_j-2
+    except IndexError:
+        return s_j1
+    
+    s_j2 = s_j1
+    s_j1 = s
+    ctr += 1
+    return coefficient_t(q_j, s_j1, s_j2, ctr)
+
 def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
     try:
         t = -1 * q_j[ctr] * t_j1 + t_j2 #t_j = (-q_j) * t_j-1 + t_j-2
@@ -57,17 +68,6 @@ def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
     t_j1 = t
     ctr += 1
     return coefficient_t(q_j, t_j1, t_j2, ctr)
-
-def coefficient_s(q_j, s_j1=0, s_j2=1, ctr=0):
-    try:
-        s = -1 * q_j[ctr] * s_j1 + s_j2 #s_j = (-q_j) * s_j-1 + s_j-2
-    except IndexError:
-        return s_j1
-    
-    s_j2 = s_j1
-    s_j1 = s
-    ctr += 1
-    return coefficient_s(q_j, s_j1, s_j2, ctr)
 
 if __name__ == '__main__':
     while True:
