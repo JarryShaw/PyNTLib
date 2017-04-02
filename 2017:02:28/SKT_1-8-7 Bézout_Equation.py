@@ -12,7 +12,7 @@ def bezoutEquation(a=1, b=1):
 
     return s, t
 
-def extendedEucrideanDivision(a, b, qSet=[]):
+def extendedEucrideanDivision(a, b, qSet=[0]):
     q = a / b
     r = a % b
     
@@ -31,7 +31,7 @@ def coefficient_s(q_j, s_j1=0, s_j2=1, ctr=0):
     s_j2 = s_j1
     s_j1 = s
     ctr += 1
-    return coefficient_s(q_j, s_j1, s_j2, ctr)
+    return coefficient_t(q_j, s_j1, s_j2, ctr)
 
 def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
     try:
