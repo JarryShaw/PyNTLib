@@ -205,25 +205,37 @@ def prmMCSLite(cgcExp, cgcCoe, mod, exp):
     return ratio
 
 #高次同餘式的提升
-def prmMSCPro(cgcExp, cgcCoe, rto, mod, exp):
+def prmMCSPro(cgcExp, cgcCoe, rto, mod, exp):
     (drvExp, drvCoe) = polyDerivative(cgcExp, cgcCoe)   #求取原同餘式的導式
-
+    polyDrv = makePolynomial(drvExp, drvCoe)
+    
+    drv = lambda x : eval(polyDrv)
     for tmpRto in rto:
-        polyDrv = 0
-        for ptr in range(len(drvExp)):      #用模重複平方法計算導式的值f'(x1) (mod p)
-            polyDrv += repetiveSquareModulo(drvCoe[ptr]*tmpRto, drvExp[ptr], mod)
-        if GCD(polyDrv, mod) == 1:          #尋找滿足(f'(x1),p)=1的x1
+        if GCD(drv(tmpRto), mod) == 1:          #尋找滿足(f'(x1),p)=1的x1
+            polyDrvMod = 0
+            for ptr in range(len(drvExp)):      #用模重複平方法計算導式的值f'(x1) (mod p)
+                polyDrvMod += repetiveSquareModulo(drvCoe[ptr]*tmpRto, drvExp[ptr], mod)
+
             x = tmpRto
-            polyDrv -= mod
-            polyDrvRcp = 1.0 / polyDrv
+            polyDrvMod = polyDrvMod % mod - mod
+            polyDrvRcp = 1 / polyDrvMod
+            #print x
+            #print polyDrvMod
             break
 
     for ctr in range(1, exp):
+        '''
         t = 0
         for ptr in range(len(cgcExp)):                              #用模重複平方法計算t_(i-1)與x_i
             cgcBase = ((-1 * cgcCoe[ptr]) / (mod**ctr)) * polyDrvRcp
             t += repetiveSquareModulo(cgcBase, cgcExp[ptr], mod)    #t_(i-1) ≡ (-f(x_i)/p^i) * (f'(x1) (mod p)) (mod p)
+        t %= mod
+        '''
+        poly = makePolynomial(cgcExp, cgcCoe)
+        fx = lambda x : eval(poly)
+        t = ((-1 * fx(x) / (mod**ctr)) * polyDrvRcp) % mod          #t_(i-1) ≡ (-f(x_i)/p^i) * (f'(x1) (mod p)) (mod p)
         x += (t * (mod**ctr)) % (mod**(ctr+1))                      #x_i ≡ x_(i-1) + t_(i-1) * p^(i-1) (mod p^i)
+        #print x, ' ', t
 
     ratio = [x]
     return ratio
@@ -279,6 +291,9 @@ def CHNRemainderTheorem(rto, mod):
         m = M / tmpMod2                                 #M_i = M / m_i
         (s, t) = bezoutEquation(tmpMod2, m)             #t_i * M_i ≡ 1 (mod m_i)
 
+        while t < 0:
+            t += m
+
         MList.append(m) 
         tList.append(t)
 
@@ -332,7 +347,7 @@ def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
     return coefficient_t(q_j, t_j1, t_j2, ctr)
 
 if __name__ == '__main__':
-    '''
+    #'''
     cgcFlg = True
     cgcExp = []
     cgcCoe = []
@@ -357,9 +372,10 @@ if __name__ == '__main__':
         print
     print
     '''
-    cgcExp = [14, 13, 11,  9,  6,  3,  2,  1]
-    cgcCoe = [ 3,  4,  2,  1,  1,  1, 12,  1]
-
+    cgcExp = [20140515, 201405, 2014, 8, 6, 3, 1, 0]
+    cgcCoe = [20140515, 201495, 2014, 8, 1, 4, 1, 1]
+    modulo = 343
+    '''
     while True:
         try:
             modulo = int(raw_input('The modulo is '))
@@ -370,7 +386,7 @@ if __name__ == '__main__':
             print 'Invalid input.'
             continue
         break
-
+    #'''
     ratio = congruenceSolution(cgcExp, cgcCoe, modulo)
 
     print 
@@ -379,7 +395,7 @@ if __name__ == '__main__':
         if ptr < len(cgcExp) - 1:
             print '+',
     print '≡ 0 (mod %d)' %modulo
-    print 'The solution of the above polynomial congruence is\nx ≡ ',
+    print 'The solution of the above polynomial congruence is\nx ≡',
     for rst in ratio:
-        print '%d ' %rst,
+        print '%d' %rst,
     print '(mod %d)' %modulo

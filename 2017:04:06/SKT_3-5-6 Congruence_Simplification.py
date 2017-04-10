@@ -113,7 +113,7 @@ def polyEDLoop(ecDictDivident, ecDictDivisor, ecDictQuotient, ecDictRatio):
     return ecDictQuotient, ecDictRatio
 
 if __name__ == '__main__':
-    '''
+    #'''
     cgcFlg = True
     cgcExp = []
     cgcCoe = []
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     '''
     cgcExp = [14, 13, 11,  9,  6,  3,  2,  1]
     cgcCoe = [ 3,  4,  2,  1,  1,  1, 12,  1]
-
+    '''
     while True:
         try:
             modulo = int(raw_input('The modulo is '))
@@ -151,7 +151,7 @@ if __name__ == '__main__':
             print 'Invalid input.'
             continue
         break
-
+    #'''
     (rtoExp, rtoCoe) = congruenceSimplification(cgcExp, cgcCoe, modulo)
 
     print 'The original polynomial congruence is'

@@ -106,6 +106,7 @@ def polyEDLoop(ecDictDivident, ecDictDivisor, ecDictQuotient, ecDictRatio):
 '''
 
 if __name__ == '__main__':
+    #'''
     dvdFlg = True
     dvdExp = []
     dvdCoe = []
