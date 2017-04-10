@@ -3,7 +3,7 @@
 #RSA 解密器
 #利用生成的私鑰進行解密操作
 
-class RSADecryter():
+class RSADecrytor():
     def __init__(self, cipherText, privateKey, divisorKey):
         '''
         blockText = self.blockSlice(str(cipherText), len(str(divisorKey)))  #對密文進行分塊
@@ -44,7 +44,7 @@ class RSADecryter():
         numberText = self.convertUnicode2Number(cipherText)
         plainText = self.repetiveSquareModulo(numberText, privateKey, divisorKey)
         #print cipherText, ' ', numberText
-        #print cipherText, ' ', plainText
+        print cipherText, ' ', plainText
         return plainText
 
     #將字串轉化爲數字（Unicode碼）
@@ -57,7 +57,7 @@ class RSADecryter():
             '''
             numberText += str(ord(unicode(letter))-32).rjust(2,'0')
             '''
-        #print 'cipherNumber=', numberText
+        print 'cipherNumber=', numberText
         return numberText
 
     #模重複平方法
@@ -75,7 +75,7 @@ class RSADecryter():
             b = b**2 % divisor                  #b_i ≡ b_i-1 ^ 2 (mod divisor)
             ptr -= 1
 
-        #print 'numberText=', a
+        print 'numberText=', a
         plainText = self.convertNumber2Unicode(a)
 
         return plainText
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     rsa_keys = RSA_Generator.RSAGenerator()
     (publicKey, divisorKey, blockSize) = rsa_keys.getPublicKey()
 
-    print '-*- Key Generated -*-'
+    print '-*- Key Generated -*-\n'
 
     plainText = 'Mathematic Fundation of Information security 20170323 515030910023'
     #plainText = 'Mathematic'
@@ -143,11 +143,11 @@ if __name__ == '__main__':
     cipherText = rsa_cipher.getCipherText()
     #print cipherText
 
-    print '-*- Text Ciphered -*-'
+    print '-*- Text Ciphered -*-\n'
 
     (privateKey, divisorKey) = rsa_keys.getPrivateKey()
 
-    rsa_plain = RSADecryter(cipherText, privateKey, divisorKey)
+    rsa_plain = RSADecrytor(cipherText, privateKey, divisorKey)
     plainText = rsa_plain.getPlainText()
 
     print 'The original message is %s' %plainText

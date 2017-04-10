@@ -19,6 +19,7 @@ def indefiniteEquation(a=1, b=1, c=1, apn=0, bpn=0):
     if bpn: y0 *= -1
     return x0, y0, a, b
 
+#廣義歐幾里德除法 | 返回100,000內任意兩整數的最大公因數
 def GCD(a, b):
     if a < 0:   a = -1 * a              #將a轉為正整數進行計算
     if b < 0:   b = -1 * b              #將b轉為正整數進行計算
@@ -28,6 +29,7 @@ def GCD(a, b):
     r = a % b
     return GCD(r, b)        #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
+#Bézout等式 | 對兩正整數a與b，求出使得s*a+t*b=(a,b)的整數s和t
 def bezoutEquation(a=1, b=1):
     if a < b:   c = a;  a = b;  b = c   #交換a與b的次序，使得a≥b
     

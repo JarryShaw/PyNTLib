@@ -14,6 +14,7 @@ def trivialDivision(N=2):
         return 1                    #N為素數
     return 0                        #N為合數
 
+#厄拉托塞師篩法 | 返回10,000以內正整數的所有素數（默認情況）
 def eratosthenesSieve(N):
     set = [1]*(N+1)                 #用於存儲N個正整數的表格／狀態；其中，0表示篩去，1表示保留
     for index in range(2,int(math.sqrt(N))):  #篩法（平凡除法）

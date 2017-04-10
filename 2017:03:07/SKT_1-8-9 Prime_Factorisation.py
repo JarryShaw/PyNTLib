@@ -16,6 +16,7 @@ def primeFactorisation(N, pn=0, p=[], q=[]):
     
     return p, q, pn
 
+#厄拉托塞師篩法 | 返回10,000以內正整數的所有素數（默認情況）
 def eratosthenesSieve(N):
     set = [1]*(N+1)                 #用於存儲N個正整數的表格／狀態；其中，0表示篩去，1表示保留
     for index in range(2,int(math.sqrt(N))):  #篩法（平凡除法）
@@ -33,6 +34,7 @@ def eratosthenesSieve(N):
 
     return rst
 
+#歐幾里得除法 | 判斷是否整除，即b|a
 def euclideanDivision(N, prmList, rst=[]):
     if N == 1:  return rst  #除盡後返回因素序列
     
