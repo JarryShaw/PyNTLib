@@ -44,7 +44,7 @@ class RSADecrytor():
         numberText = self.convertUnicode2Number(cipherText)
         plainText = self.repetiveSquareModulo(numberText, privateKey, divisorKey)
         #print cipherText, ' ', numberText
-        print cipherText, ' ', plainText
+        #print cipherText, ' ', plainText
         return plainText
 
     #將字串轉化爲數字（Unicode碼）
@@ -57,7 +57,7 @@ class RSADecrytor():
             '''
             numberText += str(ord(unicode(letter))-32).rjust(2,'0')
             '''
-        print 'cipherNumber=', numberText
+        #print 'cipherNumber=', numberText
         return numberText
 
     #模重複平方法
@@ -75,7 +75,7 @@ class RSADecrytor():
             b = b**2 % divisor                  #b_i ≡ b_i-1 ^ 2 (mod divisor)
             ptr -= 1
 
-        print 'numberText=', a
+        #print 'numberText=', a
         plainText = self.convertNumber2Unicode(a)
 
         return plainText

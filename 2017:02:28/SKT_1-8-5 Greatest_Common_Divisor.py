@@ -16,9 +16,11 @@ if __name__ == '__main__':
     while True:
         try:
             a = int(raw_input('The first number is '))
+            '''
             if a > 100000:
                 print 'The number must be under 100,000.'
                 continue
+                '''
         except ValueError:
             print 'Invalid input.'
             continue
@@ -27,9 +29,11 @@ if __name__ == '__main__':
     while True:
         try:
             b = int(raw_input('The second number is '))
+            '''
             if b > 100000:
                 print 'The number must be under 100,000.'
                 continue
+                '''
         except ValueError:
             print 'Invalid input.'
             continue
