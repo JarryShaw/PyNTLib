@@ -154,11 +154,11 @@ def cpsMCS(cgcExp, cgcCoe, modulo):
         tmpRto = []
         tmpMod = []
         for ptr in range(len(p)):
-            tmpMod = p[ptr]
-            tmpExp = q[ptr]
-            tmpMod.append(tmpMod ** tmpExp)
-            tmpRto.append(prmMCSLite(cgcExp, cgcCoe, tmpMod, tmpExp))
-        ratio = CHNRemainderTheorem(tmpRto, tmpMod)                           #用中國剩餘定理處理上述結果，得到最終結果
+            tmpModVar = p[ptr]
+            tmpExpVar = q[ptr]
+            tmpMod.append(tmpModVar ** tmpExpVar)
+            tmpRto.append(prmMCSLite(cgcExp, cgcCoe, tmpModVar, tmpExpVar))
+        ratio = CHNRemainderTheorem(tmpRto, tmpMod, modulo)                           #用中國剩餘定理處理上述結果，得到最終結果
 
     return ratio
 
@@ -200,6 +200,7 @@ def wrap(set, p, q):
 #單素數的次冪模同餘式求解
 def prmMCSLite(cgcExp, cgcCoe, mod, exp):
     tmpRto = prmMCS(cgcExp, cgcCoe, mod)                #獲取源素數模的同餘式的解
+    print tmpRto
     ratio = prmMCSPro(cgcExp, cgcCoe, tmpRto, mod, exp)      #作高次同餘式的提升，求出源素數次冪模的同餘式的解
 
     return ratio
@@ -208,9 +209,13 @@ def prmMCSLite(cgcExp, cgcCoe, mod, exp):
 def prmMCSPro(cgcExp, cgcCoe, rto, mod, exp):
     (drvExp, drvCoe) = polyDerivative(cgcExp, cgcCoe)   #求取原同餘式的導式
     polyDrv = makePolynomial(drvExp, drvCoe)
+    #print polyDrv
     
     drv = lambda x : eval(polyDrv)
     for tmpRto in rto:
+        #print 'x1 = ', tmpRto
+        #print 'p = ', mod
+        #print '(f\'(x1),p) = ', GCD(drv(tmpRto), mod)
         if GCD(drv(tmpRto), mod) == 1:          #尋找滿足(f'(x1),p)=1的x1
             polyDrvMod = 0
             for ptr in range(len(drvExp)):      #用模重複平方法計算導式的值f'(x1) (mod p)
@@ -223,7 +228,7 @@ def prmMCSPro(cgcExp, cgcCoe, rto, mod, exp):
             #print polyDrvMod
             break
 
-    for ctr in range(1, exp):
+    for ctr in range(0, exp):
         '''
         t = 0
         for ptr in range(len(cgcExp)):                              #用模重複平方法計算t_(i-1)與x_i
@@ -237,8 +242,7 @@ def prmMCSPro(cgcExp, cgcCoe, rto, mod, exp):
         x += (t * (mod**ctr)) % (mod**(ctr+1))                      #x_i ≡ x_(i-1) + t_(i-1) * p^(i-1) (mod p^i)
         #print x, ' ', t
 
-    ratio = [x]
-    return ratio
+    return x    #ratio = x
 
 #求取多項式的導式
 def polyDerivative(cgcExp, cgcCoe):
@@ -280,7 +284,7 @@ def GCD(a=1, b=1):
     return GCD(r, b)        #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
 #中國剩餘定理
-def CHNRemainderTheorem(rto, mod):
+def CHNRemainderTheorem(rto, mod, modOgn):
     M = 1
     for tmpMod1 in mod:
         M *= tmpMod1                                    #M = ∏m_i
@@ -289,62 +293,21 @@ def CHNRemainderTheorem(rto, mod):
     tList = []
     for tmpMod2 in mod:
         m = M / tmpMod2                                 #M_i = M / m_i
-        (s, t) = bezoutEquation(tmpMod2, m)             #t_i * M_i ≡ 1 (mod m_i)
-
-        while t < 0:
-            t += m
-
+        t = int(prmMCS([1,0], [m,-1], tmpMod2)[0])      #t_i * M_i ≡ 1 (mod m_i)
+        
         MList.append(m) 
         tList.append(t)
 
+    print 'm = ', MList
+    print 't = ', tList
+
     tmpRto = 0
+    print 'r = ', rto
     for ptr in range(len(rto)):
         tmpRto += rto[ptr] * tList[ptr] * MList[ptr]    #x = Σ(a_i * t_i * M_i)
 
-    ratio = [tmpRto]
+    ratio = [(tmpRto % modOgn)]
     return ratio
-
-#Bézout等式 | 對兩正整數a與b，求出使得s*a+t*b=(a,b)的整數s和t
-def bezoutEquation(a=1, b=1):
-    if a < b:   c = a;  a = b;  b = c   #交換a與b的次序，使得a≥b
-    
-    q = extendedEucrideanDivision(a,b)  #廣義歐幾里德除法，求不完全商數組q
-    s = coefficient_s(q)                #求係數s
-    t = coefficient_t(q)                #求係數t
-
-    return s, t
-
-def extendedEucrideanDivision(a, b, qSet=[0]):
-    q = a / b
-    r = a % b
-    
-    if r == 0:
-        return qSet                                     #(r,0) = r
-    else:
-        qSet.append(q)
-        return extendedEucrideanDivision(b, r, qSet)    #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
-
-def coefficient_s(q_j, s_j1=0, s_j2=1, ctr=0):
-    try:
-        s = -1 * q_j[ctr] * s_j1 + s_j2 #s_j = (-q_j) * s_j-1 + s_j-2
-    except IndexError:
-        return s_j1
-    
-    s_j2 = s_j1
-    s_j1 = s
-    ctr += 1
-    return coefficient_t(q_j, s_j1, s_j2, ctr)
-
-def coefficient_t(q_j, t_j1=1, t_j2=0, ctr=0):
-    try:
-        t = -1 * q_j[ctr] * t_j1 + t_j2 #t_j = (-q_j) * t_j-1 + t_j-2
-    except IndexError:
-        return t_j1
-    
-    t_j2 = t_j1
-    t_j1 = t
-    ctr += 1
-    return coefficient_t(q_j, t_j1, t_j2, ctr)
 
 if __name__ == '__main__':
     #'''
@@ -371,11 +334,17 @@ if __name__ == '__main__':
         cgcCoe.append(b)
         print
     print
+    #'''
     '''
     cgcExp = [20140515, 201405, 2014, 8, 6, 3, 1, 0]
     cgcCoe = [20140515, 201495, 2014, 8, 1, 4, 1, 1]
     modulo = 343
+    
+    cgcExp = [2, 0]
+    cgcCoe = [1, -1219]
+    modulo = 2310
     '''
+    #'''
     while True:
         try:
             modulo = int(raw_input('The modulo is '))
