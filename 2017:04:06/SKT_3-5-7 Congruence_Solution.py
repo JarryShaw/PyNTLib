@@ -11,7 +11,7 @@ def congruenceSolution(cgcExp, cgcCoe, modulo):
     else:
         ratio = cpsMCS(cgcExp, cgcCoe, modulo)  #如為合數模則調用cpsMCS()函數
 
-    return ratio
+    return sorted(ratio)
 
 #平凡除法 | 對100,000內的整數素性判斷
 def trivialDivision(N=2):
@@ -26,7 +26,7 @@ def trivialDivision(N=2):
 #厄拉托塞師篩法 | 返回10,000以內正整數的所有素數（默認情況）
 def eratosthenesSieve(N):
     set = [1]*(N+1)                 #用於存儲N個正整數的表格／狀態；其中，0表示篩去，1表示保留
-    for index in range(2,int(math.sqrt(N))):  #篩法（平凡除法）
+    for index in xrange(2,int(math.sqrt(N))):  #篩法（平凡除法）
         if set[index] == 1:
             ctr = 2
             while index * ctr <= N:
@@ -34,7 +34,7 @@ def eratosthenesSieve(N):
                 ctr += 1
 
     rst = []
-    for ptr in range(2,N):          #獲取結果
+    for ptr in xrange(2,N):          #獲取結果
         if set[ptr] == 1:
             rst.append(ptr)
             ptr += 1
@@ -49,7 +49,7 @@ def prmMCS(cgcExp, cgcCoe, modulo):
     polyCgc = makePolynomial(rtoExp, rtoCoe)                            #將係數與指數數組生成多項式
 
     r = lambda x : eval(polyCgc)                                        #用於計算多項式的取值
-    for x in range(modulo):                                             #逐一驗算，如模為0則加入結果數組
+    for x in xrange(modulo):                                             #逐一驗算，如模為0則加入結果數組
         if r(x) % modulo == 0:
             ratio.append(x)
 
@@ -67,12 +67,12 @@ def congruenceSimplification(cgcExp, cgcCoe, modulo):
 def polynomialEuclideanDivision(dvdExp, dvdCoe, dvsExp, dvsCoe):
     #將被除式係數與次冪添入被除式字典
     ecDictDivident = {}
-    for ptr in range(len(dvdExp)):
+    for ptr in xrange(len(dvdExp)):
         ecDictDivident[dvdExp[ptr]] = dvdCoe[ptr]
 
     #將除式係數與次冪添入除式字典
     ecDictDivisor = {}
-    for ptr in range(len(dvsExp)):
+    for ptr in xrange(len(dvsExp)):
         ecDictDivisor[dvsExp[ptr]] = dvsCoe[ptr]
 
     #print ecDictDivident
@@ -135,7 +135,7 @@ def polyEDLoop(ecDictDivident, ecDictDivisor, ecDictQuotient, ecDictRatio):
 #生成多項式
 def makePolynomial(expList, coeList):
     polynomial = ''
-    for ptr in range(len(expList)):
+    for ptr in xrange(len(expList)):
         polynomial += str(coeList[ptr]) + '*x**' + str(expList[ptr])
         if ptr < len(expList) - 1:
             polynomial += ' + '
@@ -150,15 +150,15 @@ def cpsMCS(cgcExp, cgcCoe, modulo):
         tmpMod = p[0]
         tmpExp = q[0]
         ratio = prmMCSLite(cgcExp, cgcCoe, tmpMod, tmpExp)
-    else:                                                       #若模為多素數的次冪，則逐一對其素因數調用prmMCSLite()函數求解
+    else:                                                       #若模為多素數的次冪，則逐一對其素因數調用prmMCSLite()函數求解，再用中國剩餘定理處理
         tmpRto = []
         tmpMod = []
-        for ptr in range(len(p)):
+        for ptr in xrange(len(p)):
             tmpModVar = p[ptr]
             tmpExpVar = q[ptr]
             tmpMod.append(tmpModVar ** tmpExpVar)
             tmpRto.append(prmMCSLite(cgcExp, cgcCoe, tmpModVar, tmpExpVar))
-        ratio = CHNRemainderTheorem(tmpRto, tmpMod, modulo)                           #用中國剩餘定理處理上述結果，得到最終結果
+        ratio = CHNRemainderTheorem(tmpRto, tmpMod)      #用中國剩餘定理處理上述結果，得到最終結果
 
     return ratio
 
@@ -184,7 +184,7 @@ def euclideanDivision(N, prmList, rst=[]):
 
 def wrap(set, p, q):
     ctr = 1
-    for i in range(1,len(set)):
+    for i in xrange(1,len(set)):
         if set[i] == set[i-1]:  ctr += 1        #重複因數，計數器自增
         else:                                   #互異因數，將前項及其計數器添入因數表與指數表，並重置計數器
             p.append(set[i-1]); q.append(ctr); ctr = 1
@@ -199,10 +199,11 @@ def wrap(set, p, q):
 
 #單素數的次冪模同餘式求解
 def prmMCSLite(cgcExp, cgcCoe, mod, exp):
-    tmpRto = prmMCS(cgcExp, cgcCoe, mod)                #獲取源素數模的同餘式的解
-    print tmpRto
-    ratio = prmMCSPro(cgcExp, cgcCoe, tmpRto, mod, exp)      #作高次同餘式的提升，求出源素數次冪模的同餘式的解
-
+    tmpRto = prmMCS(cgcExp, cgcCoe, mod)                    #獲取源素數模的同餘式的解
+    if exp == 1:
+        return tmpRto
+    
+    ratio = prmMCSPro(cgcExp, cgcCoe, tmpRto, mod, exp)     #作高次同餘式的提升，求出源素數次冪模的同餘式的解
     return ratio
 
 #高次同餘式的提升
@@ -218,7 +219,7 @@ def prmMCSPro(cgcExp, cgcCoe, rto, mod, exp):
         #print '(f\'(x1),p) = ', GCD(drv(tmpRto), mod)
         if GCD(drv(tmpRto), mod) == 1:          #尋找滿足(f'(x1),p)=1的x1
             polyDrvMod = 0
-            for ptr in range(len(drvExp)):      #用模重複平方法計算導式的值f'(x1) (mod p)
+            for ptr in xrange(len(drvExp)):     #用模重複平方法計算導式的值f'(x1) (mod p)
                 polyDrvMod += repetiveSquareModulo(drvCoe[ptr]*tmpRto, drvExp[ptr], mod)
 
             x = tmpRto
@@ -228,10 +229,10 @@ def prmMCSPro(cgcExp, cgcCoe, rto, mod, exp):
             #print polyDrvMod
             break
 
-    for ctr in range(0, exp):
+    for ctr in xrange(0, exp):
         '''
         t = 0
-        for ptr in range(len(cgcExp)):                              #用模重複平方法計算t_(i-1)與x_i
+        for ptr in xrange(len(cgcExp)):                             #用模重複平方法計算t_(i-1)與x_i
             cgcBase = ((-1 * cgcCoe[ptr]) / (mod**ctr)) * polyDrvRcp
             t += repetiveSquareModulo(cgcBase, cgcExp[ptr], mod)    #t_(i-1) ≡ (-f(x_i)/p^i) * (f'(x1) (mod p)) (mod p)
         t %= mod
@@ -249,7 +250,7 @@ def polyDerivative(cgcExp, cgcCoe):
     drvExp = []
     drvCoe = []
 
-    for ptr in range(len(cgcExp)):
+    for ptr in xrange(len(cgcExp)):
         if cgcExp[ptr] != 0:                            #若該項次數不為0，即不為常數項，則需添加至導式中
             drvExp.append(cgcExp[ptr] - 1)              #該項次數減一
             drvCoe.append(cgcCoe[ptr] * cgcExp[ptr])    #該項係數為原係數乘原次數
@@ -281,33 +282,82 @@ def GCD(a=1, b=1):
     if b == 0:  return a                #(r,0) = r
     
     r = a % b
-    return GCD(r, b)        #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
+    return GCD(r, b)                    #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
 #中國剩餘定理
-def CHNRemainderTheorem(rto, mod, modOgn):
-    M = 1
+def CHNRemainderTheorem(rto, mod):
+    modulo = 1
     for tmpMod1 in mod:
-        M *= tmpMod1                                    #M = ∏m_i
+        modulo *= tmpMod1                                   #M(original modulo) = ∏m_i
 
-    MList = []
-    tList = []
+    bList = []
     for tmpMod2 in mod:
-        m = M / tmpMod2                                 #M_i = M / m_i
-        t = int(prmMCS([1,0], [m,-1], tmpMod2)[0])      #t_i * M_i ≡ 1 (mod m_i)
-        
-        MList.append(m) 
-        tList.append(t)
+        M = modulo / tmpMod2                                #M_i = M / m_i
+        t = int(prmMCS([1,0], [M,-1], tmpMod2)[0])          #t_i * M_i ≡ 1 (mod m_i)
+        bList.append(t * M)                                 #b_i = t_i * M_i
+    
+    #print 'b = ', bList
+    #print 'r = ', rto
 
-    print 'm = ', MList
-    print 't = ', tList
-
-    tmpRto = 0
-    print 'r = ', rto
-    for ptr in range(len(rto)):
-        tmpRto += rto[ptr] * tList[ptr] * MList[ptr]    #x = Σ(a_i * t_i * M_i)
-
-    ratio = [(tmpRto % modOgn)]
+    ratio = iterCalc(rto, bList, modulo)                    #x_j = Σ(b_i * r_i) (mod M)                          
     return ratio
+
+#對rto多維數組（層，號）中的數進行全排列並計算結果
+def iterCalc(ognList, coeList, modulo):
+    ptrList = []                            #寄存指向每一數組層的號
+    lvlList = []                            #寄存每一數組層的最大號
+    for tmpList in ognList:
+        ptrList.append(len(tmpList)-1)
+        lvlList.append(len(tmpList)-1)
+ 
+    flag = 1
+    rstList = []
+    #print 'p = ', ptrList
+    while flag:
+        ptrNum = 0
+        rstNum = 0
+        for ptr in ptrList:
+            rstNum += ognList[ptrNum][ptr] * coeList[ptrNum]    #計算結果
+            ptrNum += 1
+
+        #print 'p = ', ptrList
+        rstList.append(rstNum % modulo)
+        (ptrList, flag) = updateState(ptrList, lvlList)         #更新ptrList的寄存值，並返回是否結束循環
+
+    return rstList
+
+'''
+def checkState(objList):
+    tmpString = ''
+    for obj in objList:
+        tmpString += str(obj)
+
+    if int(tmpString) != 0:
+        return 1
+    else:
+        return 0
+'''
+
+#更新ptrList的寄存值，並返回是否已遍歷所有組合
+def updateState(ptrList, lvlList):
+    ptr = 0
+    flag = 1
+    glbFlag = 1
+
+    while flag:                                 #未更新寄存數值前，保持循環（類似同步計數器）
+        if ptrList[ptr] > 0:                    #該層未遍歷，更新該層，終止循環
+            ptrList[ptr] -= 1                   
+            flag = 0
+        else:                                   #該層已遍歷
+            if ptr < len(lvlList) - 1:          #更新指針至下一層並接著循環
+                ptrList[ptr] = lvlList[ptr]
+                ptr += 1
+            else:                               #所有情況均已遍歷，終止循環
+                flag = 0
+                glbFlag = 0
+
+    #print 'p = ', ptrList
+    return ptrList, glbFlag
 
 if __name__ == '__main__':
     #'''
@@ -339,7 +389,13 @@ if __name__ == '__main__':
     cgcExp = [20140515, 201405, 2014, 8, 6, 3, 1, 0]
     cgcCoe = [20140515, 201495, 2014, 8, 1, 4, 1, 1]
     modulo = 343
-    
+    '''
+    '''
+    cgcExp = [2, 0]
+    cgcCoe = [1, -46]
+    modulo = 105
+    '''
+    '''
     cgcExp = [2, 0]
     cgcCoe = [1, -1219]
     modulo = 2310
@@ -359,7 +415,7 @@ if __name__ == '__main__':
     ratio = congruenceSolution(cgcExp, cgcCoe, modulo)
 
     print 
-    for ptr in range(len(cgcExp)):
+    for ptr in xrange(len(cgcExp)):
         print '%dx^%d' %(cgcCoe[ptr], cgcExp[ptr]),
         if ptr < len(cgcExp) - 1:
             print '+',
@@ -367,4 +423,4 @@ if __name__ == '__main__':
     print 'The solution of the above polynomial congruence is\nx ≡',
     for rst in ratio:
         print '%d' %rst,
-    print '(mod %d)' %modulo
+    print '(mod %d)\n' %modulo
