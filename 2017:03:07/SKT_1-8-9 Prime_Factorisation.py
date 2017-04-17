@@ -68,6 +68,7 @@ if __name__ == '__main__':
     
     ctr = 0
     (p,q,pn) = primeFactorisation(N)
+    print
     print N, '=',
     if pn:  print '-',
     for prime in p:
@@ -75,3 +76,4 @@ if __name__ == '__main__':
         if q[ctr] != 1: print '%d^%d' %(prime, q[ctr]),
         else:           print prime,
         ctr += 1
+    print
