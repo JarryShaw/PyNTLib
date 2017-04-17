@@ -14,12 +14,11 @@ class RSAGenerator:
         (self.publicKey, self.privateKey, self.divisorKey, self.blockSize) = self.keyGeneration()
 
         #print self.publicKey, self.privateKey, self.divisorKey, self.blockSize
-        '''
+
         print 'The public key is %d' %self.publicKey
         print 'The private key is %d' %self.privateKey
         print 'The divisor key is %d' %self.divisorKey
         print 'The block size is %d' %self.blockSize
-        '''
 
     #獲取公鑰對(e,n)及分區長度
     def getPublicKey(self):

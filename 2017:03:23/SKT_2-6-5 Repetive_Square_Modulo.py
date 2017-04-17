@@ -46,4 +46,4 @@ if __name__ == '__main__':
 
     r = repetiveSquareModulo(b,e,d)
 
-    print '%d ^ %d ≡ %d (mod %d)' %(b, e, r, d)
+    print '\n%d ^ %d ≡ %d (mod %d)\n' %(b, e, r, d)
