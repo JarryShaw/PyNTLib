@@ -166,4 +166,4 @@ if __name__ == '__main__':
         print '%dx^%d' %(rtoCoe[ptr], rtoExp[ptr]),
         if ptr < len(rtoExp) - 1:
             print '+',
-    print '≡ 0 (mod %d)' %modulo
+    print '≡ 0 (mod %d)\n' %modulo

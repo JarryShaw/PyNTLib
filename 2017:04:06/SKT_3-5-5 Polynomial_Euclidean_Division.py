@@ -161,6 +161,7 @@ if __name__ == '__main__':
     '''
     (qttExp, qttCoe, rtoExp, rtoCoe) = polynomialEuclideanDivision(dvdExp, dvdCoe, dvsExp, dvsCoe)
 
+    print
     for ptr in range(len(dvdExp)):
         print '%dx^%d' %(dvdCoe[ptr], dvdExp[ptr]),
         if ptr < len(dvdExp) - 1:
@@ -180,3 +181,4 @@ if __name__ == '__main__':
         print '%dx^%d' %(rtoCoe[ptr], rtoExp[ptr]),
         if ptr < len(rtoExp) - 1:
             print '+',
+    print
