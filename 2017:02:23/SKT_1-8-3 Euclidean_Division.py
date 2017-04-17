@@ -30,6 +30,6 @@ if __name__ == '__main__':
         break
 
     if euclideanDivision(a,b):
-        print 'The result is b|a.'
+        print '\nThe result is b|a.\n'
     else:
-        print 'The result is b∤a.'
+        print '\nThe result is b∤a.\n'

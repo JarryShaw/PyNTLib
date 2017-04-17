@@ -45,6 +45,6 @@ if __name__ == '__main__':
         break
 
     if trivialDivision(N):
-        print 'N is a prime number.'
+        print '\nN is a prime number.\n'
     else:
-        print 'N is a composit number.'
+        print '\nN is a composit number.\n'
