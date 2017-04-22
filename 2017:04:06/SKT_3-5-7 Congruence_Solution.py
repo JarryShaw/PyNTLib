@@ -11,6 +11,10 @@ def congruenceSolution(cgcExp, cgcCoe, modulo):
     else:
         ratio = cpsMCS(cgcExp, cgcCoe, modulo)  #如為合數模則調用cpsMCS()函數
 
+    if len(ratio) == 0:
+        print "The congruence has no solution."
+        raise ValueError
+
     return sorted(ratio)
 
 #平凡除法 | 對100,000內的整數素性判斷
@@ -412,7 +416,6 @@ if __name__ == '__main__':
             continue
         break
     #'''
-    ratio = congruenceSolution(cgcExp, cgcCoe, modulo)
 
     print 
     for ptr in xrange(len(cgcExp)):
@@ -420,6 +423,9 @@ if __name__ == '__main__':
         if ptr < len(cgcExp) - 1:
             print '+',
     print '≡ 0 (mod %d)' %modulo
+
+    ratio = congruenceSolution(cgcExp, cgcCoe, modulo)
+
     print 'The solution of the above polynomial congruence is\nx ≡',
     for rst in ratio:
         print '%d' %rst,
