@@ -1,4 +1,4 @@
-# HWCodes-for-MFIS
+# HWCodes for MFIS
 
 Homework Codes for Mathematic Fundamentals of Information Security
 
@@ -31,11 +31,15 @@ Homework Codes for Mathematic Fundamentals of Information Security
 * RSA Algorithm | RSA加密算法
   * RSA Generator | RSA密鑰發生器
   * RSA Encryptor | RSA加密過程
-  * RSA Decrypter | RSA解謎過程
+  * RSA Decrypter | RSA解密過程
 
 
 ### 2017/04/06
 
-* SKT_3-5-5  Polynomial Euclidean Division | 多項式歐幾里德除法
-* SKT_3-5-6 Congruence Simplification | 同餘式簡化
-* SKT_3-5-7 Congruence Solution | 同餘式求解
+* SKT_3-5-5   Polynomial Euclidean Division | 多項式歐幾里德除法
+* SKT_3-5-6  Congruence Simplification | 同餘式簡化
+* SKT_3-5-7  Congruence Solution | 同餘式求解
+
+### 2017/04/20
+
+* SKT_4-8-7  Square_Remainder | 解二次同餘式
