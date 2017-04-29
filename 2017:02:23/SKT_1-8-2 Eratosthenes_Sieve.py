@@ -3,6 +3,10 @@
 #厄拉托塞師篩法
 #返回10,000以內正整數的所有素數（默認情況）
 
+'''
+eratosthenesSieve = lambda n: filter(lambda x: all(map(lambda p: x%p!=0, xrange(2,int(__import__('math').sqrt(x))))), xrange(2, n))
+'''
+
 import math
 
 def eratosthenesSieve(N=10000):
