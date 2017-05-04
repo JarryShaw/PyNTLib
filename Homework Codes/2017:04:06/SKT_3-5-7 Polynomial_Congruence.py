@@ -5,7 +5,7 @@
 
 import math
 
-def linearCongruence(cgcExp, cgcCoe, modulo):
+def polynomialCongruence(cgcExp, cgcCoe, modulo):
     if trivialDivision(modulo):                 #判斷模的素性
         ratio = prmMCS(cgcExp, cgcCoe, modulo)  #如為素數模則調用prmMCS()函數
     else:
@@ -396,7 +396,7 @@ if __name__ == '__main__':
             print '+',
     print '≡ 0 (mod %d)' %modulo
 
-    ratio = linearCongruence(cgcExp, cgcCoe, modulo)
+    ratio = polynomialCongruence(cgcExp, cgcCoe, modulo)
 
     print 'The solution of the above polynomial congruence is\nx ≡',
     for rst in ratio:

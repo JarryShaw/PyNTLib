@@ -37,7 +37,7 @@ Homework Codes for Mathematic Fundamentals of Information Security
 
 * SKT_3-5-5   Polynomial Euclidean Division | 多項式歐幾里德除法
 * SKT_3-5-6  Congruence Simplification | 同餘式簡化
-* SKT_3-5-7  Linear Congruence | 同餘式求解
+* SKT_3-5-7  Polynomial Congruence | 一元同餘式求解
 
 ### 2017/04/20
 
