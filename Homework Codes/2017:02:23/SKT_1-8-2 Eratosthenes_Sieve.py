@@ -4,14 +4,14 @@
 #返回10,000以內正整數的所有素數（默認情況）
 
 '''
-eratosthenesSieve = lambda n: filter(lambda x: all(map(lambda p: x%p!=0, xrange(2,int(__import__('math').sqrt(x))))), xrange(2, n))
+print (lambda n: filter(lambda x: all(map(lambda p: x%p!=0, xrange(2,int(__import__('math').sqrt(x)+1)))), xrange(2, n)))(10000)
 '''
 
 import math
 
 def eratosthenesSieve(N=10000):
     set = [1]*(N+1)                 #用於存儲N(默认为10000）個正整數的表格／狀態；其中，0表示篩去，1表示保留
-    for index in range(2,int(math.sqrt(N))):  #篩法（平凡除法）
+    for index in xrange(2,int(math.sqrt(N))):  #篩法（平凡除法）
         if set[index] == 1:
             ctr = 2
             while index * ctr <= N:
@@ -19,7 +19,7 @@ def eratosthenesSieve(N=10000):
                 ctr += 1
 
     rst = []
-    for ptr in range(2,N):          #獲取結果
+    for ptr in xrange(2,N):          #獲取結果
         if set[ptr] == 1:
             rst.append(ptr)
             ptr += 1

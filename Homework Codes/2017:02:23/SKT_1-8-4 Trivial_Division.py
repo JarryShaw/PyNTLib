@@ -7,7 +7,8 @@ import math
 
 def trivialDivision(N=2):
     if N < 0:   N = -1 * N
-    if N == 1 or N == 0:    raise ValueError
+    if N == 1 or N == 0:
+        raise __import__('Exceptions').DifinitionError
     
     set = eratosthenesSieve(N+1)      #得出小於N的所有素數
     if N in set:                    #素性判斷

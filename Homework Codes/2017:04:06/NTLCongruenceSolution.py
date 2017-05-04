@@ -6,7 +6,7 @@
 import math
 
 def congruenceSolution(cgcExp, cgcCoe, modulo):
-    if trivialDivision(modulo):                 #判斷模的素性
+    if __import__('NTLTrivialDivision').trivialDivision(modulo):                 #判斷模的素性
         ratio = prmMCS(cgcExp, cgcCoe, modulo)  #如為素數模則調用prmMCS()函數
     else:
         ratio = cpsMCS(cgcExp, cgcCoe, modulo)  #如為合數模則調用cpsMCS()函數
@@ -21,92 +21,16 @@ def congruenceSolution(cgcExp, cgcCoe, modulo):
 def prmMCS(cgcExp, cgcCoe, modulo):
     ratio = []
 
-    (rtoExp, rtoCoe) = congruenceSimplification(cgcExp, cgcCoe, modulo) #同餘式簡化
+    #同餘式簡化
+    (rtoExp, rtoCoe) = __import__('NTLCongruenceSimplification').congruenceSimplification(cgcExp, cgcCoe, modulo) 
     polyCgc = makePolynomial(rtoExp, rtoCoe)                            #將係數與指數數組生成多項式
 
     r = lambda x : eval(polyCgc)                                        #用於計算多項式的取值
-    for x in xrange(modulo):                                             #逐一驗算，如模為0則加入結果數組
+    for x in xrange(modulo):                                            #逐一驗算，如模為0則加入結果數組
         if r(x) % modulo == 0:
             ratio.append(x)
 
     return ratio
-
-#同餘式簡化 | 素數模的同餘式的簡化
-def congruenceSimplification(cgcExp, cgcCoe, modulo):
-    dvsExp = [modulo, 1]
-    dvsCoe = [1, -1]
-    (qttExp, qttCoe, rtoExp, rtoCoe) = polynomialEuclideanDivision(cgcExp, cgcCoe, dvsExp, dvsCoe)
-
-    return rtoExp, rtoCoe
-
-#多項式歐幾里德除法 | 求解多項式的廣義歐幾里德除法
-def polynomialEuclideanDivision(dvdExp, dvdCoe, dvsExp, dvsCoe):
-    #將被除式係數與次冪添入被除式字典
-    ecDictDivident = {}
-    for ptr in xrange(len(dvdExp)):
-        ecDictDivident[dvdExp[ptr]] = dvdCoe[ptr]
-
-    #將除式係數與次冪添入除式字典
-    ecDictDivisor = {}
-    for ptr in xrange(len(dvsExp)):
-        ecDictDivisor[dvsExp[ptr]] = dvsCoe[ptr]
-
-    #print ecDictDivident
-    #print ecDictDivisor
-
-    #計算商式與餘式的字典結果
-    ecDictQuotient = {}
-    ecDictRatio = {}
-    ecDictQuotient, ecDictRatio = polyEDLoop(ecDictDivident, ecDictDivisor, ecDictQuotient, ecDictRatio)
-
-    #print ecDictQuotient
-    #print ecDictRatio
-
-    #將商式字典轉為係數與次冪數組
-    qttCoe = []
-    qttExp = sorted(ecDictQuotient.keys(), reverse=True)
-    for exp in qttExp:
-        qttCoe.append(ecDictQuotient[exp])
-
-    #將餘式字典轉為係數與次冪數組
-    rtoCoe = []
-    rtoExp = sorted(ecDictRatio.keys(), reverse=True)
-    for rto in rtoExp:
-        rtoCoe.append(ecDictRatio[rto])
-
-    return qttExp, qttCoe, rtoExp, rtoCoe
-
-#歐氏除法的循環求解
-def polyEDLoop(ecDictDivident, ecDictDivisor, ecDictQuotient, ecDictRatio):
-    ecDDvdExpMax = max(ecDictDivident.keys())               #獲取被除式的最高次數
-    #print ecDDvdExpMax
-    ecDDvsExp = sorted(ecDictDivisor.keys(), reverse=True)  #獲取除式的指數列（降序）
-
-    #若除式最高次冪的係數不為1，則終止程式
-    if ecDictDivisor[ecDDvsExp[0]] != 1:
-        print 'The coefficient of the univariate with greatest degree in divisor must be 1.'
-        raise KeyError
-
-    #若被除式最高次冪小於除式最高次冪則終止迭代
-    while ecDDvdExpMax >= ecDDvsExp[0]:
-        ecDQttCoe = ecDictDivident[ecDDvdExpMax]    #計算商式的係數，即當前被除式最高次冪項的係數
-        ecDQttExp = ecDDvdExpMax - ecDDvsExp[0]     #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-        ecDictQuotient[ecDQttExp] = ecDQttCoe       #將結果添入商式字典
-        
-        #更新被除式係數及次冪狀態
-        for exp in ecDDvsExp:
-            if ecDictDivident.has_key(exp+ecDQttExp):
-                ecDictDivident[exp+ecDQttExp] -= ecDictDivisor[exp] * ecDQttCoe
-                if ecDictDivident[exp+ecDQttExp] == 0:
-                    ecDictDivident.pop(exp+ecDQttExp)
-            else:
-                ecDictDivident[exp+ecDQttExp] = -1 * ecDictDivisor[exp] * ecDQttCoe
-                
-        #更新被除式的最高次數
-        ecDDvdExpMax = max(ecDictDivident.keys())               
-
-    ecDictRatio = ecDictDivident.copy()     #此時，餘式即為被除式所剩餘項
-    return ecDictQuotient, ecDictRatio
 
 #生成多項式
 def makePolynomial(expList, coeList):
@@ -120,7 +44,9 @@ def makePolynomial(expList, coeList):
 
 #合數模的同餘式求解
 def cpsMCS(cgcExp, cgcCoe, modulo):
-    (p, q, pn) = primeFactorisation(modulo)                     #分解模，以便判斷求解方式
+    #分解模，以便判斷求解方式
+    fac = __import__('NTLPrimeFactorisation').primeFactorisation(modulo)
+    (p, q) = wrap(fac)                     
 
     if len(p) == 1:                                             #若模為單素數的次冪，則調用prmMCSLite()函數求解
         tmpMod = p[0]
@@ -137,26 +63,6 @@ def cpsMCS(cgcExp, cgcCoe, modulo):
         ratio = CHNRemainderTheorem(tmpRto, tmpMod)      #用中國剩餘定理處理上述結果，得到最終結果
 
     return ratio
-
-#素因數分解 | 返回一給定整數的標準（素因數）分解式
-def primeFactorisation(N, pn=0, p=[], q=[]):
-    if N < 0:   pn = 1; N = -1 * N                              #將負數轉化為正整數進行計算
-    if N == 0: p.append(0); q.append(1); return p, q, pn        #N為0時的分解
-    if N == 1: p.append(1); q.append(1); return p, q, pn        #N為1時的分解
-    
-    prmList = eratosthenesSieve(N+1)        #獲取素數表
-    tmp = euclideanDivision(N, prmList)     #獲取分解因數表
-    (p,q) = wrap(tmp, p, q)                 #生成因數表p與指數表q
-    
-    return p, q, pn
-
-#歐幾里得除法 | 判斷是否整除，即b|a
-def euclideanDivision(N, prmList, rst=[]):
-    if N == 1:  return rst  #除盡後返回因素序列
-    
-    for prm in prmList:     #逐個（遞歸）嘗試歐幾里得除法，尋找因數
-        if N % prm == 0:    rst.append(prm); N = N / prm;    break
-    return euclideanDivision(N, prmList, rst)
 
 def wrap(set, p, q):
     ctr = 1

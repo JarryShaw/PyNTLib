@@ -11,7 +11,7 @@ def primeFactorisation(N, pn=0, p=[], q=[]):
     if N == 1: p.append(1); q.append(1); return p, q, pn        #N為1時的分解
     
     prmList = eratosthenesSieve(N+1)        #獲取素數表
-    tmp = euclideanDivision(N, prmList)     #獲取分解因數表
+    tmp = euclideanDivisionLoop(N, prmList)     #獲取分解因數表
     (p,q) = wrap(tmp, p, q)                 #生成因數表p與指數表q
     
     return p, q, pn
@@ -34,13 +34,13 @@ def eratosthenesSieve(N):
 
     return rst
 
-#歐幾里得除法 | 判斷是否整除，即b|a
-def euclideanDivision(N, prmList, rst=[]):
+#循環歐幾里得除法
+def euclideanDivisionLoop(N, prmList, rst=[]):
     if N == 1:  return rst  #除盡後返回因素序列
     
     for prm in prmList:     #逐個（遞歸）嘗試歐幾里得除法，尋找因數
-        if N % prm == 0:    rst.append(prm); N = N / prm;    break
-    return euclideanDivision(N, prmList, rst)
+        if N % prm == 0:    rst.append(prm);    N /= prm;    break
+    return euclideanDivisionLoop(N, prmList, rst)
 
 def wrap(set, p, q):
     ctr = 1
