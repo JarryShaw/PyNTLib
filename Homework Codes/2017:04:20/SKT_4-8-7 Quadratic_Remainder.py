@@ -5,7 +5,7 @@
 
 import math
 
-def quadraticRemainder(p):
+def quadraticEquation(p):
     if p == 2 or trivialDivision(p) == 0:           #p為奇素數
         print "The number p must be prime."
         raise ValueError
@@ -419,6 +419,6 @@ if __name__ == '__main__':
     print
     print 'x^2 + y^2 = %d' %p
 
-    (x,y) = quadraticRemainder(p)
+    (x,y) = quadraticEquation(p)
 
     print 'The solution of the above equation is x=±%d, y=±%d' %(x, y)

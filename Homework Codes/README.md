@@ -4,7 +4,6 @@ Homework Codes for Mathematic Fundamentals of Information Security
 
 信息安全的數學基礎課程 作業代碼
 
-
 ### 2017/02/23
 
 * SKT_1-8-2   Eratosthenes Sieve | 厄拉托塞師篩法
@@ -21,9 +20,9 @@ Homework Codes for Mathematic Fundamentals of Information Security
 
 ### 2017/03/07
 
-* SKT_1-8-8   Decomposition | 整數分解
+* SKT_1-8-8   Quadratic Factorisation | 整數分解
 * SKT_1-8-9   Prime Factorisation | 素因數分解
-* SKT_1-8-10  Indefinite Equation | 二元一次不定方程
+* SKT_1-8-10  Binary Equation | 二元一次不定方程
 
 ### 2017/03/23
 
@@ -38,8 +37,8 @@ Homework Codes for Mathematic Fundamentals of Information Security
 
 * SKT_3-5-5   Polynomial Euclidean Division | 多項式歐幾里德除法
 * SKT_3-5-6  Congruence Simplification | 同餘式簡化
-* SKT_3-5-7  Congruence Solution | 同餘式求解
+* SKT_3-5-7  Linear Congruence | 同餘式求解
 
 ### 2017/04/20
 
-* SKT_4-8-7  Square_Remainder | 解二次同餘式
+* SKT_4-8-7  Quadratic Equation | 解二元二次不定方程
