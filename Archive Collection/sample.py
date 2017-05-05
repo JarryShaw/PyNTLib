@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import jsntlib
+from jsntlib import NTLHeader as jsntlib
 
 #Print all primes numbers less than 100
 print 'Call primelist.'
@@ -135,7 +135,7 @@ print '≡ 0 (mod %d)' %modulo
 print
 
 #Return the solutions of congruence equation x^2 ≡ 46 (mod 105).
-print 'Call linear'
+print 'Call polymod'
 cgcExp = [2, 0]
 cgcCoe = [1, -46]
 modulo = 105
@@ -146,7 +146,7 @@ for ptr in xrange(len(cgcExp)):
         print '+',
 print '≡ 0 (mod %d)' %modulo
 
-ratio = jsntlib.linear(cgcExp, cgcCoe, modulo)
+ratio = jsntlib.polymod(cgcExp, cgcCoe, modulo)
 
 print 'The solution of the above polynomial congruence is\n\tx ≡',
 for rst in ratio:
@@ -158,5 +158,26 @@ print
 #Return the solutions of quadratic equation x^2 + y^2 = 2017.
 print 'Call quadratic.'
 print 'The solution of the equation x^2 + y^2 = 2017 is\n\tx=±%d, y=±%d' %jsntlib.quadratic(2017)
+
+print
+
+#Return the index of 2 for modulo 9.
+print 'Call index.'
+print 'The index of 2 mod 9 is\n\tmod_9(2) = %d' %jsntlib.index(9, 2)
+
+print
+
+#Return the index of 5 for modulo 17.
+print 'Call indexPrime.'
+print 'The index of 5 mod 17 is\n\tmod_17(5) = %d' %jsntlib.indexPrime(17, 5)
+
+print 
+
+#Return the primitive root(s) of odd prime modulo 7.
+print 'Call root.'
+print 'The primtive root(s) of modulo 7 is/are',
+for root in jsntlib.root(7):
+    print root,
+print '.'
 
 print

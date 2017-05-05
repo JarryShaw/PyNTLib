@@ -7,7 +7,7 @@ A Number Theory Library Adapted from Mathematic Fundamentals of Information Secu
 
 
 
-## Archive Collection 數論庫
+### Archive Collection 數論庫
 
 * The jsntlib is collected within this folder.
 
@@ -16,8 +16,7 @@ A Number Theory Library Adapted from Mathematic Fundamentals of Information Secu
 * If there're any problems or bugs, do please leave a mesage.
 
 
-
-## Homework Codes 作業代碼
+### Homework Codes 作業代碼
 
 * This folder mainly holds the homework codes.
 
