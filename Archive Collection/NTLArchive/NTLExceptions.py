@@ -31,6 +31,13 @@ class PCError:
         print
         raise ValueError(message)
 
+#布爾參數異常
+#The argument(s) must be bool type.
+class BoolError:
+    def __init__(self, message):
+        print 
+        raise ValueError(message)
+
 #參數定義異常
 #The argument must match a specific patern.
 class DefinitionError:
@@ -51,3 +58,10 @@ class ExponentError:
     def __init__(self, message):
         print
         raise KeyError(message)
+
+#關鍵詞參數異常
+#Unknow attribute(s).
+class KeywordError:
+    def __init__(self, message):
+        print
+        raise AttributeError(message)

@@ -11,12 +11,10 @@ def binaryEquation(a=1, b=1, c=1):
     if not isinstance(a, int) or not isinstance(b, int) or not isinstance(c, int):
         raise NTLExceptions.IntError('The arguments must be integral.')
 
-    if a < 0:   apn = -1;   a *= -1
-    else:       apn = 1
-    if b < 0:   bpn = -1;   b *= -1
-    else:       bpn = 1
-    if c < 0:   cpn = -1;   c *= -1
-    else:       cpn = 1
+    pn_a = pn_b = pn_c = 1
+    if a < 0:   pn_a = -1;   a *= -1
+    if b < 0:   pn_b = -1;   b *= -1
+    if c < 0:   pn_c = -1;   c *= -1
 
     gcd = NTLGreatestCommonDivisor.greatestCommonDivisor(a, b)
     if (c % gcd != 0):   
@@ -25,7 +23,7 @@ def binaryEquation(a=1, b=1, c=1):
         mtp = c / gcd
 
     (s,t) = NTLBezoutEquation.bezoutEquation(a, b)
-    x0 = s * mtp * apn * cpn;   y0 = t * mtp * bpn * cpn
+    x0 = s * mtp * pn_a * pn_c;   y0 = t * mtp * pn_b * pn_c
 
     return x0, y0
 

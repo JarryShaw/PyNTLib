@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from jsntlib import NTLHeader as jsntlib
+import jsntlib
+
+print
 
 #Print all primes numbers less than 100
 print 'Call primelist.'

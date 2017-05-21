@@ -17,13 +17,13 @@ def trivialDivision(N=2):
         raise NTLExceptions.DefinitionError('The argument must be a natural number greater than 1.')
     
     #得出小於等於N的所有素數
-    table = NTLEratosthenesSieve.eratosthenesSieve(N + 1)    
+    table = NTLEratosthenesSieve.eratosthenesSieve(N)    
 
     #素性判斷，1為素數，0為合數
     return 1 if (N in table) else 0
 
 if __name__ == '__main__':
-    if trivialDivision(100):
+    if trivialDivision(101):
         print 'N is a prime number.'
     else:
         print 'N is a composit number.'

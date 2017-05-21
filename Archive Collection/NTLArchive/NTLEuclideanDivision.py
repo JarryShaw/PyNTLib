@@ -15,7 +15,7 @@ def euclideanDivision(a=1, b=1):
     return not (a % b) or 0     #求餘數，判斷整除，1為整除，0為不整除
 
 if __name__ == '__main__':
-    if euclideanDivision():
+    if euclideanDivision(13, 24):
         print 'The result is b|a.\n'
     else:
         print 'The result is b∤a.\n'
