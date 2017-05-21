@@ -1,34 +1,17 @@
 #-*- coding: utf-8 -*-
 
-#奇素數模原根求取
-#計算奇素數m的原根
+#奇素數模指數求取
+#計算整數a模奇素數m的指數
 
 import math
 
-def primitiveRoot(m):
-    phi_m = m - 1
-    primtiveRoot = []
-
-    for a in xrange(1, m):
-        if coprimalityTest(a, m):
-            for e in xrange(1, m):
-                if a**e % m == 1:
-                    if e == phi_m:
-                        primtiveRoot.append(a)
-                    break
-
-    return primtiveRoot
-
-'''
-#Euler函數
-def eulerFunction(m):
-    phi_m = 0
-
-    for num in xrange(1, m+1):
-        if (coprimalityTest(num, m)):  phi_m += 1
-
-    return phi_m
-'''
+def primeOrdinary(m, a):
+    if coprimalityTest(a, m):
+        for e in xrange(1, m):
+            if a**e % m == 1:
+                return e
+    else:
+        raise ValueError('The arguments must be coprime.')
 
 #互素判斷 | 判斷整數a與正整數m是否互素
 def coprimalityTest(a=1, m=1):
@@ -88,9 +71,17 @@ if __name__ == '__main__':
             continue
         break
 
-    a = primitiveRoot(m)
-    print 'The primtive root(s) of modulo %d is/are' %m,
-    for root in a:
-        print root,
-    print '.'
+    while True:
+        try:
+            a = int(raw_input('The number is a = '))
+            if a < 0:
+                print 'a must be positive.'
+                continue
+        except ValueError:
+            print 'Invalid input.'
+            continue
+        break
+
+    e = primeOrdinary(m, a)
+    print 'The ordinary of %d mod %d is\n\tmod_%d(%d) = %d' %e
 

@@ -49,6 +49,18 @@ Homework Codes for Mathematic Fundamentals of Information Security
 
 ### 2017/05/04
 
-* SKT_5-4-1  Primitive_Index | 求任意模指數
-* SKT_5-4-3  Prime_Index | 求模奇素數指數
-* SKT_5-4-5  Primitive_Root | 求模奇素數原根
+* SKT_5-4-1  Ordinary | 求任意模指數
+* SKT_5-4-3  Prime Ordinary | 求模奇素數指數
+* SKT_5-4-5  Prime Primitive Root | 求模奇素數原根
+
+
+### 2017/05/09
+
+* SKT_5-4-6  Exponent Primitive Root | 求奇素數指數模原根
+* SKT_5-4-8  Index Modulo | 求奇素數指標表用於取模運算
+
+### 2017/05/18
+
+* SKT_6-4-3  Fermat Test | 求Fermat偽素數
+* SKT_6-4-4  Solovay-Stassen Test | 求Euler偽素數
+* SKT_6-4-5  Miller-Rabin Test | 求強偽素數

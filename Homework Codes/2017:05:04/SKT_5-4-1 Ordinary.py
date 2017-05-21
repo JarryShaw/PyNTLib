@@ -3,7 +3,7 @@
 #指數求取
 #計算整數a模m的指數
 
-def primitiveIndex(m, a):
+def ordinary(m, a):
     if coprimalityTest(a, m):
         for e in xrange(1, m):
             if a**e % m == 1:
@@ -51,6 +51,6 @@ if __name__ == '__main__':
             continue
         break
 
-    e = primitiveIndex(m, a)
-    print 'The index of %d mod %d is\n\tmod_%d(%d) = %d' %(a, m, m, a, e)
+    e = ordinary(m, a)
+    print 'The ordinary of %d mod %d is\n\tmod_%d(%d) = %d' %(a, m, m, a, e)
 
