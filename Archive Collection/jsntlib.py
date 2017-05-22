@@ -94,3 +94,8 @@ def indexPrime(p, a):
 def root(p):
     from NTLArchive import NTLPrimitiveRoot
     return NTLPrimitiveRoot.primitiveRoot(p)
+
+#Inheit Polynomial class.
+from NTLArchive import NTLPolynomial
+class Polynomial(NTLPolynomial.Polynomial):
+    pass

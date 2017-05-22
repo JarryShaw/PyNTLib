@@ -4,6 +4,16 @@ import jsntlib
 
 print
 
+print 'Create Polynomial.'
+poly_1 = jsntlib.Polynomial((1,-2),(3,4),(2,3),(34,1))
+poly_2 = jsntlib.Polynomial((1,0),(34,-4),(2,3))
+print poly_1
+print poly_2
+poly_3 = poly_1 + poly_2
+print poly_3
+
+print
+
 #Print all primes numbers less than 100
 print 'Call primelist.'
 print jsntlib.primelist(100)
