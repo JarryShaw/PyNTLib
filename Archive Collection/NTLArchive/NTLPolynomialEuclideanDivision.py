@@ -58,9 +58,9 @@ def polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRatio):
     ecDDvdExpMax = max(ecDictDividend.keys())               #獲取被除式的最高次數
     ecDDvsExp = sorted(ecDictDivisor.keys(), reverse=True)  #獲取除式的指數列（降序）
 
-    #若除式最高次冪的係數不為1，則需化簡
+    #若除式最高次冪的係數不為1，則中止程式
     if ecDictDivisor[ecDDvsExp[0]] != 1:
-        # raise NTLExceptions.ExponentError('The coefficient of the univariate with greatest degree in divisor must be 1.')
+        raise NTLExceptions.ExponentError('The coefficient of the univariate with greatest degree in divisor must be 1.')
 
         '''
         ecDDvdCoe = ecDictDividend.values()
@@ -78,16 +78,16 @@ def polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRatio):
         if GCD == 1 or ecDictDivisor[ecDDvsExp[0]] != GCD:
             return {}, ecDictDividend
         '''
-
+        '''
         coe = ecDictDivisor[ecDDvsExp[0]]
         ecDDvdCopy = __import__('copy').deepcopy(ecDictDividend)
 
         #判斷除式是否可化簡
-        for key in ecDictDivisor.keys():
-            if ecDictDivisor[key] % coe != 0:
+        for exp in ecDDvsExp:
+            if ecDictDivisor[exp] % coe != 0:
                 return {}, ecDictDividend
             else:
-                ecDictDivisor[key] /= coe
+                ecDictDivisor[exp] /= coe
 
         #判斷被除式是否可化簡
         for key in ecDictDividend.keys():
@@ -97,6 +97,8 @@ def polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRatio):
                 ecDDvdCopy[key] = ecDictDividend[key] / coe
 
         ecDictDividend = __import__('copy').deepcopy(ecDDvdCopy)
+
+        '''
 
     #若被除式最高次冪小於除式最高次冪則終止迭代
     while ecDDvdExpMax >= ecDDvsExp[0]:
@@ -126,6 +128,9 @@ if __name__ == '__main__':
     #'''
     dvdExp = [20140515, 201405, 2014, 8, 6, 3, 1, 0]
     dvdCoe = [20140515, 201495, 2014, 8, 1, 4, 1, 1]
+    # (1,-2), (3,4), (2,3), (34,1)
+    # dvdExp = [1, 3, 2, 34]
+    # dvdCoe = [-2, 4, 3, 1]
     dvsExp = [7,  1]
     dvsCoe = [1, -1]
     #'''

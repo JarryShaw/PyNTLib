@@ -4,7 +4,6 @@
 #具備加減乘除運算的多項式實現
 
 import NTLExceptions
-import NTLPolynomialEuclideanDivision
 
 class Polynomial:
     def __init__(self, *args):
@@ -14,7 +13,8 @@ class Polynomial:
             if not isinstance(tpl, tuple) or len(tpl) != 2:
                 raise NTLExceptions.TupleError('The arguments must be tuples of exponents and coefficients.')
 
-            if not isinstance(tpl[0], int) or not isinstance(tpl[1], int):
+            if (not isinstance(tpl[0], int) and not isinstance(tpl[0], long))\
+            or (not isinstance(tpl[1], int) and not isinstance(tpl[1], long)):
                 raise NTLExceptions.IntError('The exponent and coefficient must be integral.')
 
             if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be possitive.')
@@ -34,7 +34,8 @@ class Polynomial:
             if not isinstance(tpl, tuple) or len(tpl) != 2:
                 raise NTLExceptions.TupleError('The arguments must be tuples of exponents and coefficients.')
 
-            if not isinstance(tpl[0], int) or not isinstance(tpl[1], int):
+            if (not isinstance(tpl[0], int) and not isinstance(tpl[0], long))\
+            or (not isinstance(tpl[1], int) and not isinstance(tpl[1], long)):
                 raise NTLExceptions.IntError('The exponent and coefficients must be integral.')
 
             if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be possitive.')
@@ -469,8 +470,53 @@ class Polynomial:
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
         quo_ = Polynomial()
-        quo_.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(self.ecDict, poly.ecDict, {}, {})[0]
+        rat_ = __import__('copy').deepcopy(self)
+        did_ = __import__('copy').deepcopy(poly)
+
+        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if poly.ecDict[b_exp[0]] != 1:
+            coe_ = poly.ecDict[b_exp[0]]
+
+            if self.ecDict[a_expmax] % coe_ == 0:
+                mul_ = self.ecDict[a_expmax] / coe_
+                if self == poly * mul_:
+                    quo_ = Polynomial((0, mul_))
+                    return quo_
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if poly.ecDict[exp] % coe_ != 0:
+                    return quo_
+                else:
+                    did_.ecDict[exp] /= coe_
+
+            #判斷被除式是否可化簡
+            for key in self.ecDict.keys():
+                if self.ecDict[key] % coe_ != 0:
+                    return quo_
+                else:
+                    rat_.ecDict[key] /= coe_
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            quo_((quo_exp, quo_coe))            #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * did_.ecDict[exp] * quo_coe
+                rat_((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rat_.ecDict.keys())
+            except ValueError:
+                return quo_
 
         return quo_
 
@@ -484,8 +530,53 @@ class Polynomial:
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
 
         rquo = Polynomial()
-        rquo.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(poly.ecDict, self.ecDict, {}, {})[0]
+        rrat = __import__('copy').deepcopy(poly)
+        rdid = __import__('copy').deepcopy(self)
+
+        a_expmax = max(poly.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if self.ecDict[b_exp[0]] != 1:
+            rcoe = self.ecDict[b_exp[0]]
+
+            if poly.ecDict[a_expmax] % rcoe == 0:
+                rmul = poly.ecDict[a_expmax] / rcoe
+                if poly == self * rmul:
+                    rquo = Polynomial((0, rmul))
+                    return rquo
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if self.ecDict[exp] % rcoe != 0:
+                    return rquo
+                else:
+                    rdid.ecDict[exp] /= rcoe
+
+            #判斷被除式是否可化簡
+            for key in poly.ecDict.keys():
+                if poly.ecDict[key] % rcoe != 0:
+                    return rquo
+                else:
+                    rrat.ecDict[key] /= rcoe
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rrat.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            rquo((quo_exp, quo_coe))            #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * rdid.ecDict[exp] * quo_coe
+                rrat((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rrat.ecDict.keys())
+            except ValueError:
+                return rquo
 
         return rquo
 
@@ -499,8 +590,53 @@ class Polynomial:
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
         quo_ = Polynomial()
-        quo_.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(self.ecDict, poly.ecDict, {}, {})[0]
+        rat_ = __import__('copy').deepcopy(self)
+        did_ = __import__('copy').deepcopy(poly)
+
+        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if poly.ecDict[b_exp[0]] != 1:
+            coe_ = poly.ecDict[b_exp[0]]
+
+            if self.ecDict[a_expmax] % coe_ == 0:
+                mul_ = self.ecDict[a_expmax] / coe_
+                if self == poly * mul_:
+                    quo_ = Polynomial((0, mul_))
+                    return quo_
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if poly.ecDict[exp] % coe_ != 0:
+                    return quo_
+                else:
+                    did_.ecDict[exp] /= coe_
+
+            #判斷被除式是否可化簡
+            for key in self.ecDict.keys():
+                if self.ecDict[key] % coe_ != 0:
+                    return quo_
+                else:
+                    rat_.ecDict[key] /= coe_
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            quo_((quo_exp, quo_coe))            #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * did_.ecDict[exp] * quo_coe
+                rat_((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rat_.ecDict.keys())
+            except ValueError:
+                return quo_
 
         return quo_
 
@@ -514,8 +650,53 @@ class Polynomial:
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
         quo_ = Polynomial()
-        quo_.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(self.ecDict, poly.ecDict, {}, {})[0]
+        rat_ = __import__('copy').deepcopy(self)
+        did_ = __import__('copy').deepcopy(poly)
+
+        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if poly.ecDict[b_exp[0]] != 1:
+            coe_ = poly.ecDict[b_exp[0]]
+
+            if self.ecDict[a_expmax] % coe_ == 0:
+                mul_ = self.ecDict[a_expmax] / coe_
+                if self == poly * mul_:
+                    quo_ = Polynomial((0, mul_))
+                    return quo_
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if poly.ecDict[exp] % coe_ != 0:
+                    return quo_
+                else:
+                    did_.ecDict[exp] /= coe_
+
+            #判斷被除式是否可化簡
+            for key in self.ecDict.keys():
+                if self.ecDict[key] % coe_ != 0:
+                    return quo_
+                else:
+                    rat_.ecDict[key] /= coe_
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            quo_((quo_exp, quo_coe))            #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * did_.ecDict[exp] * quo_coe
+                rat_((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rat_.ecDict.keys())
+            except ValueError:
+                return quo_
 
         return quo_
 
@@ -529,8 +710,53 @@ class Polynomial:
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
 
         rquo = Polynomial()
-        rquo.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(poly.ecDict, self.ecDict, {}, {})[0]
+        rrat = __import__('copy').deepcopy(poly)
+        rdid = __import__('copy').deepcopy(self)
+
+        a_expmax = max(poly.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if self.ecDict[b_exp[0]] != 1:
+            rcoe = self.ecDict[b_exp[0]]
+
+            if poly.ecDict[a_expmax] % rcoe == 0:
+                rmul = poly.ecDict[a_expmax] / rcoe
+                if poly == self * rmul:
+                    rquo = Polynomial((0, rmul))
+                    return rquo
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if self.ecDict[exp] % rcoe != 0:
+                    return rquo
+                else:
+                    rdid.ecDict[exp] /= rcoe
+
+            #判斷被除式是否可化簡
+            for key in poly.ecDict.keys():
+                if poly.ecDict[key] % rcoe != 0:
+                    return rquo
+                else:
+                    rrat.ecDict[key] /= rcoe
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rrat.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            rquo((quo_exp, quo_coe))            #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * rdid.ecDict[exp] * quo_coe
+                rrat((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rrat.ecDict.keys())
+            except ValueError:
+                return rquo
 
         return rquo
 
@@ -543,9 +769,61 @@ class Polynomial:
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
+        if isinstance(poly, int):   poly = Polynomial((0, poly))
+
+        if isinstance(poly, str):   poly = make_poly(poly)
+
+        if not isinstance(poly, Polynomial):
+            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
+
         quo_ = Polynomial()
-        quo_.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(self.ecDict, poly.ecDict, {}, {})[0]
+        rat_ = __import__('copy').deepcopy(self)
+        did_ = __import__('copy').deepcopy(poly)
+
+        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if poly.ecDict[b_exp[0]] != 1:
+            coe_ = poly.ecDict[b_exp[0]]
+
+            if self.ecDict[a_expmax] % coe_ == 0:
+                mul_ = self.ecDict[a_expmax] / coe_
+                if self == poly * mul_:
+                    quo_ = Polynomial((0, mul_))
+                    return quo_
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if poly.ecDict[exp] % coe_ != 0:
+                    return quo_
+                else:
+                    did_.ecDict[exp] /= coe_
+
+            #判斷被除式是否可化簡
+            for key in self.ecDict.keys():
+                if self.ecDict[key] % coe_ != 0:
+                    return quo_
+                else:
+                    rat_.ecDict[key] /= coe_
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            quo_((quo_exp, quo_coe))            #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * did_.ecDict[exp] * quo_coe
+                rat_((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rat_.ecDict.keys())
+            except ValueError:
+                return quo_
 
         return quo_
 
@@ -558,9 +836,55 @@ class Polynomial:
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
-        rat_ = Polynomial()
-        rat_.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(self.ecDict, poly.ecDict, {}, {})[1]
+        # quo_ = Polynomial()
+        rat_ = __import__('copy').deepcopy(self)
+        did_ = __import__('copy').deepcopy(poly)
+
+        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if poly.ecDict[b_exp[0]] != 1:
+            coe_ = poly.ecDict[b_exp[0]]
+
+            if self.ecDict[a_expmax] % coe_ == 0:
+                mul_ = self.ecDict[a_expmax] / coe_
+                if self == poly * mul_:
+                    rat_ = Polynomial()
+                    return rat_
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if poly.ecDict[exp] % coe_ != 0:
+                    return rat_
+                else:
+                    did_.ecDict[exp] /= coe_
+
+            #判斷被除式是否可化簡
+            for key in self.ecDict.keys():
+                if self.ecDict[key] % coe_ != 0:
+                    return rat_
+                else:
+                    rat_.ecDict[key] /= coe_
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * did_.ecDict[exp] * quo_coe
+                rat_((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rat_.ecDict.keys())
+            except ValueError:
+                # rat_ = Polynomial()
+                return rat_
 
         return rat_
 
@@ -573,9 +897,55 @@ class Polynomial:
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
 
-        rrat = Polynomial()
-        rrat.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(poly.ecDict, self.ecDict, {}, {})[1]
+        # rquo = Polynomial()
+        rrat = __import__('copy').deepcopy(poly)
+        rdid = __import__('copy').deepcopy(self)
+
+        a_expmax = max(poly.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if self.ecDict[b_exp[0]] != 1:
+            rcoe = self.ecDict[b_exp[0]]
+
+            if poly.ecDict[a_expmax] % rcoe == 0:
+                rmul = poly.ecDict[a_expmax] / rcoe
+                if poly == poly * rmul:
+                    rrat = Polynomial()
+                    return rrat
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if self.ecDict[exp] % rcoe != 0:
+                    return rrat
+                else:
+                    rdid.ecDict[exp] /= rcoe
+
+            #判斷被除式是否可化簡
+            for key in poly.ecDict.keys():
+                if poly.ecDict[key] % rcoe != 0:
+                    return rrat
+                else:
+                    rrat.ecDict[key] /= rcoe
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * rdid.ecDict[exp] * quo_coe
+                rrat((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rrat.ecDict.keys())
+            except ValueError:
+                # rrat = Polynomial()
+                return rrat
 
         return rrat
 
@@ -588,9 +958,55 @@ class Polynomial:
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
-        rat_ = Polynomial()
-        rat_.ecDict = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(self.ecDict, poly.ecDict, {}, {})[1]
+        # quo_ = Polynomial()
+        rat_ = __import__('copy').deepcopy(self)
+        did_ = __import__('copy').deepcopy(poly)
+
+        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if poly.ecDict[b_exp[0]] != 1:
+            coe_ = poly.ecDict[b_exp[0]]
+
+            if self.ecDict[a_expmax] % coe_ == 0:
+                mul_ = self.ecDict[a_expmax] / coe_
+                if self == poly * mul_:
+                    rat_ = Polynomial()
+                    return rat_
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if poly.ecDict[exp] % coe_ != 0:
+                    return rat_
+                else:
+                    did_.ecDict[exp] /= coe_
+
+            #判斷被除式是否可化簡
+            for key in self.ecDict.keys():
+                if self.ecDict[key] % coe_ != 0:
+                    return rat_
+                else:
+                    rat_.ecDict[key] /= coe_
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * did_.ecDict[exp] * quo_coe
+                rat_((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rat_.ecDict.keys())
+            except ValueError:
+                # rat_ = Polynomial()
+                return rat_
 
         return rat_
 
@@ -604,9 +1020,55 @@ class Polynomial:
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
         quo_ = Polynomial()
-        rat_ = Polynomial()
-        (quo_.ecDict, rat_.ecDict) = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(self.ecDict, poly.ecDict, {}, {})
+        rat_ = __import__('copy').deepcopy(self)
+        did_ = __import__('copy').deepcopy(poly)
+
+        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if poly.ecDict[b_exp[0]] != 1:
+            coe_ = poly.ecDict[b_exp[0]]
+
+            if self.ecDict[a_expmax] % coe_ == 0:
+                mul_ = self.ecDict[a_expmax] / coe_
+                if self == poly * mul_:
+                    quo_ = Polynomial((0, mul_))
+                    rat_ = Polynomial()
+                    return quo_, rat_
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if poly.ecDict[exp] % coe_ != 0:
+                    return quo_, rat_
+                else:
+                    did_.ecDict[exp] /= coe_
+
+            #判斷被除式是否可化簡
+            for key in self.ecDict.keys():
+                if self.ecDict[key] % coe_ != 0:
+                    return quo_, rat_
+                else:
+                    rat_.ecDict[key] /= coe_
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            quo_((quo_exp, quo_coe))            #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * did_.ecDict[exp] * quo_coe
+                rat_((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rat_.ecDict.keys())
+            except ValueError:
+                # rat_ = Polynomial()
+                return quo_, rat_
 
         return quo_, rat_
 
@@ -620,9 +1082,55 @@ class Polynomial:
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
 
         rquo = Polynomial()
-        rrat = Polynomial()
-        (rquo.ecDict, rrat.ecDict) = \
-            NTLPolynomialEuclideanDivision.polyEDLoop(poly.ecDict, self.ecDict, {}, {})
+        rrat = __import__('copy').deepcopy(poly)
+        rdid = __import__('copy').deepcopy(self)
+
+        a_expmax = max(poly.ecDict.keys())                  #獲取被除式的最高次數
+        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+
+        #若除式最高次冪的係數不為1，則需化簡
+        if self.ecDict[b_exp[0]] != 1:
+            rcoe = self.ecDict[b_exp[0]]
+
+            if poly.ecDict[a_expmax] % rcoe == 0:
+                rmul = poly.ecDict[a_expmax] / rcoe
+                if poly == poly * rmul:
+                    rquo = Polynomial((0, rmul))
+                    rrat = Polynomial()
+                    return rquo, rrat
+
+            #判斷除式是否可化簡
+            for exp in b_exp:
+                if self.ecDict[exp] % rcoe != 0:
+                    return rquo, rrat
+                else:
+                    rdid.ecDict[exp] /= rcoe
+
+            #判斷被除式是否可化簡
+            for key in poly.ecDict.keys():
+                if poly.ecDict[key] % rcoe != 0:
+                    return rquo, rrat
+                else:
+                    rrat.ecDict[key] /= rcoe
+
+        #若被除式最高次冪小於除式最高次冪則終止迭代
+        while a_expmax >= b_exp[0]:
+            quo_coe = rat_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
+            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
+
+            #更新被除式係數及次冪狀態
+            for exp in b_exp:
+                rat_exp = exp + quo_exp
+                rat_coe = -1 * rdid.ecDict[exp] * quo_coe
+                rrat((rat_exp, rat_coe))
+                    
+            #更新被除式的最高次數
+            try:
+                a_expmax = max(rrat.ecDict.keys())
+            except ValueError:
+                # rrat = Polynomial()
+                return rquo, rrat
 
         return rquo, rrat
 
@@ -688,13 +1196,13 @@ class Polynomial:
         pass
 
 if __name__ == '__main__':
-    poly_1 = Polynomial((1,-2), (3,4), (2,3), (34,1))
+    poly_1 = Polynomial((1,-2), (3,4), (2,2), (34,3))
     poly_2 = Polynomial((1,0), (4,-4), (2,3))
     poly_3 = Polynomial((2,-1), (0,1))
-    poly_4 = Polynomial((0,0))
+    poly_4 = Polynomial((0,1))
     poly_5 = Polynomial((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1))
     poly_6 = Polynomial((7,1), (1,-1))
-    poly_7 = abs(poly_1)
+    poly_7 = (2 * poly_1) % poly_1
 
     print poly_1
     print poly_2
