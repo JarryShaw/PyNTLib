@@ -17,6 +17,27 @@ class ListError:
         print
         raise TypeError(message)
 
+#元組參數異常
+#The argument(s) must be tuple type.
+class TupleError:
+    def __init__(self, message):
+        print
+        raise TypeError(message)
+
+#多項式參數異常
+#The argument(s) must be Polynomial type.
+class PolyError:
+    def __init__(self, message):
+        print
+        raise TypeError(message)
+
+#參數異常
+#Function expected at most / least n arguments, got m.
+class ArgumentError:
+    def __init__(self, message):
+        print
+        raise TypeError(message)
+
 #正／負值參數異常
 #The argument(s) must be positive/negative.
 class PNError:
