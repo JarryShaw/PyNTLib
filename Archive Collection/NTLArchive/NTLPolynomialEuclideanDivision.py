@@ -9,22 +9,34 @@ import NTLGreatestCommonDivisor
 def polyED(dvdExp, dvdCoe, dvsExp, dvsCoe):
     if not isinstance(dvdExp, list) or not isinstance(dvdCoe, list)\
     or not isinstance(dvsExp, list) or not isinstance(dvsCoe, list):
-        raise NTLExceptions.ListError('The argument(s) must be list type.')
+        raise NTLExceptions.ListError('The arguments must be list type.')
 
     #將被除式係數與次冪添入被除式字典
     ecDictDividend = {}
     for ptr in range(len(dvdExp)):
-        ecDictDividend[dvdExp[ptr]] = dvdCoe[ptr]
+        exp_ = dvdExp[ptr]
+        coe_ = dvdCoe[ptr]
+
+        if not isinstance(exp_, int) or not isinstance(coe_, int):
+            raise NTLExceptions.IntError('The arguments must be list of integers')
+            
+        ecDictDividend[exp_] = coe_
 
     #將除式係數與次冪添入除式字典
     ecDictDivisor = {}
     for ptr in range(len(dvsExp)):
-        ecDictDivisor[dvsExp[ptr]] = dvsCoe[ptr]
+        exp_ = dvsExp[ptr]
+        coe_ = dvsCoe[ptr]
+
+        if not isinstance(exp_, int) or not isinstance(coe_, int):
+            raise NTLExceptions.IntError('The arguments must be list of integers')
+
+        ecDictDivisor[exp_] = coe_
 
     #計算商式與餘式的字典結果
     ecDictQuotient = {}
-    ecDictRatio = {}
-    ecDictQuotient, ecDictRatio = polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRatio)
+    ecDictRemainder = {}
+    ecDictQuotient, ecDictRemainder = polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRemainder)
 
     #將商式字典轉為係數與次冪數組
     qttCoe = []
@@ -33,72 +45,53 @@ def polyED(dvdExp, dvdCoe, dvsExp, dvsCoe):
         qttCoe.append(ecDictQuotient[exp])
 
     #將餘式字典轉為係數與次冪數組
-    rtoCoe = []
-    rtoExp = sorted(ecDictRatio.keys(), reverse=True)
-    for rto in rtoExp:
-        rtoCoe.append(ecDictRatio[rto])
+    rmdCoe = []
+    rmdExp = sorted(ecDictRemainder.keys(), reverse=True)
+    for rmd in rmdExp:
+        rmdCoe.append(ecDictRemainder[rmd])
 
-    return qttExp, qttCoe, rtoExp, rtoCoe
+    return qttExp, qttCoe, rmdExp, rmdCoe
 
 #歐氏除法的循環求解
-def polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRatio):
-    #當除式為一常數時，直接判斷係數是否能被整除
-    if ecDictDivisor.keys() == [0]:
-        num = ecDictDivisor[0]
-        ecDDvdCopy = __import__('copy').deepcopy(ecDictDividend)
+def polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRemainder):
+    ecDDvdCopy = __import__('copy').deepcopy(ecDictDividend)
 
-        for key in ecDictDividend.keys():
-            if ecDictDividend[key] % num != 0:
-                return {}, ecDictDividend
-            else:
-                ecDDvdCopy[key] = ecDictDividend[key] / num
-
-        return ecDictDividend, {}
-    
     ecDDvdExpMax = max(ecDictDividend.keys())               #獲取被除式的最高次數
     ecDDvsExp = sorted(ecDictDivisor.keys(), reverse=True)  #獲取除式的指數列（降序）
 
-    #若除式最高次冪的係數不為1，則中止程式
+    #若除式最高次冪的係數不為1，則需化簡
     if ecDictDivisor[ecDDvsExp[0]] != 1:
-        raise NTLExceptions.ExponentError('The coefficient of the univariate with greatest degree in divisor must be 1.')
+        # raise NTLExceptions.ExponentError('The coefficient of the univariate with greatest degree in divisor must be 1.')
 
-        '''
-        ecDDvdCoe = ecDictDividend.values()
-        ecDDvsCoe = ecDictDivisor.values()
+        flag = True
+        ecDDvsCoeMax = ecDictDivisor[ecDDvsExp[0]]
 
-        dvdGCD = ecDDvdCoe[0]
-        for dvdCoe in ecDDvdCoe:
-            dvdGCD = NTLGreatestCommonDivisor.greatestCommonDivisor(dvdCoe, dvdGCD)
-
-        dvsGCD = ecDDvsCoe[0]
-        for dvsCoe in ecDDvsCoe:
-            dvsGCD = NTLGreatestCommonDivisor.greatestCommonDivisor(dvsCoe, dvsGCD)
-
-        GCD = NTLGreatestCommonDivisor.greatestCommonDivisor(dvdGCD, dvsGCD)
-        if GCD == 1 or ecDictDivisor[ecDDvsExp[0]] != GCD:
-            return {}, ecDictDividend
-        '''
-        '''
-        coe = ecDictDivisor[ecDDvsExp[0]]
-        ecDDvdCopy = __import__('copy').deepcopy(ecDictDividend)
+        if ecDictDividend[ecDDvdExpMax] % ecDDvsCoeMax == 0:
+            mul_ = ecDictDividend[ecDDvdExpMax] / ecDDvsCoeMax
+            for key in ecDictDivisor.keys():
+                if ecDictDivisor[key] * mul_ != ecDictDividend[key]:
+                    flag = False;   break
+            if flag:
+                ecDictQuotient = __import__('copy').deepcopy(ecDictDivisor)
+                return ecDictQuotient, ecDictRemainder
 
         #判斷除式是否可化簡
         for exp in ecDDvsExp:
-            if ecDictDivisor[exp] % coe != 0:
-                return {}, ecDictDividend
+            if ecDictDivisor[exp] % ecDDvsCoeMax != 0:
+                ecDictRemainder = __import__('copy').deepcopy(ecDictDividend)
+                return ecDictQuotient, ecDictRemainder
             else:
-                ecDictDivisor[exp] /= coe
+                ecDictDivisor[exp] /= ecDDvsCoeMax
 
         #判斷被除式是否可化簡
         for key in ecDictDividend.keys():
-            if ecDictDividend[key] % coe != 0:
-                return {}, ecDictDividend
+            if ecDictDividend[key] % ecDDvsCoeMax != 0:
+                ecDictRemainder = __import__('copy').deepcopy(ecDictDividend)
+                return ecDictQuotient, ecDictRemainder
             else:
-                ecDDvdCopy[key] = ecDictDividend[key] / coe
+                ecDDvdCopy[key] /= ecDDvsCoeMax
 
-        ecDictDividend = __import__('copy').deepcopy(ecDDvdCopy)
-
-        '''
+    ecDictDividend = __import__('copy').deepcopy(ecDDvdCopy)
 
     #若被除式最高次冪小於除式最高次冪則終止迭代
     while ecDDvdExpMax >= ecDDvsExp[0]:
@@ -119,10 +112,11 @@ def polyEDLoop(ecDictDividend, ecDictDivisor, ecDictQuotient, ecDictRatio):
         try:
             ecDDvdExpMax = max(ecDictDividend.keys())
         except ValueError:
-            return ecDictQuotient, {}
+            ecDictRemainder = {}
+            return ecDictQuotient, ecDictRemainder
 
-    ecDictRatio = ecDictDividend.copy()             #此時，餘式即為被除式所剩餘項
-    return ecDictQuotient, ecDictRatio
+    ecDictRemainder = ecDictDividend.copy()             #此時，餘式即為被除式所剩餘項
+    return ecDictQuotient, ecDictRemainder
 
 if __name__ == '__main__':
     #'''
@@ -134,7 +128,7 @@ if __name__ == '__main__':
     dvsExp = [7,  1]
     dvsCoe = [1, -1]
     #'''
-    (qttExp, qttCoe, rtoExp, rtoCoe) = polyED(dvdExp, dvdCoe, dvsExp, dvsCoe)
+    (qttExp, qttCoe, rmdExp, rmdCoe) = polyED(dvdExp, dvdCoe, dvsExp, dvsCoe)
 
     print '\n\t'
     for ptr in range(len(dvdExp)):
@@ -152,8 +146,8 @@ if __name__ == '__main__':
         if ptr < len(qttExp) - 1:
             print '+',
     print ') +',
-    for ptr in range(len(rtoExp)):
-        print '%dx^%d' %(rtoCoe[ptr], rtoExp[ptr]),
-        if ptr < len(rtoExp) - 1:
+    for ptr in range(len(rmdExp)):
+        print '%dx^%d' %(rmdCoe[ptr], rmdExp[ptr]),
+        if ptr < len(rmdExp) - 1:
             print '+',
     print

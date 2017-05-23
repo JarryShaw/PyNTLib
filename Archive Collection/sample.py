@@ -5,11 +5,11 @@ import jsntlib
 print
 
 print 'Create Polynomial.'
-poly_1 = jsntlib.Polynomial((1,-2),(3,4),(2,3),(34,1))
-poly_2 = jsntlib.Polynomial((1,0),(34,-4),(2,3))
-print poly_1
+poly_1 = jsntlib.Polynomial((1,3), (3,4), (2,2), (34,(1+3j)), var='a')
+poly_2 = jsntlib.Polynomial((1,0), (4,-4), (2,3), (0,1))
+poly_3 = poly_1 / poly_2
+print poly_1[:]
 print poly_2
-poly_3 = poly_1 + poly_2
 print poly_3
 
 print
