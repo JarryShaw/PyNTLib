@@ -3,6 +3,13 @@
 #自定義異常類型
 #用於在NTL中給予用戶提示
 
+#數字參數異常
+#The argument(s) must be (a) number(s).
+class DigitError:
+    def __init__(self, message):
+        print
+        raise TypeError(message)
+
 #整數參數異常
 #The argument(s) must be integral.
 class IntError:
@@ -38,6 +45,13 @@ class ArgumentError:
         print
         raise TypeError(message)
 
+#複數功能異常
+#The function is not defined for complex instance.
+class ComplexError:
+    def __init__(self, message):
+        print
+        raise TypeError(message)
+
 #正／負值參數異常
 #The argument(s) must be positive/negative.
 class PNError:
@@ -58,6 +72,14 @@ class BoolError:
     def __init__(self, message):
         print 
         raise ValueError(message)
+
+#字符串參數異常
+#The argument(s) must be (a) string(s).
+class StringError:
+    def __init__(self, message):
+        print 
+        raise ValueError(message)
+
 
 #參數定義異常
 #The argument must match a specific patern.
