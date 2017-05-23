@@ -286,6 +286,12 @@ class Polynomial:
 
         return True
 
+    '''
+    特別注意：
+    1. 當下標值（key／i&j）小於零時，系統自動調用__len__()函數，並自增轉化為正數下標，即 key += len；
+    2. 若下標缺省，起始地址模認為0，而終止地址將被模認為最大整型數，即9223372036854775807。
+    '''
+
     #返回i至j-1次項的多項式
     def __getslice__(self, i, j):
         if not isinstance(i, int) or not isinstance(j, int):
