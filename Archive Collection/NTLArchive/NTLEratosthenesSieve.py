@@ -19,8 +19,8 @@ def eratosthenesSieve(upper=2, lower=2):
 
     table = [1]*(upper+1)                   #用於存儲upper個正整數的表格／狀態；其中，0表示篩去，1表示保留
 
-    #篩法（平凡除法）                 
-    for index in xrange(2, int(__import__('math').sqrt(upper))+1):   
+    #篩法（平凡除法）
+    for index in xrange(2, int(__import__('math').sqrt(upper))+1):
         tmp = index * 2
         if table[index] == 1:
             while tmp <= upper:
@@ -29,11 +29,11 @@ def eratosthenesSieve(upper=2, lower=2):
 
     #獲取結果
     rst = []
-    for ptr in xrange(lower, upper+1):             
+    for ptr in range(lower, upper+1):             
         if table[ptr] == 1:
             rst.append(ptr)
 
     return rst
 
 if __name__ == '__main__':
-    print eratosthenesSieve(101, -1)
+    print eratosthenesSieve(10000000, -1)

@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 
 #自定義異常類型
-#用於在NTL中給予用戶提示
+#用於在NTL中反饋用戶異常信息
+
+'''
+TODO:
+
+* Keep define and refine exceptions
+* Consider further functions besides error alarming
+'''
 
 #數字參數異常
 #The argument(s) must be (a) number(s).

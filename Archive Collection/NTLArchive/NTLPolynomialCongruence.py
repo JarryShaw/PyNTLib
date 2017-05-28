@@ -154,9 +154,9 @@ def CHNRemainderTheorem(rto, mod):
     bList = []
     for tmpMod2 in mod:
         M = modulo / tmpMod2                                #M_i = M / m_i
-        t = int(prmMCS([1,0], [M,-1], tmpMod2)[0])          #t_i * M_i ≡ 1 (mod m_i)
+        t = prmMCS([1,0], [M,-1], tmpMod2)[0]               #t_i * M_i ≡ 1 (mod m_i)
         bList.append(t * M)                                 #b_i = t_i * M_i
-    
+
     ratio = iterCalc(rto, bList, modulo)                    #x_j = Σ(b_i * r_i) (mod M)                          
     return ratio
 

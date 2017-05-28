@@ -4,7 +4,6 @@
 #求解多項式的廣義歐幾里德除法
 
 import NTLExceptions
-import NTLGreatestCommonDivisor
 
 def polyED(dvdExp, dvdCoe, dvsExp, dvsCoe):
     if not isinstance(dvdExp, list) or not isinstance(dvdCoe, list)\

@@ -7,7 +7,7 @@ import NTLExceptions
 import NTLBezoutEquation
 import NTLGreatestCommonDivisor
 
-def binaryEquation(a=1, b=1, c=1):
+def GbinaryEquation(a=1, b=1, c=1):
     if not isinstance(a, int) or not isinstance(b, int) or not isinstance(c, int):
         raise NTLExceptions.IntError('The arguments must be integral.')
 

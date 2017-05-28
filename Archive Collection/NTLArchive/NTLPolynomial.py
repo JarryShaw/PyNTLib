@@ -1,11 +1,32 @@
 # -*- coding: utf-8 -*-
 
-#多項式類
-#具備加減乘除運算的多項式實現
+#複數域多項式類
+#具備基本運算的複數域多項式實現
+
+'''
+TODO:
+
+* Rewrite this file to an ABC (abstract base class)
+* Inherit Polynomial class into integral/float/complex field (of coefficients)
+* Consider using C++ to write a Polynomial extension type
+
+Refernece: https://github.com/numpy/numpy/blob/v1.12.0/numpy/polynomial/_polybase.py
+'''
 
 import NTLExceptions
+import NTLRepetiveSquareModulo
+
+# class Polynomial(__import__('numbers').Number):
+#     __name__  = 'Polynomial()'
+#     __bases__ = '(Number)'
+#     __slots__ = ('var', 'ecDict', 'rcflag')
+
+__all__     = ['']
+__version__ = '1.0'
+__auther__  = 'jsNBZH'
 
 class Polynomial:
+
     def __init__(self, *args, **kwargs):
         self.var = 'x'
         self.ecDict = {}
@@ -23,7 +44,7 @@ class Polynomial:
             if not isinstance(tpl[0], int):
                 raise NTLExceptions.IntError('The exponent must be integral.')
 
-            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be possitive.')
+            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be positive.')
 
             if isinstance(tpl[1], complex):     self.rcflag = True
 
@@ -56,7 +77,7 @@ class Polynomial:
             if not isinstance(tpl[0], int):
                 raise NTLExceptions.IntError('The exponent must be integral.')
 
-            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be possitive.')
+            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be positive.')
 
             if isinstance(tpl[1], complex):     self.rcflag = True
 
@@ -69,7 +90,7 @@ class Polynomial:
 
     #返回多項式對象的從屬
     def __repr__(self):
-        return 'Polynomial()'
+        return 'Polynomial(%s)' %self.var
 
     #返回多項式的算術形式
     def __str__(self):
@@ -104,7 +125,7 @@ class Polynomial:
     def __lt__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
@@ -127,7 +148,7 @@ class Polynomial:
     def __le__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
@@ -150,7 +171,7 @@ class Polynomial:
     def __eq__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
@@ -169,7 +190,7 @@ class Polynomial:
     def __ne__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
@@ -191,7 +212,7 @@ class Polynomial:
     def __gt__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
@@ -214,7 +235,7 @@ class Polynomial:
     def __ge__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
@@ -271,7 +292,7 @@ class Polynomial:
     def __contains__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The argument must be an instance of Polynomial.')
@@ -349,7 +370,7 @@ class Polynomial:
     def __add__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial): 
             raise NTLExceptions.PolyError('The addent must be an instance of Polynomial.')
@@ -369,7 +390,7 @@ class Polynomial:
     def __radd__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The augend must be an instance of Polynomial.')
@@ -389,7 +410,7 @@ class Polynomial:
     def __iadd__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial): 
             raise NTLExceptions.PolyError('The addent must be an instance of Polynomial.')
@@ -409,7 +430,7 @@ class Polynomial:
     def __sub__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The subtrahend must be an instance of Polynomial.')
@@ -429,7 +450,7 @@ class Polynomial:
     def __rsub__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The minuend must be an instance of Polynomial.')
@@ -449,7 +470,7 @@ class Polynomial:
     def __isub__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The minuend must be an instance of Polynomial.')
@@ -469,7 +490,7 @@ class Polynomial:
     def __mul__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The multiplier must be an instance of Polynomial.')
@@ -489,7 +510,7 @@ class Polynomial:
     def __rmul__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The multiplicand must be an instance of Polynomial.')
@@ -509,7 +530,7 @@ class Polynomial:
     def __imul__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The multiplier must be an instance of Polynomial.')
@@ -529,7 +550,7 @@ class Polynomial:
     def __div__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
@@ -565,7 +586,7 @@ class Polynomial:
     def __rdiv__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
@@ -601,7 +622,7 @@ class Polynomial:
     def __idiv__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
@@ -637,7 +658,7 @@ class Polynomial:
     def __floordiv__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
@@ -698,7 +719,7 @@ class Polynomial:
     def __rfloordiv__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
@@ -759,14 +780,14 @@ class Polynomial:
     def __ifloordiv__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
 
         if isinstance(poly, int):   poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
@@ -827,7 +848,7 @@ class Polynomial:
     def __mod__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
@@ -889,7 +910,7 @@ class Polynomial:
     def __rmod__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
@@ -951,7 +972,7 @@ class Polynomial:
     def __imod__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
@@ -1013,7 +1034,7 @@ class Polynomial:
     def __divmod__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
@@ -1076,7 +1097,7 @@ class Polynomial:
     def __rdivmod__(self, poly):
         if numbercheck(poly):       poly = Polynomial((0, poly))
 
-        if isinstance(poly, str):   poly = make_poly(poly)
+        if isinstance(poly, str):   poly = self.make_poly(poly)
 
         if not isinstance(poly, Polynomial):
             raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
@@ -1205,16 +1226,25 @@ class Polynomial:
 
         return ie_
 
-    #求取self在x=int_時的值
-    def calc(self, num_):
+    #求取self在x=num_時的值
+    def eval(self, num_):
         if not numbercheck:
-            raise NTLExceptions.NTLIntError('The argument must be integral.')
+            raise NTLExceptions.NTLIntError('The argument must be a number.')
 
         poly = self.make_eval()
         rst_ = lambda x: eval(poly)
 
         return rst_(num_)
         # return (lambda x: eval(self.make_eval()))(num_)
+
+    #用模重複平方法求self在x=num_時求模mod後的值
+    def mod(self, num_, mod_):
+        rst_ = 0
+        for key_ in self.ecDict:
+            coe_ = self.ecDict[key_] % mod_
+            var_ = NTLRepetiveSquareModulo.repetiveSquareModulo(num_, key_, mod_)
+            rst_ += (coe_ * var_) % mod_
+        return rst_
 
     #將多項式字典轉化為其係數與次冪數組
     def dicttolist(self):
@@ -1241,6 +1271,20 @@ class Polynomial:
 
         return polynomial
 
+    #生成可計算的多項式的項
+    def make_item(self):
+        (expList, coeList) = self.dicttolist()
+
+        items = []
+        for ptr in xrange(len(expList)):
+            item = ''
+            item += str(coeList[ptr]) + '*x**' + str(expList[ptr])
+            items.append(item)
+
+        return items
+
+# Polynomial.register(__import__('types').ClassType)
+
 #數字參數檢查（整型、浮點、長整、複數）
 def numbercheck(*args):
     for var in args:
@@ -1248,6 +1292,16 @@ def numbercheck(*args):
            or isinstance(var, float) or isinstance(var, complex)):
             return False
     return True
+
+def poly(poly):
+    if numbercheck(poly):       poly = Polynomial((0, poly))
+
+    if isinstance(poly, str):   poly = self.make_poly(poly)
+
+    if not isinstance(poly, Polynomial):
+        raise NTLExceptions.PolyError('The argument cannot be tranfered into a polynomial.')
+
+    return poly
 
 if __name__ == '__main__':
     a = complex(1,3)

@@ -23,7 +23,7 @@ def primeFactorisation(N=1, **kwargs):
                 raise NTLExceptions.BoolError('The argument must be bool type.')
             if kwargs[kw]:
                 if p != []:
-                    raise NTLExceptions.PNError('The argument must be possitive under \'wrap\' mode.')
+                    raise NTLExceptions.PNError('The integer must be possitive under \'wrap\' mode.')
                 if N == 0:  p.append(0);    return p, [1]   #N為0時的分解
                 if N == 1:  p.append(1);    return p, [1]   #N為1時的分解
                 return wrap(EDLoop(N, prmList, p))          #獲取分解因數表
