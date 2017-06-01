@@ -7,7 +7,8 @@ import NTLExceptions
 import NTLEuclideanAlgorithm
 
 def bezoutEquation(a=1, b=1):
-    if not isinstance(a, int) or not isinstance(b, int):
+    if (not isinstance(a, int) and not isinstance(a, long))\
+    or (not isinstance(b, int) and not isinstance(b, long)):
         raise NTLExceptions.IntError('The arguments must be integral.')
 
     exflag = pn_a = pn_b = 0

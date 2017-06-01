@@ -18,9 +18,9 @@ def pseudoPrime(**kwargs):
             if not isinstance(kwargs[kw], str):
                 raise NTLExceptions.StringError('Mode must be a string.')
 
-            if kwargs[kw] == 'Fermat':      mode = 0
-            elif kwargs[kw] == 'Euler':     mode = 1
-            elif kwargs[kw] == 'Strong':    mode = 2
+            if kwargs[kw] == 'Fermat':                          mode = 0
+            elif kwargs[kw] == 'Euler' or 'Solovay-Stassen':    mode = 1
+            elif kwargs[kw] == 'Strong' or 'Miller-Rabin':      mode = 2
             else:
                 raise NTLExceptions.DefinitionError('Mode \'%s\' is not defined.' %kwargs[kw])
         
