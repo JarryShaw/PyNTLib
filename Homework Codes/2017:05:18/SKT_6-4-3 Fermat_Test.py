@@ -29,6 +29,8 @@ def fermatTest(n, t):
 def isCarmicheal(n):
     (p, q) = primeFactorisation(n)[:2]
 
+    if len(p) < 3:                  return False
+
     for qitem in q:
         if qitem > 1:               return False
 
@@ -38,14 +40,15 @@ def isCarmicheal(n):
     return True
 
 #素因數分解 | 返回一給定整數的標準（素因數）分解式
-def primeFactorisation(N, pn=0, p=[], q=[]):
+def primeFactorisation(N):
+    pn=0;   p=[];   q=[]
     if N < 0:   pn = 1; N = -1 * N                              #將負數轉化為正整數進行計算
     if N == 0: p.append(0); q.append(1); return p, q, pn        #N為0時的分解
     if N == 1: p.append(1); q.append(1); return p, q, pn        #N為1時的分解
     
-    prmList = eratosthenesSieve(N+1)        #獲取素數表
-    tmp = euclideanDivisionLoop(N, prmList)     #獲取分解因數表
-    (p,q) = wrap(tmp, p, q)                 #生成因數表p與指數表q
+    prmList = eratosthenesSieve(N+1)                #獲取素數表
+    tmp = euclideanDivisionLoop(N, prmList, [])     #獲取分解因數表
+    (p,q) = wrap(tmp, p, q)                         #生成因數表p與指數表q
     
     return p, q, pn
 
@@ -68,7 +71,7 @@ def eratosthenesSieve(N):
     return rst
 
 #循環歐幾里得除法
-def euclideanDivisionLoop(N, prmList, rst=[]):
+def euclideanDivisionLoop(N, prmList, rst):
     if N == 1:  return rst  #除盡後返回因素序列
     
     for prm in prmList:     #逐個（遞歸）嘗試歐幾里得除法，尋找因數
