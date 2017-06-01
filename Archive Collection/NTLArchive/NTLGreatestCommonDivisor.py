@@ -6,7 +6,8 @@
 import NTLExceptions
 
 def greatestCommonDivisor(a=1, b=1):
-    if not isinstance(a, int) or not isinstance(b, int):
+    if (not isinstance(a, int) and not isinstance(a, long))\
+    or (not isinstance(b, int) and not isinstance(b, long)):
         raise NTLExceptions.IntError('The arguments must be integral.')
 
     if a < 0:   a = -1 * a      #將a轉為正整數進行計算

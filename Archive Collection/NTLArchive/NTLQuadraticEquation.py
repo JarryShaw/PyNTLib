@@ -19,7 +19,7 @@ def quadraticEquation(p):
         x = (2**((p-1)/4)) % p                          
     else:               #反之，用同餘式求解函數求出結果
         #令x_0為x^2≡-1(mod p)的正解
-        x = NTLPolynomialCongruence.polynomialCongruence([2,0], [1,1], 2017)[0]   
+        x = NTLPolynomialCongruence.polynomialCongruence([2,0], [1,1], p)[0]   
     
     y = 1                                               #令y_0 = 1
     m = (x**2 + y**2) / p                               #由x_0^2 + y_0^2 = m_0 * p得m_0

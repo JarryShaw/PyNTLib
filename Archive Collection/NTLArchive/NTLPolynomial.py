@@ -21,9 +21,9 @@ import NTLRepetiveSquareModulo
 #     __bases__ = '(Number)'
 #     __slots__ = ('var', 'ecDict', 'rcflag')
 
-__all__     = ['']
-__version__ = '1.0'
-__auther__  = 'jsNBZH'
+# __all__     = ['']
+# __version__ = '1.0'
+# __auther__  = 'jsNBZH'
 
 class Polynomial:
 

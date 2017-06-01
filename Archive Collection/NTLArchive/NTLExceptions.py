@@ -66,6 +66,13 @@ class PNError:
         print
         raise ValueError(message)
 
+#奇／偶數參數異常
+#The argument(s) must be odd/even.
+class OEError:
+    def __init__(self, message):
+        print
+        raise ValueError(message)
+
 #素／合數參數異常
 #The argument(s) must be prime/composit.
 class PCError:
@@ -86,7 +93,6 @@ class StringError:
     def __init__(self, message):
         print 
         raise ValueError(message)
-
 
 #參數定義異常
 #The argument must match a specific patern.
