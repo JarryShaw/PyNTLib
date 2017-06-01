@@ -4,19 +4,50 @@ import jsntlib
 
 print
 
+#Create an instacne of Polynomial.
 print 'Create Polynomial.'
 poly_1 = jsntlib.Polynomial((1,3), (3,4), (2,2), (34,(1+3j)), var='a')
 poly_2 = jsntlib.Polynomial((1,0), (4,-4), (2,3), (0,1))
-poly_3 = poly_1 / poly_2
+poly_3 = poly_1 // poly_2
 print poly_1[:]
 print poly_2
 print poly_3
 
 print
 
-#Print all primes numbers less than 100
+#Create an instacne of Congruence.
+print 'Create Congruence.'
+con_ = jsntlib.Congruence((2,1), (0,-46), mod=105, var='z')
+rat_ = con_.solve()
+
+print 'The solution of %s is\n\t' %str(con_),
+print rat_
+
+print
+
+#Create an instacne of Quadratic.
+print 'Create Quadratic.'
+qua_ = jsntlib.Quadratic(8068, vars=('p', 'q'))
+rst_ = qua_.solve()
+
+print 'The solution of %s is' %str(qua_)
+print rst_
+
+print
+
+#Create an instacne of Index.
+print 'Create Index.'
+index = jsntlib.Index(41)
+print index
+print
+rst = index(4, 8)
+print '4 * 8 ≡ %d' %rst
+
+print
+
+#Print all primes numbers less than 100.
 print 'Call primelist.'
-print jsntlib.primelist(100)
+print jsntlib.primelist(100, -1)
 
 print
 
@@ -91,8 +122,10 @@ print
 
 #Return the Euclidean division result of (20140515x^20140515 + 201495x^201405 + 2014x^2014 + 8x^8 + x^6 + 4x^3 + x + 1) / (x^7 - 1).
 print 'Call polydiv.'
-dvdExp = [20140515, 201405, 2014, 8, 6, 3, 1, 0]
-dvdCoe = [20140515, 201495, 2014, 8, 1, 4, 1, 1]
+# dvdExp = [20140515, 201405, 2014, 8, 6, 3, 1, 0]
+# dvdCoe = [20140515, 201495, 2014, 8, 1, 4, 1, 1]
+dvdExp = [1, 3, 2, 34]
+dvdCoe = [-2, 4, 3, 1]
 dvsExp = [7,  1]
 dvsCoe = [1, -1]
 
@@ -146,8 +179,23 @@ print '≡ 0 (mod %d)' %modulo
 
 print
 
+#Return the solutions of a naïve congruence set.
+print 'Call crt'
+
+ratio = jsntlib.crt((3, [1,-1]), (5, [1,-1]), (7, [2,-2]))
+
+print 'x ≡ ±1 (mod 3)'
+print 'x ≡ ±1 (mod 5)'
+print 'x ≡ ±2 (mod 7)'
+print 'The solutions of the above equation set is\n\tx ≡',
+for rst in ratio:
+    print rst,
+print '(mod 105)'
+
+print
+
 #Return the solutions of congruence equation x^2 ≡ 46 (mod 105).
-print 'Call polymod'
+print 'Call congsolve'
 cgcExp = [2, 0]
 cgcCoe = [1, -46]
 modulo = 105
@@ -158,7 +206,7 @@ for ptr in xrange(len(cgcExp)):
         print '+',
 print '≡ 0 (mod %d)' %modulo
 
-ratio = jsntlib.polymod(cgcExp, cgcCoe, modulo)
+ratio = jsntlib.congsolve(cgcExp, cgcCoe, modulo)
 
 print 'The solution of the above polynomial congruence is\n\tx ≡',
 for rst in ratio:
@@ -173,19 +221,13 @@ print 'The solution of the equation x^2 + y^2 = 2017 is\n\tx=±%d, y=±%d' %jsnt
 
 print
 
-#Return the index of 2 for modulo 9.
-print 'Call index.'
-print 'The index of 2 mod 9 is\n\tmod_9(2) = %d' %jsntlib.index(9, 2)
+#Return the order of 2 for modulo 9.
+print 'Call ord.'
+print 'The order of 2 mod 9 is\n\tord_9(2) = %d' %jsntlib.ord(9, 2)
 
 print
 
-#Return the index of 5 for modulo 17.
-print 'Call indexPrime.'
-print 'The index of 5 mod 17 is\n\tmod_17(5) = %d' %jsntlib.indexPrime(17, 5)
-
-print 
-
-#Return the primitive root(s) of odd prime modulo 7.
+#Return the primitive root(s) of modulo 7.
 print 'Call root.'
 print 'The primtive root(s) of modulo 7 is/are',
 for root in jsntlib.root(7):
@@ -193,3 +235,49 @@ for root in jsntlib.root(7):
 print '.'
 
 print
+
+#Return the primitive residue class of integer 40.
+print 'Call prc'
+print 'The primitive residue class of 40 is'
+for num in jsntlib.prc(40):
+    print num,
+print '.'
+
+print
+
+#Return Euler function φ(40)
+print 'Call euler.'
+print 'φ(40) = %d' %jsntlib.euler(40)
+
+print
+
+#Return the result of Legendre symbol for (a | p).
+print 'Call legendre.'
+print '(3 | 17) = %d' %jsntlib.legendre(3, 17)
+
+print
+
+#Return the result of jocabi symbol for (a | m).
+print 'Call jacobi.'
+print '(286 | 563) = %d' %jsntlib.jacobi(286, 563)
+
+print
+
+#Return if an integer is a Carmicheal number.
+print 'Call carmicheal.'
+print '3499',
+if jsntlib.carmicheal(3499):
+    print 'is',
+else:
+    print 'isn\'t',
+print 'a Carmicheal number'
+
+print
+
+#Return a pseudo-prime number with certain paterns.
+print 'Call pseudo.'
+print 'A pseudo-prime number with Fermat test (t=100000) is %d.' %pseudoPrime(byte=12, para=100000, mode='Fermat')
+print 'An Euler pseudo-prime number with Solovay-Stassen test (t=100000) is %d.' %pseudoPrime(byte=12, para=100000, mode='Euler')
+print 'A strong pseudo-prime number with Miller-Rabin test (k=100000) is %d.' %pseudoPrime(byte=12, para=100000, mode='Strong')
+
+print 

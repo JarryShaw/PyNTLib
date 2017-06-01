@@ -5,6 +5,28 @@ Alternative declaration:
 __import__([folder.]module).[module.]function(*args, **kwargs)
 '''
 
+from NTLArchive.NTLValidations import *
+
+#Inherit Polynomial class.
+from NTLArchive import NTLPolynomial
+class Polynomial(NTLPolynomial.Polynomial):
+    pass
+
+#Inherit Congruence class.
+from NTLArchive import NTLCongruence
+class Congruence(NTLCongruence.Congruence):
+    pass
+
+#Inherit Quadratic class.
+from NTLArchive import NTLQuadratic
+class Quadratic(NTLQuadratic.Quadratic):
+    pass
+
+#Inherit Index class.
+from NTLArchive import NTLIndex
+class Index(NTLIndex.Index):
+    pass
+
 #Return all prime numbers between lower and upper bound.
 def primelist(upper, lower=2):
     from NTLArchive import NTLEratosthenesSieve
@@ -70,8 +92,13 @@ def simplify(cgcExp, cgcCoe, modulo):
     from NTLArchive import NTLCongruenceSimplification
     return NTLCongruenceSimplification.congruenceSimplification(cgcExp, cgcCoe, modulo)
 
+#Return the solutions of a naïve congruence set.
+def crt(*args):
+    from NTLArchive import NTLChineseRemainderTheorem
+    return NTLChineseRemainderTheorem.CHNRemainderTheorem(*args)
+
 #Return the solutions of a polynomial congruence.
-def polymod(cgcExp, cgcCoe, modulo):
+def congsolve(cgcExp, cgcCoe, modulo):
     from NTLArchive import NTLPolynomialCongruence
     return NTLPolynomialCongruence.polynomialCongruence(cgcExp, cgcCoe, modulo)
 
@@ -80,22 +107,42 @@ def quadratic(p):
     from NTLArchive import NTLQuadraticEquation
     return NTLQuadraticEquation.quadraticEquation(p)
 
-#Return the index of an integer (a) for a modulo (m).
-def index(m, a):
-    from NTLArchive import NTLPrimitiveIndex
-    return NTLPrimitiveIndex.primitiveIndex(m, a)
+#Return the order of an integer (a) for a modulo (m), i.e. ord_m(a).
+def ord(m, a):
+    from NTLArchive import NTLOrder
+    return NTLOrder.order(m, a)
 
-#Return the index of an integer (a) for a prime modulo (p).
-def indexPrime(p, a):
-    from NTLArchive import NTLPrimeIndex
-    return NTLPrimeIndex.primeIndex(p, a)
-
-#Return the primitive root(s) of an odd prime modulo (p).
-def root(p):
+#Return the primitive root(s) of modulo (m).
+def root(m):
     from NTLArchive import NTLPrimitiveRoot
-    return NTLPrimitiveRoot.primitiveRoot(p)
+    return NTLPrimitiveRoot.primitiveRoot(m)
 
-#Inheit Polynomial class.
-from NTLArchive import NTLPolynomial
-class Polynomial(NTLPolynomial.Polynomial):
-    pass
+#Return the primitive residue class of an integer m.
+def prc(m):
+    from NTLArchive import NTLPrimitiveResidueClass
+    return NTLPrimitiveResidueClass.primitiveResidueClass(m)
+
+#Return Euler function φ(m).
+def euler(m):
+    from NTLArchive import NTLEulerFunction
+    return NTLEulerFunction.eulerFunction(m)
+
+#Return the result of Legendre symbol for (a | p).
+def legendre(a, p):
+    from NTLArchive import NTLLegendreSymbol
+    return NTLLegendreSymbol.legendreSymbol(a, p)
+
+#Return the result of Jacobi symbol for (a | m).
+def jacobi(a, m):
+    from NTLArchive import NTLJacobiSymbol
+    return NTLJacobiSymbol.jacobiSymbol(a, m)
+
+#Return if an integer is a Carmicheal number.
+def carmicheal(n):
+    from NTLArchive import NTLCarmichealTest
+    return NTLCarmichealTest.carmichealTest(n)
+
+#Return a pseudo-prime number with certain paterns.
+def pseudo(**kwargs):
+    from NTLArchive import NTLPseudoPrime
+    return NTLPseudoPrime.pseudoPrime(**kwargs)
