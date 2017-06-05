@@ -6,6 +6,12 @@
 import NTLExceptions
 import NTLEuclideanAlgorithm
 
+'''
+TODO:
+
+* The algorithm of coefficient s and t should be updated. (P32)
+'''
+
 def bezoutEquation(a=1, b=1):
     if (not isinstance(a, int) and not isinstance(a, long))\
     or (not isinstance(b, int) and not isinstance(b, long)):
