@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['coprimalityTest']
+nickname = 'coprime'
+
 #互素判斷
 #判斷整數a與整數m是否互素
 
-import NTLExceptions
-import NTLGreatestCommonDivisor
+from .NTLGreatestCommonDivisor import greatestCommonDivisor
+from .NTLValidations           import int_check
 
-def coprimalityTest(a=1, b=1):
-    if not isinstance(a, int) or not isinstance(b, int):
-        raise NTLExceptions.IntError('The arguments must be integral.')
+def coprimalityTest(a, b):
+    int_check(a, b)
 
-    if NTLGreatestCommonDivisor.greatestCommonDivisor(a, b) == 1:   #互素定義，即(a,b) = 1
-        return 1
-    else:
-        return 0
+    return 1 if greatestCommonDivisor(a, b) == 1 else 0     #互素定義，即(a,b) = 1
 
-if __name__ == '__main__':
-    if coprimalityTest(53, 19):
-        print '53 and 19 are coprime.'
-    else:
-        print '53 and 19 are not coprime.'
+# if __name__ == '__main__':
+#     if coprimalityTest(53, 19):
+#         print('53 and 19 are coprime.')
+#     else:
+#         print('53 and 19 are not coprime.')

@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+__all__ = [ 'int_check',
+            'list_check',
+            'pos_check']
+
+import inspect
+import sys
+
 #自定義模式化參數檢查
 #用於在NTL中進行模式化的參數檢查
 
@@ -10,22 +17,30 @@ TODO:
 * Connect this file with NTLExceptions
 '''
 
-import NTLExceptions
+from .NTLExceptions import IntError, ListError, PNError
 
-def int_check(*args, **kwargs):
-    func = ''
-    for kw in kwargs:
-        func = kwargs[kw] if kw == 'func' else ''
+def int_check(*args):
+    func = inspect.stack()[2][3]
+    
+    if sys.version_info[0] > 2:
+        for var in args:
+            if not isinstance(var, int):
+                raise IntError('Function %s expected int, %s got instead.' %(func,  type(var).__name__))
+    else:
+        for var in args:
+            if not isinstance(var, int) and not isinstance(var, long):
+                raise IntError('Function %s expected int or long, %s got instead.' %(func,  type(var).__name__))
 
-    for var in args:
-        if not isinstance(var, int):
-            raise NTLExceptions.IntError('Function %s expected integers, %s got instead.' %(func,  (var)))
-
-def list_check(*args, **kwargs):
-    func = ''
-    for kw in kwargs:
-        func = kwargs[kw] if kw == 'func' else ''
+def list_check(*args):
+    func = inspect.stack()[2][3]
 
     for var in args:
         if not isinstance(var, list):
-            raise NTLExceptions.IntError('Function %s expected integers, %s got instead.' %(func, (var)))
+            raise ListError('Function %s expected int, %s got instead.' %(func,  type(var).__name__))
+
+def pos_check(*args):
+    func = inspect.stack()[2][3]
+
+    for var in args:
+        if var <= 0:
+            PNError('Function %s expected positives, negatives got instead.' %func)

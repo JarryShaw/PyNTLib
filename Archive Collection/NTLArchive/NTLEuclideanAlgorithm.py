@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['euclideanAlgorithm', 'EEALoop']
+nickname = 'eealist'
+
 #廣義歐幾里德除法
 #用輾轉相除法求出商數列
 
-import NTLExceptions
+from .NTLExceptions  import DefinitionError
+from .NTLValidations import int_check
 
-def euclideanAlgorithm(divident=1, divisor=1):
-    if not isinstance(divident, int) or not isinstance(divisor, int):
-        raise NTLExceptions.IntError('The arguments must be integral.')
+def euclideanAlgorithm(dividend, divisor):
+    int_check(dividend, divisor)
 
     if divisor == 0:
-        raise ZeroDivisionError
+        raise DefinitionError('The divisor should never be zero.')
 
-    return EEALoop(divident, divisor, [])
+    return EEALoop(dividend, divisor, [])
 
 def EEALoop(a, b, qSet):
-    q = a / b
-    r = a % b
+    q = a // b
+    r = a %  b
     
     if r == 0:
         return qSet                 #(r,0) = r
@@ -24,5 +27,5 @@ def EEALoop(a, b, qSet):
         qSet.append(q)
         return EEALoop(b, r, qSet)  #(a,b) = (r_-2,r_-1) = (r_-1,r_0) = … = (r_n,r_n+1) = (r_n,0) = r_n
 
-if __name__ == '__main__':
-    print euclideanAlgorithm(3424, 13)
+# if __name__ == '__main__':
+#     print(euclideanAlgorithm(3424, 13))

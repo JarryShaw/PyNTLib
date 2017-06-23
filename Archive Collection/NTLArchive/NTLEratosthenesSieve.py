@@ -1,26 +1,30 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['eratosthenesSieve']
+nickname = 'primelist'
+
+import math
+
 #厄拉托塞師篩法
 #返回upper以內正整數的所有素數列表
 
-import NTLExceptions
+from .NTLUtilities   import jsrange
+from .NTLValidations import int_check, pos_check
 
-def eratosthenesSieve(upper=2, lower=2):
-    if not isinstance(lower, int) or not isinstance(upper, int):
-        raise NTLExceptions.IntError('The arguments must be integral.')
-
+def eratosthenesSieve(upper, lower=None):
+    if lower is None:   lower = 2
+    int_check(upper, lower)
+    
     if upper < lower:
         upper, lower = lower, upper
 
-    if upper < 0:
-        raise NTLExceptions.PNError('The upper bound must be positive.')
-
     if lower < 2:   lower = 2
+    pos_check(upper)
 
     table = [1]*(upper+1)                   #用於存儲upper個正整數的表格／狀態；其中，0表示篩去，1表示保留
 
     #篩法（平凡除法）
-    for index in xrange(2, int(__import__('math').sqrt(upper))+1):
+    for index in jsrange(2, int(math.sqrt(upper))+1):
         tmp = index * 2
         if table[index] == 1:
             while tmp <= upper:
@@ -29,11 +33,11 @@ def eratosthenesSieve(upper=2, lower=2):
 
     #獲取結果
     rst = []
-    for ptr in range(lower, upper+1):             
+    for ptr in jsrange(lower, upper+1):             
         if table[ptr] == 1:
             rst.append(ptr)
 
     return rst
 
-if __name__ == '__main__':
-    print eratosthenesSieve(10000000, -1)
+# if __name__ == '__main__':
+#     print(eratosthenesSieve(-1, -2))
