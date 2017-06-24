@@ -5,30 +5,43 @@ Alternative declaration:
 __import__([folder.]module).[module.]function(*args, **kwargs)
 '''
 
-from NTLArchive.NTLValidations import *
-
 #Inherit Polynomial class.
-from NTLArchive import NTLPolynomial
-class Polynomial(NTLPolynomial.Polynomial):
-    pass
+# from NTLArchive import NTLPolynomial
+# class Polynomial(NTLPolynomial.Polynomial):
+#     pass
 
-#Inherit Congruence class.
-from NTLArchive import NTLCongruence
-class Congruence(NTLCongruence.Congruence):
-    pass
+# #Inherit Congruence class.
+# from NTLArchive import NTLCongruence
+# class Congruence(NTLCongruence.Congruence):
+#     pass
 
-#Inherit Quadratic class.
-from NTLArchive import NTLQuadratic
-class Quadratic(NTLQuadratic.Quadratic):
-    pass
+# #Inherit Quadratic class.
+# from NTLArchive import NTLQuadratic
+# class Quadratic(NTLQuadratic.Quadratic):
+#     pass
 
-#Inherit Index class.
-from NTLArchive import NTLIndex
-class Index(NTLIndex.Index):
-    pass
+# #Inherit Index class.
+# from NTLArchive import NTLIndex
+# class Index(NTLIndex.Index):
+#     pass
+
+# #Inherit Legendre class.
+# from NTLArchive import NTLLegendre
+# class Legendre(NTLLegendre.Legendre):
+#     pass
+
+# #Inherit Jacobi class.
+# from NTLArchive import NTLJacobi
+# class Jacobi(NTLJacobi.Jacobi):
+#     pass
+
+# #Inherit Fraction class.
+# from NTLArchive import NTLFraction
+# class Fraction(NTLFraction.Fraction):
+#     pass
 
 #Return all prime numbers between lower and upper bound.
-def primelist(upper, lower=2):
+def primelist(upper, lower=None):
     from NTLArchive import NTLEratosthenesSieve
     return NTLEratosthenesSieve.eratosthenesSieve(upper, lower)
 
@@ -47,20 +60,25 @@ def gcd(a, b):
     from NTLArchive import NTLGreatestCommonDivisor
     return NTLGreatestCommonDivisor.greatestCommonDivisor(a, b)
 
+#Return the least common multiple of a and b.
+def lcm(a, b):
+    from NTLArchive import NTLLeastCommonMultiple
+    return NTLLeastCommonMultiple.leastCommonMultiple(a, b)
+
 #Return if a and b are coprime numbers.
 def coprime(a, b):
     from NTLArchive import NTLCoprimalityTest
     return NTLCoprimalityTest.coprimalityTest(a, b)
 
-#Return the parameters of a and b in Bézout equation.
-def bezout(a, b):
-    from NTLArchive import NTLBezoutEquation
-    return NTLBezoutEquation.bezoutEquation(a, b)
-
 #Return list of the quotients with extended Euclidean Algorithm.
 def eealist(a, b):
     from NTLArchive import NTLEuclideanAlgorithm
     return NTLEuclideanAlgorithm.euclideanAlgorithm(a, b)
+
+#Return the parameters of a and b in Bézout equation.
+def bezout(a, b):
+    from NTLArchive import NTLBezoutEquation
+    return NTLBezoutEquation.bezoutEquation(a, b)
 
 #Return the prime factor list of N.
 def factor(N, **kwargs):
@@ -112,20 +130,20 @@ def ord(m, a):
     from NTLArchive import NTLOrder
     return NTLOrder.order(m, a)
 
-#Return the primitive root(s) of modulo (m).
-def root(m):
-    from NTLArchive import NTLPrimitiveRoot
-    return NTLPrimitiveRoot.primitiveRoot(m)
+#Return Euler function φ(m).
+def euler(m):
+    from NTLArchive import NTLEulerFunction
+    return NTLEulerFunction.eulerFunction(m)
 
 #Return the primitive residue class of an integer m.
 def prc(m):
     from NTLArchive import NTLPrimitiveResidueClass
     return NTLPrimitiveResidueClass.primitiveResidueClass(m)
 
-#Return Euler function φ(m).
-def euler(m):
-    from NTLArchive import NTLEulerFunction
-    return NTLEulerFunction.eulerFunction(m)
+#Return the primitive root(s) of modulo (m).
+def root(m):
+    from NTLArchive import NTLPrimitiveRoot
+    return NTLPrimitiveRoot.primitiveRoot(m)
 
 #Return the result of Legendre symbol for (a | p).
 def legendre(a, p):
@@ -146,3 +164,8 @@ def carmicheal(n):
 def pseudo(**kwargs):
     from NTLArchive import NTLPseudoPrime
     return NTLPseudoPrime.pseudoPrime(**kwargs)
+
+#Return the continued fraction of a real number.
+def fraction(n, d):
+    from NTLArchive import NTLContinuedFraction
+    return NTLContinuedFraction.continuedFraction(n, d)

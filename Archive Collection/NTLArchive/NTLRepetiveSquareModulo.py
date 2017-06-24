@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['repetiveSquareModulo']
+nickname = 'modulo'
+
 #模重複平方法
 #求解b^n (mod m)的值
 
-import NTLExceptions
+from .NTLValidations import int_check, pos_check, notneg_check
 
-def repetiveSquareModulo(base=1, exponent=1, modulo=1):
-    if not isinstance(base, int) or not isinstance(exponent, int) or not isinstance(modulo, int):
-        raise NTLExceptions.IntError('The arguments must be integral.')
+def repetiveSquareModulo(base, exponent, modulo):
+    int_check(base, exponent, modulo)
+    pos_check(modulo)
+    notneg_check(exponent)
 
-    if exponent < 0:
-        raise NTLExceptions.PNError('The exponent must be possitive.')
-
-    if modulo <= 0:
-        raise NTLExceptions.PNError('The modulo must be possitive.')
-
-    if base == 0:
-        return 0 if (exponent != 0) else 1
+    if base == 0:       return 0 if (exponent != 0) else 1
+    if exponent == 0:   return 1
 
     get_bin = lambda x: format(x, 'b')              #二進制轉化函數
 
@@ -33,5 +31,5 @@ def repetiveSquareModulo(base=1, exponent=1, modulo=1):
 
     return a if (base > 0) else (-1 * a)            #base ^ exponent ≡ a_k-1 (mod modulo)
 
-if __name__ == '__main__':
-    print '-765 ^ 264 ≡ %d (mod 597)\n' %repetiveSquareModulo(-765, 264, 597)
+# if __name__ == '__main__':
+#     print('-765 ^ 264 ≡ %d (mod 597)\n' %repetiveSquareModulo(-765, 264, 597))

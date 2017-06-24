@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['primeFactorisation', 'EDLoop', 'wrap']
+nickname = 'factor'
+
 #素因數分解
 #返回一給定整數的標準（素因數）分解式
 
-import NTLExceptions
-import NTLEratosthenesSieve
+from .NTLEratosthenesSieve import eratosthenesSieve
+from .NTLExceptions        import KeywordError
+from .NTLValidations       import int_check, bool_check, pos_check
 
-def primeFactorisation(N=1, **kwargs):
-    if not isinstance(N, int):
-        raise NTLExceptions.IntError('The argument must be integral.')
+def primeFactorisation(N, **kwargs):
+    int_check(N)
 
     p = [] 
     if N < 0:   p.append(-1);   N = -1 * N                  #將負數轉化為正整數進行計算
     
-    prmList = NTLEratosthenesSieve.eratosthenesSieve(N)     #獲取素數表
+    prmList = eratosthenesSieve(N)     #獲取素數表
 
     for kw in kwargs:
         if kw != 'wrap':
-            raise NTLExceptions.KeywordError('Keyword \'%s\' is not defined.' %kw)
+            raise KeywordError('Keyword \'%s\' is not defined.' %kw)
         else:
-            if not isinstance(kwargs[kw], bool):
-                raise NTLExceptions.BoolError('The argument must be bool type.')
+            bool_check(kwargs[kw])
             if kwargs[kw]:
-                if p != []:
-                    raise NTLExceptions.PNError('The integer must be possitive under \'wrap\' mode.')
                 if N == 0:  p.append(0);    return p, [1]   #N為0時的分解
                 if N == 1:  p.append(1);    return p, [1]   #N為1時的分解
                 return wrap(EDLoop(N, prmList, p))          #獲取分解因數表
@@ -37,7 +37,7 @@ def EDLoop(N, prmList, rst):
     if N == 1:  return rst  #除盡後返回因數序列
     
     for prm in prmList:     #逐個（遞歸）嘗試歐幾里得除法，尋找因數
-        if N % prm == 0:    rst.append(prm);    N /= prm;    break
+        if N % prm == 0:    rst.append(prm);    N //= prm;      break
     return EDLoop(N, prmList, rst)
 
 #整合質因數表得到因數表和指數表
@@ -58,12 +58,12 @@ def wrap(table):
 
     return p, q
 
-if __name__ == '__main__':
-    ctr = 0
-    p = primeFactorisation(-100, wrap=False)
-    print '-100 =',
-    for prime in p:
-        if ctr > 0:     print '*',
-        print prime,
-        ctr += 1
-    print
+# if __name__ == '__main__':
+#     ctr = 0
+#     p = primeFactorisation(-100, wrap=False)
+#     print('-100 =', end=' ')
+#     for prime in p:
+#         if ctr > 0:     print('*', end=' ')
+#         print(prime, end=' ')
+#         ctr += 1
+#     print()

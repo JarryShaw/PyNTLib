@@ -1,62 +1,61 @@
 #-*- coding: utf-8 -*-
 
+__all__  = ['primitiveRoot',
+            'primePR', 'exponentPR', 'binaryPR']
+nickname = 'root'
+
 #任意數模原根求取
 #計算任意數m的原根
 
-import NTLExceptions
-import NTLEulerFunction
-import NTLCoprimalityTest
-import NTLTrivialDivision
-import NTLPrimeFactorisation
-import NTLRepetiveSquareModulo
-import NTLGreatestCommonDivisor
-import NTLPrimitiveResidueClass
+from .NTLExceptions            import SolutionError
+from .NTLCoprimalityTest       import coprimalityTest
+from .NTLEulerFunction         import eulerFunction
+from .NTLGreatestCommonDivisor import greatestCommonDivisor
+from .NTLPrimeFactorisation    import primeFactorisation
+from .NTLPrimitiveResidueClass import primitiveResidueClass
+from .NTLRepetiveSquareModulo  import repetiveSquareModulo
+from .NTLUtilities             import jsrange
+from .NTLValidations           import int_check, pos_check
 
 def primitiveRoot(m):
-    if not isinstance(m, int):
-        raise NTLExceptions.IntError('The argument must be integral.')
-
-    if m <= 0:
-        raise NTLExceptions.PNError('The integer must be positive.')
+    int_check(m);   pos_check(m)
 
     if m == 2:          #m = 2
         return [1]
     elif m == 4:        #m = 4
         return [3]
     else:               #m = p^⍺ / 2p^⍺
-        (p, q) = NTLPrimeFactorisation.primeFactorisation(m, wrap=True)
+        (p, q) = primeFactorisation(m, wrap=True)
         if len(p) == 1:                             #m = p^⍺
             return primePR(p[0]) if q[0] == 1 else exponentPR(p[0], q[0])
         elif len(p) == 2 and q[0] == 1:             #m = 2p^⍺
             return binaryPR(p[1], q[1])
         else:           #No primitive root.
-            return []
+            raise SolutionError('%d has no primitive root.' %m)
 
 #奇素數模原根求取
 def primePR(prime):
     primitiveRoot = []
 
     #p-1的所有不同質因數表
-    q = NTLPrimeFactorisation.primeFactorisation(prime - 1, wrap=True)[0]
+    q = primeFactorisation(prime - 1, wrap=True)[0]
 
-    for g in xrange(1, prime):
-        modFlag = 1
+    for g in jsrange(1, prime):
         for qitem in q:
-            exp = (prime - 1) / qitem
-            if NTLRepetiveSquareModulo.repetiveSquareModulo(g, exp, prime)  == 1:
-                modFlag = 0;    break
-        if modFlag == 1:        break
+            exp = (prime - 1) // qitem
+            if repetiveSquareModulo(g, exp, prime)  == 1:   break
+        else:   break
 
-    prc = NTLPrimitiveResidueClass.primitiveResidueClass(prime-1)
+    prc = primitiveResidueClass(prime-1)
     for num in prc:
-        primitiveRoot.append(NTLRepetiveSquareModulo.repetiveSquareModulo(g, num, prime))
+        primitiveRoot.append(repetiveSquareModulo(g, num, prime))
 
     # #由定義求解
     # phi_prime = prime - 1
-
-    # for a in xrange(1, prime):
+    #
+    # for a in jsrange(1, prime):
     #     if coprimalityTest(a, prime):
-    #         for e in xrange(1, prime):
+    #         for e in jsrange(1, prime):
     #             if a**e % m == 1:
     #                 if e == phi_prime:
     #                     primitiveRoot.append(a)
@@ -71,15 +70,15 @@ def exponentPR(base, exponent):
 
     for prr in prrList:
         if (prr**(base-1)) % base == 1\
-            and NTLGreatestCommonDivisor.greatestCommonDivisor(base, ((prr**(base-1)) // base)) == 1:
+            and greatestCommonDivisor(base, ((prr**(base-1)) // base)) == 1:
             g = prr;        break
         if ((prr+base)**(base-1)) % base == 1\
-            and NTLGreatestCommonDivisor.greatestCommonDivisor(base, (((prr+base)**(base-1)) // base)) == 1:
+            and greatestCommonDivisor(base, (((prr+base)**(base-1)) // base)) == 1:
             g = prr+base;   break
 
-    prc = NTLPrimitiveResidueClass.primitiveResidueClass(NTLEulerFunction.eulerFunction(base**2))
+    prc = primitiveResidueClass(eulerFunction(base**2))
     for num in prc:
-        primitiveRoot.append(NTLRepetiveSquareModulo.repetiveSquareModulo(g, num, int(base**exponent)))
+        primitiveRoot.append(repetiveSquareModulo(g, num, base**exponent))
 
     return sorted(primitiveRoot)
 
@@ -98,10 +97,10 @@ def binaryPR(base, exponent):
 
     return sorted(primitiveRoot)
 
-if __name__ == '__main__':
-    a = primitiveRoot(3362)
-    print 'The primtive root(s) of modulo 7 is/are',
-    for root in a:
-        print root,
-    print '.'
+# if __name__ == '__main__':
+#     a = primitiveRoot(7)
+#     print('The primtive root(s) of modulo 7 is/are', end=' ')
+#     for root in a:
+#         print(root, end=' ')
+#     print('.')
 

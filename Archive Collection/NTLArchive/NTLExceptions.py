@@ -2,23 +2,11 @@
 
 from __future__ import print_function
 
-__all__ = [ 'BaseError'
-            'DigitError',
-            'IntError',
-            'ComplexError',
-            'ListError',
-            'TupleError',
-            'PolyError',
-            'ArgumentError',
-            'PNError',
-            'OEError',
-            'PCError',
-            'BoolError',
-            'StringError',
-            'DefinitionError',
-            'SolutionError',
-            'ExponentError',
-            'KeywordError']
+__all__ = [ 'BaseError', 'DigitError', 'IntError', 'RealError', 'ComplexError', 
+            'BoolError', 'ListError', 'TupleError', 'StringError', 'PolyError',
+            'PNError', 'OEError', 'PCError',
+            'DefinitionError', 'ArgumentError', 'KeywordError',
+            'ExponentError', 'SolutionError']
 
 import sys
 import traceback
@@ -104,7 +92,7 @@ class ListError(BaseError):
 
 #元組參數異常
 #The argument(s) must be tuple type.
-class TupleError:
+class TupleError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -115,7 +103,7 @@ class TupleError:
 
 #多項式參數異常
 #The argument(s) must be Polynomial type.
-class PolyError:
+class PolyError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -126,7 +114,18 @@ class PolyError:
 
 #參數異常
 #Function expected at most / least n arguments, got m.
-class ArgumentError:
+class ArgumentError(BaseError):
+    def __init__(self, message):
+        if sys.version_info[0] > 2:
+            self.traceback_3() 
+        else:
+            self.traceback_2()
+
+        raise TypeError(message)
+
+#實數功能異常
+#The function is not defined for real number.
+class RealError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -137,7 +136,7 @@ class ArgumentError:
 
 #複數功能異常
 #The function is not defined for complex instance.
-class ComplexError:
+class ComplexError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -159,7 +158,7 @@ class PNError(BaseError):
 
 #奇／偶數參數異常
 #The argument(s) must be odd/even.
-class OEError:
+class OEError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -170,7 +169,7 @@ class OEError:
 
 #素／合數參數異常
 #The argument(s) must be prime/composit.
-class PCError:
+class PCError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -181,7 +180,7 @@ class PCError:
 
 #布爾參數異常
 #The argument(s) must be bool type.
-class BoolError:
+class BoolError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -192,7 +191,7 @@ class BoolError:
 
 #字符串參數異常
 #The argument(s) must be (a) string(s).
-class StringError:
+class StringError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -214,7 +213,7 @@ class DefinitionError(BaseError):
 
 #方程無解異常
 #The polynomial has no integral solution.
-class SolutionError:
+class SolutionError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -225,7 +224,7 @@ class SolutionError:
 
 #係數參數異常
 #The coefficient of the univariate with greatest degree in divisor must be 1.
-class ExponentError:
+class ExponentError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 
@@ -236,7 +235,7 @@ class ExponentError:
 
 #關鍵詞參數異常
 #Unknow attribute(s).
-class KeywordError:
+class KeywordError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3() 

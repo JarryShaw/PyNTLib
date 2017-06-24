@@ -1,46 +1,53 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['CHNRemainderTheorem', 'solve', 'iterCalc', 'updateState']
+nickname = 'crt'
+
 #中國剩餘定理
 #求基本同餘式組的通解
 
-import NTLExceptions
-import NTLPolynomialCongruence
+from .NTLExceptions           import DefinitionError
+from .NTLUtilities            import jsrange
+from .NTLValidations          import int_check, list_check, tuple_check
 
 def CHNRemainderTheorem(*args):
-    rto = []
+    rmd = []
     mod = []
 
     for tpl in args:
-        if not isinstance(tpl, tuple) or len(tpl) != 2:
-            raise NTLExceptions.TupleError('The arguments must be tuples of modulos and corresponding solutions (in a list).')
+        tuple_check(tpl)
 
-        if not isinstance(tpl[0], int) and not isinstance(tpl[0], long):
-            raise NTLExceptions.IntError('The modulo must be integral.')
+        if len(tpl) != 2:
+            raise DefinitionError('The arguments must be tuples of modulos and corresponding solutions (in a list).')
 
-        if not isinstance(tpl[1], list):
-            raise NTLExceptions.TupleError('The solutions must contained in a list.')
+        int_check(tpl[0]);  list_check(tpl[1])
+        for num in tpl[1]:  int_check(num)
 
-        for num in tpl[1]:
-            if not isinstance(num, int) and not isinstance(num, long):
-                raise NTLExceptions.IntError('The solutions must be integral.')
-
-        mod.append(tpl[0])
-        rto.append(tpl[1])
+        mod.append(tpl[0]); rmd.append(tpl[1])
 
     modulo = 1
     for tmpMod1 in mod:
-        modulo *= tmpMod1                                               #M(original modulo) = ∏m_i
+        modulo *= tmpMod1                       #M(original modulo) = ∏m_i
 
     bList = []
     for tmpMod2 in mod:
-        M = modulo / tmpMod2                                            #M_i = M / m_i
-        t = NTLPolynomialCongruence.prmMCS([1,0], [M,-1], tmpMod2)[0]   #t_i * M_i ≡ 1 (mod m_i)
-        bList.append(t * M)                                             #b_i = t_i * M_i
+        M = modulo // tmpMod2                   #M_i = M / m_i
+        t = solve(M, tmpMod2)                   #t_i * M_i ≡ 1 (mod m_i)
+        bList.append(t * M)                     #b_i = t_i * M_i
     
-    ratio = iterCalc(rto, bList, modulo)                                #x_j = Σ(b_i * r_i) (mod M)                          
-    return sorted(ratio)
+    remainder = iterCalc(rmd, bList, modulo)    #x_j = Σ(b_i * r_i) (mod M)                          
+    return sorted(remainder)
 
-#對rto多維數組（層，號）中的數進行全排列並計算結果
+#求解M_i^-1 (mod m_i)
+def solve(variable, modulo):
+    polyCgc = '%d*x - 1' %variable              #將係數與指數數組生成多項式
+
+    r = lambda x : eval(polyCgc)                #用於計算多項式的取值
+    for x in jsrange(modulo):                   #逐一驗算，如模為0則加入結果數組
+        if r(x) % modulo == 0:
+            return x
+
+#對rmd多維數組（層，號）中的數進行全排列並計算結果
 def iterCalc(ognList, coeList, modulo):
     ptrList = []                            #寄存指向每一數組層的號
     lvlList = []                            #寄存每一數組層的最大號
@@ -83,14 +90,14 @@ def updateState(ptrList, lvlList):
 
     return ptrList, glbFlag
 
-if __name__ == '__main__':
-    ratio = CHNRemainderTheorem((3, [1,-1]), (5, [1,-1]), (7, [2,-2]))
+# if __name__ == '__main__':
+#     remainder = CHNRemainderTheorem((3, [1,-1]), (5, [1,-1]), (7, [2,-2]))
 
-    print
-    print 'x ≡ ±1 (mod 3)'
-    print 'x ≡ ±1 (mod 5)'
-    print 'x ≡ ±2 (mod 7)'
-    print 'The solutions of the above equation set is\n\tx ≡',
-    for rst in ratio:
-        print rst,
-    print '(mod 105)'
+#     print()
+#     print('x ≡ ±1 (mod 3)')
+#     print('x ≡ ±1 (mod 5)')
+#     print('x ≡ ±2 (mod 7)')
+#     print('The solutions of the above equation set is\n\tx ≡', end=' ')
+#     for rst in remainder:
+#         print(rst, end=' ')
+#     print('(mod 105)')
