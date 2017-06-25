@@ -64,6 +64,18 @@ def str_check(*args):
         if not isinstance(var, str):
             raise BoolError('Function %s expected str, %s got instead.' %(func,  type(var).__name__))
 
+def basestring_check(*args):
+    func = inspect.stack()[2][3]
+
+    if sys.version_info[0] > 2:
+        for var in args:
+            if not isinstance(var, str):
+                raise BoolError('Function %s expected str, %s got instead.' %(func,  type(var).__name__))
+    else:
+        for var in args:
+            if not isinstance(var, basestring):
+                raise BoolError('Function %s expected basestring, %s got instead.' %(func,  type(var).__name__))
+
 def bool_check(*args):
     func = inspect.stack()[2][3]
 

@@ -25,15 +25,15 @@ __import__([folder.]module).[module.]function(*args, **kwargs)
 # class Index(NTLIndex.Index):
 #     pass
 
-# #Inherit Legendre class.
-# from NTLArchive import NTLLegendre
-# class Legendre(NTLLegendre.Legendre):
-#     pass
+#Inherit Legendre class.
+from NTLArchive import NTLLegendre
+class Legendre(NTLLegendre.Legendre):
+    pass
 
-# #Inherit Jacobi class.
-# from NTLArchive import NTLJacobi
-# class Jacobi(NTLJacobi.Jacobi):
-#     pass
+#Inherit Jacobi class.
+from NTLArchive import NTLJacobi
+class Jacobi(NTLJacobi.Jacobi):
+    pass
 
 # #Inherit Fraction class.
 # from NTLArchive import NTLFraction

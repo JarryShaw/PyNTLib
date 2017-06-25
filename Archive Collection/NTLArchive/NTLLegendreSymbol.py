@@ -13,7 +13,6 @@ TODO:
 '''
 
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
-from .NTLTrivialDivision      import trivialDivision
 from .NTLValidations          import int_check, prime_check
 
 def legendreSymbol(a, p):

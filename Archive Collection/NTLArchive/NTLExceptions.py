@@ -6,7 +6,7 @@ __all__ = [ 'BaseError', 'DigitError', 'IntError', 'RealError', 'ComplexError',
             'BoolError', 'ListError', 'TupleError', 'StringError', 'PolyError',
             'PNError', 'OEError', 'PCError',
             'DefinitionError', 'ArgumentError', 'KeywordError',
-            'ExponentError', 'SolutionError']
+            'ExponentError', 'ResidueError', 'SolutionError']
 
 import sys
 import traceback
@@ -36,7 +36,7 @@ class BaseError(Exception):
         length = len(tb)
 
         for ptr in jsrange(length):
-            if tb[ptr][0][-6:-3] == 'lib':
+            if tb[ptr][0].rfind('NTLArchive.py'):
                 index = ptr;    break
 
         return length, index
@@ -45,7 +45,7 @@ class BaseError(Exception):
         length, index = self.tb_preparation()
 
         print('Traceback (most recent call last):')
-        stack_limit = length - index - 2
+        stack_limit = length - index - 5
         print(''.join(traceback.format_stack()[:stack_limit])[:-1])
         sys.tracebacklimit = 0
 
@@ -53,7 +53,7 @@ class BaseError(Exception):
         length, index = self.tb_preparation()
 
         print('Traceback (most recent call last):')
-        stack_limit = index + 2 - length
+        stack_limit = index + 5 - length
         traceback.print_stack(limit=stack_limit)
         sys.tracebacklimit = None
 
@@ -232,6 +232,17 @@ class ExponentError(BaseError):
             self.traceback_2()
 
         raise KeyError(message)
+
+#取模參數異常
+#The modulo of residue should not be 0.
+class ResidueError(BaseError):
+    def __init__(self, message):
+        if sys.version_info[0] > 2:
+            self.traceback_3() 
+        else:
+            self.traceback_2()
+
+        raise ZeroDivisionError(message)
 
 #關鍵詞參數異常
 #Unknow attribute(s).
