@@ -31,9 +31,7 @@ def trivialDivision(N):
         byte = math.log(N, 2) - 1
         para = 3**jsfloor(math.log(2**byte, 10) // 3)
 
-        para1 = para2 = para3 = para // 3
-
-        if miller_rabinTest(N, para3) and solovay_stassenTest(N, para2) and fermatTest(N, para1, False):
+        if miller_rabinTest(N, para) and fermatTest(N, para, False):
             return 1
         else:
             return 0
