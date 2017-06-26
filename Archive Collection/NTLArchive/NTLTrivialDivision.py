@@ -33,12 +33,7 @@ def trivialDivision(N):
 
         para1 = para2 = para3 = para // 3
 
-        try:
-            if not solovay_stassenTest(N, para2):   return 0
-        except OverflowError:
-            para1 = para3 = para // 2
-
-        if miller_rabinTest(N, para3) and fermatTest(N, para1, False):
+        if miller_rabinTest(N, para3) and solovay_stassenTest(N, para2) and fermatTest(N, para1, False):
             return 1
         else:
             return 0

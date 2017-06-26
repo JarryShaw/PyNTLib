@@ -33,5 +33,5 @@ def continuedFraction(numerator, denominator=None):
 
 # if __name__ == '__main__':
 #     print('7700/2145 = ', end=' ')
-#     rst_ = jsntlib.fraction(7700, 2145)
+#     rst_ = continuedFraction(7700, 2145)
 #     print(rst_)

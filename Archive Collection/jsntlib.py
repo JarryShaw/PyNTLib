@@ -5,40 +5,40 @@ Alternative declaration:
 __import__([folder.]module).[module.]function(*args, **kwargs)
 '''
 
-#Inherit Polynomial class.
+#Derive from Polynomial class.
 # from NTLArchive import NTLPolynomial
 # class Polynomial(NTLPolynomial.Polynomial):
 #     pass
 
-# #Inherit Congruence class.
+# #Derive from Congruence class.
 # from NTLArchive import NTLCongruence
 # class Congruence(NTLCongruence.Congruence):
 #     pass
 
-# #Inherit Quadratic class.
+# #Derive from Quadratic class.
 # from NTLArchive import NTLQuadratic
 # class Quadratic(NTLQuadratic.Quadratic):
 #     pass
 
-# #Inherit Index class.
-# from NTLArchive import NTLIndex
-# class Index(NTLIndex.Index):
-#     pass
+#Derive from Index class.
+from NTLArchive import NTLIndex
+class Index(NTLIndex.Index):
+    pass
 
-#Inherit Legendre class.
+#Derive from Legendre class.
 from NTLArchive import NTLLegendre
 class Legendre(NTLLegendre.Legendre):
     pass
 
-#Inherit Jacobi class.
+#Derive from Jacobi class.
 from NTLArchive import NTLJacobi
 class Jacobi(NTLJacobi.Jacobi):
     pass
 
-# #Inherit Fraction class.
-# from NTLArchive import NTLFraction
-# class Fraction(NTLFraction.Fraction):
-#     pass
+#Derive from Fraction class.
+from NTLArchive import NTLFraction
+class Fraction(NTLFraction.Fraction):
+    pass
 
 #Return all prime numbers between lower and upper bound.
 def primelist(upper, lower=None):
@@ -166,6 +166,6 @@ def pseudo(**kwargs):
     return NTLPseudoPrime.pseudoPrime(**kwargs)
 
 #Return the continued fraction of a real number.
-def fraction(n, d):
+def fraction(n, d=None):
     from NTLArchive import NTLContinuedFraction
     return NTLContinuedFraction.continuedFraction(n, d)

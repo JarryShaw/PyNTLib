@@ -30,7 +30,7 @@ def int_check(*args):
                 raise IntError('Function %s expected int, %s got instead.' %(func,  type(var).__name__))
     else:
         for var in args:
-            if not isinstance(var, int) and not isinstance(var, long):
+            if not isinstance(var, (int, long)):
                 raise IntError('Function %s expected int or long, %s got instead.' %(func,  type(var).__name__))
 
 def real_check(*args):
@@ -38,11 +38,11 @@ def real_check(*args):
     
     if sys.version_info[0] > 2:
         for var in args:
-            if not isinstance(var, int) and not isinstance(var, float):
+            if not isinstance(var, (int, float)):
                 raise RealError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
     else:
         for var in args:
-            if not isinstance(var, int) and not isinstance(var, long) and not isinstance(var, float):
+            if not isinstance(var, (int, long, float)):
                 raise RealError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
 
 def complex_check(*args):
@@ -50,11 +50,11 @@ def complex_check(*args):
     
     if sys.version_info[0] > 2:
         for var in args:
-            if not isinstance(var, int) and not isinstance(var, float) and not isinstance(var, complex):
+            if not isinstance(var, (int, float, complex)):
                 raise ComplexError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
     else:
         for var in args:
-            if not isinstance(var, int) and not isinstance(var, long) and not isinstance(var, float) and not isinstance(var, complex):
+            if not isinstance(var, (int, long, float, complex)):
                 raise ComplexError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
 
 def str_check(*args):

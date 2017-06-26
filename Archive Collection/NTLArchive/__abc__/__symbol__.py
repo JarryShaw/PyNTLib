@@ -28,6 +28,7 @@ abstractproperty = abc.abstractproperty
 
 class ABCSymbol(object):
 
+    __all__ = ['numerator', 'denominator', 'nickname']
     __metaclass__ = ABCMeta
 
     # Not hashable
@@ -126,3 +127,18 @@ class ABCSymbol(object):
     @classmethod
     def convert(cls, kind):
         return cls if kind is None else cls.cast(kind)
+
+    # support for pickling, copy, and deepcopy
+
+    def __reduce__(self):
+        return (self.__class__, (str(self),))
+
+    def __copy__(self):
+        if type(self) == ABCSymbol:
+            return self     # I'm immutable; therefore I am my own clone
+        return self.__class__(self.numerator, self._denominator, self.nickname)
+
+    def __deepcopy__(self, memo):
+        if type(self) == ABCSymbol:
+            return self     # My components are also immutable
+        return self.__class__(self.numerator, self._denominator, self.nickname)
