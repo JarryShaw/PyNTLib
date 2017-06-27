@@ -67,7 +67,7 @@ class Legendre(Symbol):
     def __init__(self, _numerator, _denominator=None):
         prime_check(self.denominator)
 
-    def cast(self, kind):
+    def convert(self, kind):
         str_check(kind)
 
         if kind == 'Legendre':

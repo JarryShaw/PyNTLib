@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-__all__  = ['ABCSymbol']
+__all__ = ['ABCSymbol']
 
 import abc
 import re
@@ -10,6 +10,11 @@ import re
 
 from NTLArchive.NTLExceptions  import DefinitionError, ResidueError
 from NTLArchive.NTLValidations import basestring_check, int_check
+
+'''
+SYMBOL_FORMAT
+    (+\-) numerator (/\|) denominator
+'''
 
 SYMBOL_FORMAT = re.compile(r'''
     \A\s*                       # optional whitespace at the start, then
@@ -58,17 +63,13 @@ class ABCSymbol(object):
     def reciprocate(self):
         pass
 
+    @abstractmethod
+    def convert(self, kind):
+        pass
+
     # Check is types match.
     def has_sametype(self, other):
         return isinstance(other, self.__class__)
-
-    # Cast to antoher type.
-    def cast(self, kind):
-        pass
-
-    # Copy a shadow instance.
-    def copy(self):
-        return self.__class__(self.numerator, self.denominator)
 
     def __new__(cls, _numerator, _denominator=None):
         self = super(ABCSymbol, cls).__new__(cls)
@@ -124,10 +125,6 @@ class ABCSymbol(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    @classmethod
-    def convert(cls, kind):
-        return cls if kind is None else cls.cast(kind)
-
     # support for pickling, copy, and deepcopy
 
     def __reduce__(self):
@@ -136,9 +133,9 @@ class ABCSymbol(object):
     def __copy__(self):
         if type(self) == ABCSymbol:
             return self     # I'm immutable; therefore I am my own clone
-        return self.__class__(self.numerator, self._denominator, self.nickname)
+        return self.__class__(self.numerator, self.denominator, self.nickname)
 
     def __deepcopy__(self, memo):
         if type(self) == ABCSymbol:
             return self     # My components are also immutable
-        return self.__class__(self.numerator, self._denominator, self.nickname)
+        return self.__class__(self.numerator, self.denominator, self.nickname)

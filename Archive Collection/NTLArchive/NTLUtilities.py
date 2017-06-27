@@ -1,6 +1,9 @@
 #-*- coding: utf-8 -*-
 
-__all__ = ['jsrange', 'jsfloor', 'jssquare', 'jssign']
+__all__ =  ['jsrange', 'jsstring',
+            'jsfloor', 'jsceil', 'jsround'
+            'jslist', 'jssquare', 'jssign',
+            'jsappend', 'jsupdate']
 
 import sys
 
@@ -9,6 +12,8 @@ import sys
 
 #Python 2.7 -- xrange | Python 3.6 -- range
 jsrange = range if sys.version_info[0] > 2 else xrange
+
+jsstring = str if sys.version_info[0] > 2 else basestring
 
 #Python 2.7 -- int(floor) | Python 3.6 -- floor
 def jsfloor(*args):
@@ -35,3 +40,22 @@ def jssquare(*args):
 #獲取整數的符號
 def jssign(num):
     return 1 if num >= 0 else -1
+
+#合併列表（去重）
+def jsappend(rst, dst):
+    if dst is list:
+        return list(set(rst + dst))
+    else:
+        return list(set(rst + [dst]))
+
+#合併字典（增補）
+def jsupdate(rst, dst):
+    for key in list(dst):
+        if key in rst:
+            if rst[key] is dict:
+                jsupdate(rst[key], dst[key])
+            else:
+                rst[key] += dst[key]
+        else:
+            rst[key] = dst[key]
+    return rst

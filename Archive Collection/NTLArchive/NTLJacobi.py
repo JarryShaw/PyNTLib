@@ -64,7 +64,7 @@ def jacobi_reciprocate(jacobi):
 
 class Jacobi(Symbol):
 
-    def cast(self, kind):
+    def convert(self, kind):
         str_check(kind)
 
         if kind == 'Jacobi':
