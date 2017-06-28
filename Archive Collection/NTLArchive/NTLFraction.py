@@ -12,15 +12,16 @@ import sys
 #連分數類
 #基于分数類，增加转化、逼近等功能
 
-from .NTLUtilities   import jsstring, jsfloor, jsceil, jsround
-from .NTLValidations import int_check
+from .NTLGreatestCommonDivisor import greatestCommonDivisor
+from .NTLUtilities             import jsstring, jsint, jsfloor, jsceil, jsround
+from .NTLValidations           import int_check
 
 _PyHASH_MODULUS = fractions._PyHASH_MODULUS
 _PyHASH_INF = fractions._PyHASH_INF
 
 class Fraction(fractions.Fraction):
 
-    __all__   = ['_numerator', '_denominator', '_fraction', '_convergent', '_number']
+    __all__   = ['numerator', 'denominator', 'fraction', 'convergent', 'number']
     __slots__ = ('_numerator', '_denominator', '_fraction', '_convergent', '_number')
 
     def __new__(cls, numerator=0, denominator=None, *, _normalise=True):
@@ -122,29 +123,19 @@ class Fraction(fractions.Fraction):
 
     def _operator_fallbacks(monomorphic_operator, fallback_operator):
         def forward(a, b):
-            if sys.version_info[0] > 2:
-                if isinstance(b, (int, Fraction)):
-                    return monomorphic_operator(a, b)
-                elif isinstance(b, float):
-                    return fallback_operator(float(a), b)
-                elif isinstance(b, complex):
-                    return fallback_operator(complex(a), b)
-                else:
-                    return NotImplemented
+            if isinstance(b, (jsint, Fraction)):
+                return monomorphic_operator(a, b)
+            elif isinstance(b, float):
+                return fallback_operator(float(a), b)
+            elif isinstance(b, complex):
+                return fallback_operator(complex(a), b)
             else:
-                if isinstance(b, (int, long, Fraction)):
-                    return monomorphic_operator(a, b)
-                elif isinstance(b, float):
-                    return fallback_operator(float(a), b)
-                elif isinstance(b, complex):
-                    return fallback_operator(complex(a), b)
-                else:
-                    return NotImplemented
+                return NotImplemented
         forward.__name__ = '__' + fallback_operator.__name__ + '__'
         forward.__doc__ = monomorphic_operator.__doc__
 
         def reverse(b, a):
-            if isinstance(a, _number.Rational):
+            if isinstance(a, numbers.Rational):
                 # Includes ints.
                 return monomorphic_operator(a, b)
             elif isinstance(a, numbers.Real):

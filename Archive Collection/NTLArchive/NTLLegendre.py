@@ -27,8 +27,8 @@ default_denominator = 2
 def legendre_eval(legendre):
     _ret = legendre_simplify(legendre)
 
-    a = _ret.numerator
-    p = _ret.denominator
+    a = _ret._numerator
+    p = _ret._denominator
 
     if a == 1:      return 1
     if a == - 1:    return (-1)**((p-1)//2)
@@ -43,10 +43,10 @@ def legendre_eval(legendre):
 def legendre_simplify(legendre):
     _ret = legendre
 
-    while abs(_ret.numerator) not in [0, 1, 2]\
-            and trivialDivision(abs(_ret.numerator)):
-        _num = _ret.numerator
-        _den = _ret.denominator
+    while abs(_ret._numerator) not in [0, 1, 2]\
+            and trivialDivision(abs(_ret._numerator)):
+        _num = _ret._numerator
+        _den = _ret._denominator
 
         if _den > abs(_num):
             _ret = legendre_reciprocate(_ret)
@@ -54,8 +54,8 @@ def legendre_simplify(legendre):
     return _ret
 
 def legendre_reciprocate(legendre):
-    _den = legendre.numerator
-    _num = legendre.denominator * (-1)**((_den-1)//2) % _den
+    _den = legendre._numerator
+    _num = legendre._denominator * (-1)**((_den-1)//2) % _den
 
     if _num == _den - 1:    _num = -1
     _ret = Legendre(_num, _den)
@@ -64,8 +64,8 @@ def legendre_reciprocate(legendre):
 
 class Legendre(Symbol):
 
-    def __init__(self, _numerator, _denominator=None):
-        prime_check(self.denominator)
+    def __init__(self, numerator, denominator=None):
+        prime_check(self._denominator)
 
     def convert(self, kind):
         str_check(kind)
@@ -74,15 +74,15 @@ class Legendre(Symbol):
             return self
         elif kind == 'Jacobi':
             from .NTLJacobi import Jacobi
-            _ret = Jacobi(self.numerator, self.denominator)
+            _ret = Jacobi(self._numerator, self._denominator)
             return _ret
         else:
             raise KeywordError('%s is an unknown type of symbol.' %kind)
 
     # Virtual properties.
-    nickname    = 'Legendre'
-    numerator   = default_numerator
-    denominator = default_denominator
+    _nickname    = 'Legendre'
+    _numerator   = default_numerator
+    _denominator = default_denominator
 
     # Virtual functions.
     eval = legendre_eval

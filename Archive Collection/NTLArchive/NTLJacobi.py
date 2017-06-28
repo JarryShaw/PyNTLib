@@ -27,8 +27,8 @@ default_denominator = 2
 def jacobi_eval(jacobi):
     _ret = jacobi_simplify(jacobi)
 
-    a = _ret.numerator
-    p = _ret.denominator
+    a = _ret._numerator
+    p = _ret._denominator
 
     if a == 1:      return 1
     if a == - 1:    return (-1)**((p-1)//2)
@@ -43,10 +43,10 @@ def jacobi_eval(jacobi):
 def jacobi_simplify(jacobi):
     _ret = jacobi
 
-    while abs(_ret.numerator) not in [0, 1, 2]\
-            and trivialDivision(abs(_ret.numerator)):
-        _num = _ret.numerator
-        _den = _ret.denominator
+    while abs(_ret._numerator) not in [0, 1, 2]\
+            and trivialDivision(abs(_ret._numerator)):
+        _num = _ret._numerator
+        _den = _ret._denominator
 
         if _den > abs(_num):
             _ret = jacobi_reciprocate(_ret)
@@ -54,8 +54,8 @@ def jacobi_simplify(jacobi):
     return _ret
 
 def jacobi_reciprocate(jacobi):
-    _den = jacobi.numerator
-    _num = jacobi.denominator * (-1)**((_den-1)//2) % _den
+    _den = jacobi._numerator
+    _num = jacobi._denominator * (-1)**((_den-1)//2) % _den
 
     if _num == _den - 1:    _num = -1
     _ret = Jacobi(_num, _den)
@@ -71,15 +71,15 @@ class Jacobi(Symbol):
             return self
         elif kind == 'Legendre':
             from .NTLLegendre import Legendre
-            _ret = Legendre(self.numerator, self.denominator)
+            _ret = Legendre(self._numerator, self._denominator)
             return _ret
         else:
             raise KeywordError('%s is an unknown type of symbol.' %kind)
 
     # Virtual properties.
-    nickname    = 'Jacobi'
-    numerator   = default_numerator
-    denominator = default_denominator
+    _nickname    = 'Jacobi'
+    _numerator   = default_numerator
+    _denominator = default_denominator
 
     # Virtual functions.
     eval = jacobi_eval

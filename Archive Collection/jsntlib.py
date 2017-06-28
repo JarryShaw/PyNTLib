@@ -6,9 +6,9 @@ __import__([folder.]module).[module.]function(*args, **kwargs)
 '''
 
 #Derive from Polynomial class.
-# from NTLArchive import NTLPolynomial
-# class Polynomial(NTLPolynomial.Polynomial):
-#     pass
+from NTLArchive import NTLPolynomial
+class Polynomial(NTLPolynomial.Polynomial):
+    pass
 
 # #Derive from Congruence class.
 # from NTLArchive import NTLCongruence

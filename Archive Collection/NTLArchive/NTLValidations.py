@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-__all__ = [ 'int_check', 'real_check', 'complex_check',
-            'str_check', 'bool_check', 'list_check', 'tuple_check',
+__all__ = [ 'int_check', 'real_check', 'complex_check', 'number_check', 
+            'str_check', 'bool_check', 'list_check', 'tuple_check', 'dict_check', 
             'neg_check', 'pos_check', 'notneg_check', 'notpos_check',
             'odd_check', 'even_check', 'prime_check', 'composit_check']
 
@@ -18,44 +18,43 @@ TODO:
 * Connect this file with NTLExceptions
 '''
 
-from .NTLExceptions import IntError, ListError, PCError, PNError, OEError, RealError, ComplexError
+from .NTLExceptions import IntError, ListError, PCError, PNError, OEError, RealError, ComplexError, DigitError
 # from .NTLTrivialDivision import trivialDivision
 
 def int_check(*args):
+    from numbers import Integral
     func = inspect.stack()[2][3]
     
-    if sys.version_info[0] > 2:
-        for var in args:
-            if not isinstance(var, int):
+    for var in args:
+        if not isinstance(var, Integral):
+            if sys.version_info[0] > 2:
                 raise IntError('Function %s expected int, %s got instead.' %(func,  type(var).__name__))
-    else:
-        for var in args:
-            if not isinstance(var, (int, long)):
+            else:
                 raise IntError('Function %s expected int or long, %s got instead.' %(func,  type(var).__name__))
 
 def real_check(*args):
+    from numbers import Real
     func = inspect.stack()[2][3]
     
-    if sys.version_info[0] > 2:
-        for var in args:
-            if not isinstance(var, (int, float)):
-                raise RealError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
-    else:
-        for var in args:
-            if not isinstance(var, (int, long, float)):
-                raise RealError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
-
+    for var in args:
+        if not isinstance(var, Real):
+            raise RealError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
+           
 def complex_check(*args):
+    from numbers import Complex
     func = inspect.stack()[2][3]
     
-    if sys.version_info[0] > 2:
-        for var in args:
-            if not isinstance(var, (int, float, complex)):
-                raise ComplexError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
-    else:
-        for var in args:
-            if not isinstance(var, (int, long, float, complex)):
-                raise ComplexError('Function %s expected real number, %s got instead.' %(func,  type(var).__name__))
+    for var in args:
+        if not isinstance(var, Complex):
+            raise RealError('Function %s expected complex number, %s got instead.' %(func,  type(var).__name__))
+       
+def number_check(*args):
+    from numbers import Number
+    func = inspect.stack()[2][3]
+
+    for var in args:
+        if not isinstance(var, Number):
+            raise DigitError('Function %s expected number, %s got instead.' %(func,  type(var).__name__))
 
 def str_check(*args):
     func = inspect.stack()[2][3]
@@ -89,6 +88,13 @@ def list_check(*args):
     for var in args:
         if not isinstance(var, list):
             raise ListError('Function %s expected list, %s got instead.' %(func,  type(var).__name__))
+
+def dict_check(*args):
+    func = inspect.stack()[2][3]
+
+    for var in args:
+        if not isinstance(var, dict):
+            raise BoolError('Function %s expected dict, %s got instead.' %(func,  type(var).__name__))
 
 def tuple_check(*args):
     func = inspect.stack()[2][3]

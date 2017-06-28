@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
+from .__abc__ import __polynomial__
+
+__all__  = ['Polynomial']
+nickname = 'Polynomial'
+
+import copy
+import sys
+
 #複數域多項式類
 #具備基本運算的複數域多項式實現
 
-'''
-TODO:
-
-* Rewrite this file to an ABC (abstract base class)
-* Inherit Polynomial class into integral/float/complex field (of coefficients)
-* Consider using C++ to write a Polynomial extension type
-
-Refernece: https://github.com/numpy/numpy/blob/v1.12.0/numpy/polynomial/_polybase.py
-'''
-
-import NTLExceptions
-import NTLRepetiveSquareModulo
+from .NTLExceptions           import ComplexError, PolyError, DefinitionError
+from .NTLRepetiveSquareModulo import repetiveSquareModulo
+from .NTLUtilities            import jsitems, jsmaxint, jsappend, jsupdate, jsrange, jsint, jskeys
+from .NTLValidations          import int_check, number_check
 
 # class Polynomial(__import__('numbers').Number):
 #     __name__  = 'Polynomial()'
@@ -25,1294 +25,661 @@ import NTLRepetiveSquareModulo
 # __version__ = '1.0'
 # __auther__  = 'jsNBZH'
 
-class Polynomial:
+PolyBase = __polynomial__.ABCPolynomial
 
-    def __init__(self, *args, **kwargs):
-        self.var = 'x'
-        self.ecDict = {}
-        self.rcflag = False
+class Polynomial(PolyBase):
 
-        for tpl in args:
-            if not isinstance(tpl, tuple) or len(tpl) != 2:
-                raise NTLExceptions.TupleError('The arguments must be tuples of exponents and coefficients.')
+    __all__   = ['cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
+    __slots__ = ('_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
 
-            if not numbercheck(tpl[1]):
-                raise NTLExceptions.DigitError('The coefficient must be a number.')
+    @property
+    def cflag(a):
+        return a._cflag
 
-            if tpl[1] == 0:     continue
+    @property
+    def iflag(a):
+        return a._iflag
 
-            if not isinstance(tpl[0], int):
-                raise NTLExceptions.IntError('The exponent must be integral.')
+    @property
+    def vflag(a):
+        return a._vflag
 
-            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be positive.')
+    @property
+    def var(a):
+        return a._var
 
-            if isinstance(tpl[1], complex):     self.rcflag = True
+    @property
+    def vec(self):
+        return a._vec
 
-            try:
-                self.ecDict[tpl[0]] += tpl[1]
-                if self.ecDict[tpl[0]] == 0:
-                    del self.ecDict[tpl[0]]
-            except KeyError:
-                self.ecDict[tpl[0]] = tpl[1]
+    @property
+    def dfvar(self):
+        return a._dfvar
 
-        for kw in kwargs:
-            if kw != 'var':
-                raise NTLExceptions.KeywordError('Keyword \'%s\' is not defined.' %kw)
+    @property
+    def nickname(self):
+        return a._nickname
+
+    @staticmethod
+    def _complex_check(_dict):
+        for _key in _dict:
+            if isinstance(_dict[_key], complex):
+                _cflag = True;      break
+        else:
+            _cflag = False
+        return _cflag
+
+    @staticmethod
+    def _int_check(_dict):
+        for _key in _dict:
+            if not isinstance(_dict[_key], jsint):
+                _iflag = False;     break
+        else:
+            _iflag = True
+        return _iflag
+
+    def _update_state(self):
+        for var in self._var:
+            for exp in jskeys(self._vec[var]):
+                if self._vec[var][exp] == 0:    del self._vec[var][exp]
+            if self._none_check(self._vec[var]):
+                self._var.remove(var);          del self._vec[var]
+
+        self._var.sort()
+        self._vflag = True if len(self._var) > 1 else False
+
+        for var in self._var:
+            if self._complex_check(self._vec[var]):
+                self._cflag = True;         break
+        else:
+            self._cflag = False
+
+        if self._cflag:
+            self._iflag = False
+        else:
+            for var in self._var:
+                if not self._int_check(self._vec[var]):
+                    self._iflag = False;    break
             else:
-                if not isinstance(kwargs[kw], str):
-                    raise NTLExceptions.StringError('The argument must be a string.')
+                self._iflag = True
 
-                self.var = kwargs[kw]
+    def __init__(self, other=None, *items):
+        self._nickname = 'poly'
+        self._update_state()
 
-    def __call__(self, *args):
-        for tpl in args:
-            if not isinstance(tpl, tuple) or len(tpl) != 2:
-                raise NTLExceptions.TupleError('The arguments must be tuples of exponents and coefficients.')
+    #求取self的值
+    def eval(self, *vars):
+        #生成可計算的多項式
+        def make_eval(_dict):
+            poly = []
+            for exp in _dict:
+                item = str(_dict[exp]) + '*x**' + str(exp)
+                poly.append(item)
+            _eval = ' + '.join(poly)
+            return _eval
 
-            if not numbercheck(tpl[1]):
-                raise NTLExceptions.DigitError('The coefficient must be a number.')
+        _rst = 0;   _var = self._read_vars(*vars)
+        for var in _var:
+            poly = make_eval(self._vec[var])
+            _rst += (lambda x: eval(poly))(_var[var])
+        return _rst
 
-            if tpl[1] == 0:     continue
+    #用模重複平方法求self取模後的值
+    def mod(self, *vars, **mods):
+        #生成可計算的多項式的項
 
-            if not isinstance(tpl[0], int):
-                raise NTLExceptions.IntError('The exponent must be integral.')
-
-            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be positive.')
-
-            if isinstance(tpl[1], complex):     self.rcflag = True
-
-            try:
-                self.ecDict[tpl[0]] += tpl[1]
-                if self.ecDict[tpl[0]] == 0:
-                    del self.ecDict[tpl[0]]
-            except KeyError:
-                self.ecDict[tpl[0]] = tpl[1]
-
-    #返回多項式對象的從屬
-    def __repr__(self):
-        return 'Polynomial(%s)' %self.var
-
-    #返回多項式的算術形式
-    def __str__(self):
-        if self.ecDict == {}:   return '0'
-
-        string = ''
-        (exp, coe) = self.dicttolist()
-
-        for ptr in xrange(len(exp)):
-            exp_ = exp[ptr]
-
-            if isinstance(coe[ptr], complex):
-                coe_ = coe[ptr]
-                if coe_ == 0:   continue
-                if ptr > 0:     string += ' + '
-            else:
-                coe_ = abs(coe[ptr]) 
-                if coe_ == 0:   continue
-                if ptr == 0:  string += '-' if coe[0] < 0 else ''
-                if ptr > 0:     string += ' - ' if coe[ptr] < 0 else ' + '
-
-            if exp_ == 0:
-                string += str(coe_)
-            else:
-                string += '' if coe_ == 1 else (str(coe_))
-                string += self.var
-                string += ''  if exp_ == 1 else ('^' + str(exp_))
-
-        return string
-
-    #返回self<poly的布爾值
-    def __lt__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
-
-        if self.rcflag or poly.rcflag:
-            raise NTLExceptions.ComplexError('No ordering relation is defined for complex polynomials.')
-
-        if len(self) > len(poly):       return False
-        if len(self) < len(poly):       return True
-        
-        a_coe = self.dicttolist()[1]
-        b_coe = poly.dicttolist()[1]
-        for ptr in range(len(a_coe)):
-            if a_coe[ptr] >= b_coe[ptr]:
-                return False
-
-        return True
-
-    #返回self≤poly的布爾值
-    def __le__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
-
-        if self.rcflag or poly.rcflag:
-            raise NTLExceptions.ComplexError('No ordering relation is defined for complex polynomials.')
-
-        if len(self) >  len(poly):      return False
-        if len(self) <= len(poly):      return True
-        
-        a_coe = self.dicttolist()[1]
-        b_coe = poly.dicttolist()[1]
-        for ptr in range(len(a_coe)):
-            if a_coe[ptr] > b_coe[ptr]:
-                return False
-
-        return True
+        _rst = 0
+        _var = self._read_vars(*vars)
+        _mod = self._read_mods(**mods)
+        for var in _var:
+            for exp in self._vec[var]:
+                _coe = self._vec[var][exp] % _mod
+                base = _var[var]
+                _tmp = repetiveSquareModulo(base, exp, _mod)
+                _rst += (_coe * _tmp) % _mod
+        return _rst
 
     #返回self=poly的布爾值
-    def __eq__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
-
-        if len(self) != len(poly):       return False
-        
-        a_coe = self.dicttolist()[1]
-        b_coe = poly.dicttolist()[1]
-        for ptr in range(len(a_coe)):
-            if a_coe[ptr] != b_coe[ptr]:
+    def __eq__(self, other):
+        if isinstance(other, Polynomial):
+            if self._var == other._var and self._vec == other._vec:
+                return True
+            else:
                 return False
-
-        return True
+        else:
+            return (self == Polynomial(other))
 
     #返回self≠poly的布爾值
     def __ne__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+        return (not (self == poly))
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
+    #返回self<poly的布爾值
+    def __lt__(self, poly):
+        if self.has_sametype(poly):
+            if self._cflag or poly._cflag:
+                raise ComplexError('No ordering relation is defined for complex polynomial.')
 
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
+            if self._vflag or poly._vflag:
+                raise PolyError('No ordering relation is defined for multi-variable polynomial.')
 
-        if self.rcflag or poly.rcflag:
-            raise NTLExceptions.ComplexError('No ordering relation is defined for complex polynomials.')
-
-        if len(self) != len(poly):       return True
+            if len(self) > len(poly):       return False
+            if len(self) < len(poly):       return True
         
-        a_coe = self.dicttolist()[1]
-        b_coe = poly.dicttolist()[1]
-        for ptr in range(len(a_coe)):
-            if a_coe[ptr] != b_coe[ptr]:
-                return True
+            a_ec = self._vec[self._var[0]]
+            b_ec = poly._vec[poly._var[0]]
 
-        return False
+            for ptr in jsrange(len(self), -1, -1):
+                try:
+                    if ptr in a_ec and ptr not in b_ec:     return False
+                    if a_ec[ptr] > b_ec[ptr]:               return False
+                except KeyError:
+                    continue
+            return True
+        else:
+            return (self < Polynomial(poly))
+
+    #返回self≤poly的布爾值
+    def __le__(self, poly):
+        return ((self == poly) or (self < poly))
 
     #返回self>poly的布爾值
     def __gt__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
-
-        if self.rcflag or poly.rcflag:
-            raise NTLExceptions.ComplexError('No ordering relation is defined for complex polynomials.')
-
-        if len(self) >  len(poly):      return True
-        if len(self) <= len(poly):      return False
-        
-        a_coe = self.dicttolist()[1]
-        b_coe = poly.dicttolist()[1]
-        for ptr in range(len(a_coe)):
-            if a_coe[ptr] <= b_coe[ptr]:
-                return False
-
-        return True
+        return (not (self <= poly))
 
     #返回self≥poly的布爾值
     def __ge__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+        return (not (self < poly))
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The comparison is between two instances of Polynomial.')
-
-        if self.rcflag or poly.rcflag:
-            raise NTLExceptions.ComplexError('No ordering relation is defined for complex polynomials.')
-
-        if len(self) > len(poly):       return True
-        if len(self) < len(poly):       return False
-        
-        a_coe = self.dicttolist()[1]
-        b_coe = poly.dicttolist()[1]
-        for ptr in range(len(a_coe)):
-            if a_coe[ptr] < b_coe[ptr]:
-                return False
-
-        return True
-
-    #返回最高次項的次冪
+    #返回最高次項的次冪加一
     def __len__(self):
-        return (max(self.ecDict) + 1)
+        if self._vflag:
+            raise PolyError('Multi-variable polynomial has no len().')
+        else:
+            return (max(self._vec[self._var[0]]) + 1)
 
-    #返回key次項的係數
+    #返回key次項的係數或關於key變量的多項式
     def __getitem__(self, key):
-        if not isinstance(key, int):
-            raise NTLExceptions.IntError('The index must be integral.')
+        if isinstance(key, str):
+            if key in self._var:
+                vec = {key: self._vec[key]}
+                item = Polynomial(vec)
+                item._dfvar = self._dfvar
+            else:
+                item = Polynomial()
+            return item
 
-        try:
-            return self.ecDict[key]
-        except KeyError:
-            return 0
+        elif isinstance(key, slice):
+            return self.__getslice__(key.start, key.stop, key.step)
 
-    #修改key次項的係數為value
+        else:
+            int_check(key)
+            if sys.version_info[0] > 2: 
+                if key < 0:     key += len(self)
+                
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial has no attribute \'__getitem__\'.')
+            else:
+                try:
+                    return self._vec[self._var[0]][key]
+                except KeyError:
+                    return 0
+
+    #修改key次項的係數或關於key變量的項為value
     def __setitem__(self, key, value):
-        if not isinstance(key, int):
-            raise NTLExceptions.IntError('The index must be integral.')
+        if isinstance(key, str):
+            tuple_check(value);     _ec = {}
+            for item in value:
+                tuple_check()
+                if len(item) != 2:
+                    raise DefinitionError('Tuple of coeffients and corresponding exponents in need.')
+                _ec[item[0]] = item[1]
 
-        if not numbercheck(value):
-            raise NTLExceptions.DigitError('The value must be a number.') 
+            jsappend(self._var, key)
+            self._vec[key] = _ec
 
-        self.ecDict[key] = value
+        elif isinstance(key, slice):
+            self.__setslice__(key.start, key.stop, key.step, value)
+
+        else:
+            int_check(key);     number_check(value)
+            if sys.version_info[0] > 2: 
+                    if key < 0:     key += len(self)
+
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial does not support item assignment.')
+
+            if value == 0:
+                del self._vec[self._var[0]][key]
+            else:
+                self._vec[self._var[0]][key] = value
+
+        self._update_state()
 
     #刪去key次項
     def __delitem__(self, key):
-        if not isinstance(key, int):
-            raise NTLExceptions.IntError('The index must be integral.')
+        if isinstance(key, str):
+            if key in self._var:
+                self._var.remove(key)
+                del self._vec[key]
 
-        try:    
-            del self.ecDict[key]
-        except KeyError:
-            pass
+        elif isinstance(key, slice):
+            self.__delslice__(key.start, key.stop, key.step)
+
+        else:
+            int_check(key)
+
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial does not support item deletion.')
+
+            try:
+                del self._vec[self._var[0]][key]
+            except KeyError:
+                pass
+
+        self._update_state()
 
     #判斷一多項式是否含於多項式中
     def __contains__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The argument must be an instance of Polynomial.')
-
-        poly_exp = poly.dicttolist()[0]
-        for exp in poly_exp:
-            try:
-                if self[exp] != poly[exp]:
-                    return False
-            except KeyError:
+        if isinstance(poly, Polynomial):
+            if (poly._var in self._var):
+                for var in poly._var:
+                    for key in poly._vec[var]:
+                        try:
+                            if poly._vec[var][key] == self._vec[var][key]:
+                                continue
+                            else:
+                                return False
+                        except KeyError:
+                            return False
+            else:
                 return False
-
-        return True
+        else:
+            return (Polynomial(poly) in self)
 
     '''
     特別注意：
-    1. 當下標值（key／i&j）小於零時，系統自動調用__len__()函數，並自增轉化為正數下標，即 key += len；
+    1. 當下標值（key\i&j）小於零時，系統自動調用__len__()函數，並自增轉化為正數下標，即 key += len；
     2. 若下標缺省，起始地址模認為0，而終止地址將被模認為最大整型數，即9223372036854775807。
     '''
 
     #返回i至j-1次項的多項式
-    def __getslice__(self, i, j):
-        if not isinstance(i, int) or not isinstance(j, int):
-            raise NTLExceptions.IntError('The arguments must be integral.')
+    def __getslice__(self, i, j, k):
+        if i is None:   i = 0
+        if j is None:   j = len(self)
+        if k is None:   k = 1
 
-        # if i < 0:   tmp_i = len(self) + i + 1;  i = 0 if tmp_i < 0 else tmp_i
-        # if j < 0:   tmp_j = len(self) + j + 1;  j = 0 if tmp_j < 0 else tmp_j
-        if j == 9223372036854775807:    j = len(self)
+        int_check(i, j, k)
         
-        poly = Polynomial()
-        for ptr in range(i, j):
+        if self._vflag:
+            raise PolyError('Multi-variable polynomial has no attribute \'__getitem__\'.')
+
+        if j == jsmaxint:   j = len(self)
+        
+        _list = [self._var[0]]
+        for ptr in jsrange(i, j, k):
             try:
-                poly((ptr, self.ecDict[ptr]))
+                _list.append((ptr, self._vec[self._var[0]][ptr]))
             except KeyError:
                 pass
 
+        poly = Polynomial(tuple(_list))
         return poly
 
     #修改i至j-1次項的多項式
-    def __setslice__(self, i, j, coe):
-        if not isinstance(i, int) or not isinstance(j, int):
-            raise NTLExceptions.IntError('The arguments must be integral.')
+    def __setslice__(self, i, j, k, coe):
+        if i is None:   i = 0
+        if j is None:   j = len(self)
+        if k is None:   k = 1
 
-        if not isinstance(coe, list):
-            raise NTLExceptions.ListError('The sequence must be list type.')
+        int_check(i, j, k);     list_check(coe)
 
-        for coe_ in coe:
-            if not numbercheck(coe_):
-                raise NTLExceptions.DigitError('The values must be numbers.')
-        
-        # if i < 0:   tmp_i = len(self) + i + 1;  i = 0 if tmp_i < 0 else tmp_i
-        # if j < 0:   tmp_j = len(self) + j + 1;  j = 0 if tmp_j < 0 else tmp_j
-        if j == 9223372036854775807:    j = len(self)
+        if self._vflag:
+            raise PolyError('Multi-variable polynomial does not support item assignment.')
 
-        j = i + len(coe)
-        for ptr in range(i, j):
-            self.ecDict[ptr] = coe[ptr - i]
+        j = i + len(coe) * k
+        for ptr in jsrange(i, j, k):
+            if coe[ptr - i] == 0:
+                del self._vec[self._var[0]][ptr]
+            else:
+                self._vec[self._var[0]][ptr] = coe[ptr - i]
+
+        self._update_state()
            
     #刪除i至j-1次項的多項式       
-    def __delslice__(self, i, j):
-        if not isinstance(i, int) or not isinstance(j, int):
-            raise NTLExceptions.IntError('The arguments must be integral.')
+    def __delslice__(self, i, j, k):
+        if i is None:   i = 0
+        if j is None:   j = len(self)
+        if k is None:   k = 1
 
-        # if i < 0:   tmp_i = len(self) + i + 1;  i = 0 if tmp_i < 0 else tmp_i
-        # if j < 0:   tmp_j = len(self) + j + 1;  j = 0 if tmp_j < 0 else tmp_j
-        if j == 9223372036854775807:    j = len(self)
+        int_check(i, j, k)
+
+        if self._vflag:
+            raise PolyError('Multi-variable polynomial does not support item deletion.')
+        
+        if j == jsmaxint:   j = len(self)
 
         for ptr in range(i, j):
             try:
-                del self.ecDict[ptr]
+                del self._vec[self._var[0]][ptr]
             except KeyError:
                 pass
 
-    #求取sum_ = self + poly
-    def __add__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+        self._update_state()
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial): 
-            raise NTLExceptions.PolyError('The addent must be an instance of Polynomial.')
-
-        sum_ = __import__('copy').deepcopy(self)
-        sum_.var = 'x'
-
-        (b_exp, b_coe) = poly.dicttolist()
-        for ptr in range(len(b_exp)):
-            exp = b_exp[ptr]
-            coe = b_coe[ptr]
-            sum_((exp, coe))
-
-        return sum_
+    #求取_sum = self + poly
+    def _add(self, poly):
+        if isinstance(poly, Polynomial):
+            _sum = copy.deepcopy(self)
+            _sum._var = jsappend(_sum._var, poly._var)
+            _sum._vec = jsupdate(self._vec, poly._vec)
+            _sum._update_state()
+        else:
+            _sum = self + Polynomial(poly)
+        return _sum
 
     #求取rsum = poly + self
-    def __radd__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The augend must be an instance of Polynomial.')
-
-        rsum = __import__('copy').deepcopy(poly)
-        rsum.var = 'x'
-
-        (b_exp, b_coe) = self.dicttolist()
-        for ptr in range(len(b_exp)):
-            exp = b_exp[ptr]
-            coe = b_coe[ptr]
-            rsum((exp, coe))
-
+    def radd(self, poly):
+        rsum = poly + self
         return rsum
 
-    #求取self += poly
-    def __iadd__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+    __add__  = _add
+    __radd__ = radd
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
+    #求取_dif = self - poly
+    def _sub(self, poly):
+        if isinstance(poly, Polynomial):
+            _dif = copy.deepcopy(self);     _poly = -poly
+            _dif._var = jsappend(_dif._var, poly._var)
+            _dif._vec = jsupdate(self._vec, _poly._vec)
+            _dif._update_state()
+        else:
+            _dif = self - Polynomial(poly)
+        
+        return _dif
 
-        if not isinstance(poly, Polynomial): 
-            raise NTLExceptions.PolyError('The addent must be an instance of Polynomial.')
-
-        sum_ = __import__('copy').deepcopy(self)
-        sum_.var = 'x'
-
-        (b_exp, b_coe) = poly.dicttolist()
-        for ptr in range(len(b_exp)):
-            exp = b_exp[ptr]
-            coe = b_coe[ptr]
-            sum_((exp, coe))
-
-        return sum_
-
-    #求取dif_ = self - poly
-    def __sub__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The subtrahend must be an instance of Polynomial.')
-
-        dif_ = __import__('copy').deepcopy(self)
-        dif_.var = 'x'
-
-        (b_exp, b_coe) = poly.dicttolist()
-        for ptr in range(len(b_exp)):
-            exp = b_exp[ptr]
-            coe = b_coe[ptr] * -1
-            dif_((exp, coe))
-
-        return dif_
-
-    #求取rdif = poly - self
-    def __rsub__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The minuend must be an instance of Polynomial.')
-
-        rdif = __import__('copy').deepcopy(poly)
-        rdif.var = 'x'
-
-        (b_exp, b_coe) = self.dicttolist()
-        for ptr in range(len(b_exp)):
-            exp = b_exp[ptr]
-            coe = b_coe[ptr] * -1
-            rdif((exp, coe))
-
+     #求取rdif = poly - self
+    
+    def rsub(self, poly):
+        rdif = poly - self
         return rdif
 
-    #求取self -= poly
-    def __isub__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+    __sub__  = _sub
+    __rsub__ = rsub
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The minuend must be an instance of Polynomial.')
-
-        dif_ = __import__('copy').deepcopy(self)
-        dif_.var = 'x'
-
-        (b_exp, b_coe) = poly.dicttolist()
-        for ptr in range(len(b_exp)):
-            exp = b_exp[ptr]
-            coe = b_coe[ptr] * -1
-            dif_((exp, coe))
-
-        return dif_
-
-    #求取pro_ = self * poly
-    def __mul__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The multiplier must be an instance of Polynomial.')
-
-        pro_ = Polynomial()
-        (a_exp, a_coe) = self.dicttolist()
-        (b_exp, b_coe) = poly.dicttolist()
-        for ptr_1 in range(len(a_exp)):
-            for ptr_2 in range(len(b_exp)):
-                exp = a_exp[ptr_1] + b_exp[ptr_2]
-                coe = a_coe[ptr_1] * b_coe[ptr_2]
-                pro_((exp, coe))
-
-        return pro_
+    #求取_pro = self * poly
+    def _mul(self, poly):
+        if isinstance(poly, Polynomial):
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial does not support multiplication.')
+            else:
+                if self._var == poly._var:
+                    _pro = copy.deepcopy(self)
+                    vec = {};   _ec = {}
+                    for exp_a in self._vec[self._var[0]]:
+                        for exp_b in poly._vec[poly._var[0]]:
+                            exp = exp_a + exp_b
+                            coe = self._vec[self._var[0]][exp_a] * poly._vec[poly._var[0]][exp_b]
+                            _ec[exp] = coe
+                    vec[self._var[0]] = _ec
+                    _pro = Polynomial(vec)
+                else:
+                    raise PolyError('No support for multi-variable multiplication.')
+        else:
+            _pro = self * Polynomial(poly)
+        return _pro
 
     #求取rpro = poly * self
-    def __rmul__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The multiplicand must be an instance of Polynomial.')
-
-        rpro = Polynomial()
-        (a_exp, a_coe) = poly.dicttolist()
-        (b_exp, b_coe) = self.dicttolist()
-        for ptr_1 in range(len(a_exp)):
-            for ptr_2 in range(len(b_exp)):
-                exp = a_exp[ptr_1] + b_exp[ptr_2]
-                coe = a_coe[ptr_1] * b_coe[ptr_2]
-                rpro((exp, coe))
-
+    def rmul(self, poly):
+        rpro = poly * self
         return rpro
 
-    #求取self *= poly
-    def __imul__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+    __mul__  = _mul
+    __rmul__ = rmul
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
+    #求取_quo = self / poly
+    def _div(self, poly):
+        if sys.version_info[0] < 3 and self._iflag and poly._iflag:
+            _quo = self // poly
+            return _quo
 
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The multiplier must be an instance of Polynomial.')
+        if isinstance(poly, Polynomial):
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial does not support division.')
+            else:
+                if self._var == poly._var:
+                    _var = self._var[0];    _vec = {_var: {}}
+                    _did = copy.deepcopy(poly)
+                    _rem = copy.deepcopy(self)
 
-        pro_ = Polynomial()
-        (a_exp, a_coe) = self.dicttolist()
-        (b_exp, b_coe) = poly.dicttolist()
-        for ptr_1 in range(len(a_exp)):
-            for ptr_2 in range(len(b_exp)):
-                exp = a_exp[ptr_1] + b_exp[ptr_2]
-                coe = a_coe[ptr_1] * b_coe[ptr_2]
-                pro_((exp, coe))
+                    a_expmax = max(self._vec[_var])                         #獲取被除式的最高次數
+                    b_exp = sorted(jskeys(_did._vec[_var]), reverse=True)   #獲取除式的指數列（降序）
 
-        return pro_
+                    #若被除式最高次冪小於除式最高次冪則終止迭代
+                    while a_expmax >= b_exp[0]:
+                        quo_coe = _rem._vec[_var][a_expmax] / \
+                                    _did._vec[_var][b_exp[0]]               #計算商式的係數，即當前被除式最高次冪項係數與除式最高次冪的項係數的商值
+                        quo_exp = a_expmax - b_exp[0]                       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+                        _vec[_var][quo_exp] = quo_coe                       #將結果添入商式多項式
 
-    #求取quo_ = self / poly
-    def __div__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+                        #更新被除式係數及次冪狀態
+                        for exp in b_exp:
+                            rem_exp = exp + quo_exp
+                            rem_coe = _did._vec[_var][exp] * quo_coe
+                            try:
+                                _rem._vec[_var][rem_exp] -= rem_coe
+                            except KeyError:
+                                _rem._vec[_var][rem_exp] = -rem_coe
+                        _rem._update_state()
+                                
+                        #更新被除式的最高次數
+                        try:
+                            a_expmax = max(_rem._vec[_var])
+                        except ValueError:
+                            break
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
-
-        quo_ = Polynomial()
-        rem_ = __import__('copy').deepcopy(self)
-        rem_.var = 'x'
-
-        a_expmax = max(self.ecDict)                         #獲取被除式的最高次數
-        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = 1.0 * rem_.ecDict[a_expmax] / poly.ecDict[b_exp[0]]   #計算商式的係數，即當前被除式最高次冪項係數與除式最高次冪的項係數的商值
-            quo_exp = a_expmax - b_exp[0]                                   #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            quo_((quo_exp, quo_coe))                                        #將結果添入商式多項式
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1.0 * poly.ecDict[exp] * quo_coe
-                rem_((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rem_.ecDict)
-            except ValueError:
-                return quo_
-
-        return quo_
+                    _quo = Polynomial(_vec)
+                    return _quo
+                else:
+                    raise PolyError('No support for multi-variable division.')
+        else:
+            _quo = self / Polynomial(poly)
+            return _quo
 
     #求取rquo = poly / self
-    def __rdiv__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
-
-        rquo = Polynomial()
-        rrem = __import__('copy').deepcopy(self)
-        rrem.var = 'x'
-
-        a_expmax = max(poly.ecDict)                         #獲取被除式的最高次數
-        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = 1.0 * rem_.ecDict[a_expmax] / self.ecDict[b_exp[0]]   #計算商式的係數，即當前被除式最高次冪項係數與除式最高次冪的項係數的商值
-            quo_exp = a_expmax - b_exp[0]                                   #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            rquo((quo_exp, quo_coe))            #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * self.ecDict[exp] * quo_coe
-                rrem((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rrem.ecDict)
-            except ValueError:
-                return rquo
-
+    def rdiv(self, poly):
+        rquo = poly / self
         return rquo
 
-    #求取self /= poly
-    def __idiv__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+    __truediv__  = _div
+    __rtruediv__ = rdiv
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
+    if sys.version_info[0] < 3:
+        __div__  = _div
+        __rdiv__ = rdiv
 
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
+    #求取(_quo, _rem) = divmod(self, poly)
+    def _divmod(self, poly):
+        if isinstance(poly, Polynomial):
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial does not support division & modulo.')
+            else:
+                if self._var == poly._var:
+                    _var = self._var[0];    _vec = {_var: {}}
+                    _did = copy.deepcopy(poly)
+                    _rem = copy.deepcopy(self)
 
-        quo_ = Polynomial()
-        rem_ = __import__('copy').deepcopy(self)
-        rem_.var = 'x'
+                    a_expmax = max(self._vec[_var])                         #獲取被除式的最高次數
+                    b_exp = sorted(jskeys(_did._vec[_var]), reverse=True)   #獲取除式的指數列（降序）
 
-        a_expmax = max(self.ecDict)                         #獲取被除式的最高次數
-        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+                    #若除式最高次冪的係數不為1，則需化簡
+                    if _did._vec[_var][b_exp[0]] != 1:
+                        _coe = _did._vec[_var][b_exp[0]]
 
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = 1.0 * rem_.ecDict[a_expmax] / poly.ecDict[b_exp[0]]   #計算商式的係數，即當前被除式最高次冪項係數與除式最高次冪的項係數的商值
-            quo_exp = a_expmax - b_exp[0]                                   #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            quo_((quo_exp, quo_coe))                                        #將結果添入商式多項式
+                        if self._vec[_var][a_expmax] % _coe == 0:
+                            _mul = self._vec[_var][a_expmax] // _coe
+                            if self == _did * _mul:
+                                _quo = Polynomial(_mul)
+                                _rem = Polynomial()
+                                return _quo, _rem
 
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1.0 * poly.ecDict[exp] * quo_coe
-                rem_((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rem_.ecDict)
-            except ValueError:
-                return quo_
+                        #判斷除式是否可化簡
+                        for exp in b_exp:
+                            if _did._vec[_var][exp] % _coe != 0:
+                                _quo = Polynomial()
+                                _rem = copy.deepcopy(self)
+                                return _quo, _rem
+                            else:
+                                _did._vec[_var][exp] //= _coe
 
-        return quo_
+                        #判斷被除式是否可化簡
+                        for key in self._vec[_var]:
+                            if self._vec[_var][key] % _coe != 0:
+                                _quo = Polynomial()
+                                _rem = copy.deepcopy(self)
+                                return _quo, _rem
+                            else:
+                                _rem._vec[_var][key] //= _coe
 
-    #求取quo_ = self // poly
-    def __floordiv__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+                    #若被除式最高次冪小於除式最高次冪則終止迭代
+                    while a_expmax >= b_exp[0]:
+                        quo_coe = _rem._vec[_var][a_expmax]     #計算商式的係數，即當前被除式最高次冪項係數
+                        quo_exp = a_expmax - b_exp[0]           #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+                        _vec[_var][quo_exp] = quo_coe           #將結果添入商式多項式
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
-
-        quo_ = Polynomial()
-        did_ = __import__('copy').deepcopy(poly)
-        rem_ = __import__('copy').deepcopy(self)
-        rem_.var = 'x'
-
-        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若除式最高次冪的係數不為1，則需化簡
-        if poly.ecDict[b_exp[0]] != 1:
-            coe_ = poly.ecDict[b_exp[0]]
-
-            if self.ecDict[a_expmax] % coe_ == 0:
-                mul_ = self.ecDict[a_expmax] / coe_
-                if self == poly * mul_:
-                    quo_ = Polynomial((0, mul_))
-                    return quo_
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if poly.ecDict[exp] % coe_ != 0:
-                    return quo_
+                        #更新被除式係數及次冪狀態
+                        for exp in b_exp:
+                            rem_exp = exp + quo_exp
+                            rem_coe = _did._vec[_var][exp] * quo_coe
+                            try:
+                                _rem._vec[_var][rem_exp] -= rem_coe
+                            except KeyError:
+                                _rem._vec[_var][rem_exp] = -rem_coe
+                        _rem._update_state()
+                                
+                        #更新被除式的最高次數
+                        try:
+                            a_expmax = max(_rem._vec[_var])
+                        except ValueError:
+                            break
+                    _quo = Polynomial(_vec)
+                    return _quo, _rem
                 else:
-                    did_.ecDict[exp] /= coe_
+                    raise PolyError('No support for multi-variable division & modulo.')
+        else:
+            _quo, _rem = self._divmod(Polynomial(poly))
+            return _quo, _rem
 
-            #判斷被除式是否可化簡
-            for key in self.ecDict.keys():
-                if self.ecDict[key] % coe_ != 0:
-                    return quo_
-                else:
-                    rem_.ecDict[key] /= coe_
+    #求取(_quo, _rem) = divmod(poly, self)
+    def rdivmod(self, poly):
+        (_quo, _rem) = divmod(poly, self)
+        return _quo, _rem
 
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rem_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            quo_((quo_exp, quo_coe))            #將結果添入商式字典
+    __divmod__  = _divmod
+    __rdivmod__ = rdivmod
 
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * did_.ecDict[exp] * quo_coe
-                rem_((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rem_.ecDict.keys())
-            except ValueError:
-                return quo_
-
-        return quo_
+    #求取_quo = self // poly
+    def _floordiv(self, poly):
+        _quo = self._divmod(poly)[0]
+        return _quo
 
     #求取rquo = poly // self
-    def __rfloordiv__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
-
-        rquo = Polynomial()
-        rdid = __import__('copy').deepcopy(self)
-        rrem = __import__('copy').deepcopy(poly)
-        rrem.var = 'x'
-
-        a_expmax = max(poly.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若除式最高次冪的係數不為1，則需化簡
-        if self.ecDict[b_exp[0]] != 1:
-            rcoe = self.ecDict[b_exp[0]]
-
-            if poly.ecDict[a_expmax] % rcoe == 0:
-                rmul = poly.ecDict[a_expmax] / rcoe
-                if poly == self * rmul:
-                    rquo = Polynomial((0, rmul))
-                    return rquo
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if self.ecDict[exp] % rcoe != 0:
-                    return rquo
-                else:
-                    rdid.ecDict[exp] /= rcoe
-
-            #判斷被除式是否可化簡
-            for key in poly.ecDict.keys():
-                if poly.ecDict[key] % rcoe != 0:
-                    return rquo
-                else:
-                    rrem.ecDict[key] /= rcoe
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rrem.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            rquo((quo_exp, quo_coe))            #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * rdid.ecDict[exp] * quo_coe
-                rrem((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rrem.ecDict.keys())
-            except ValueError:
-                return rquo
-
+    def rfloordiv(self, poly):
+        rquo = poly // self
         return rquo
 
-    #求取self //= poly
-    def __ifloordiv__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+    __floordiv__  = _floordiv
+    __rfloordiv__ = rfloordiv
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
-
-        if isinstance(poly, int):   poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
-
-        quo_ = Polynomial()
-        did_ = __import__('copy').deepcopy(poly)
-        rem_ = __import__('copy').deepcopy(self)
-        rem_.var = 'x'
-
-        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若除式最高次冪的係數不為1，則需化簡
-        if poly.ecDict[b_exp[0]] != 1:
-            coe_ = poly.ecDict[b_exp[0]]
-
-            if self.ecDict[a_expmax] % coe_ == 0:
-                mul_ = self.ecDict[a_expmax] / coe_
-                if self == poly * mul_:
-                    quo_ = Polynomial((0, mul_))
-                    return quo_
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if poly.ecDict[exp] % coe_ != 0:
-                    return quo_
-                else:
-                    did_.ecDict[exp] /= coe_
-
-            #判斷被除式是否可化簡
-            for key in self.ecDict.keys():
-                if self.ecDict[key] % coe_ != 0:
-                    return quo_
-                else:
-                    rem_.ecDict[key] /= coe_
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rem_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            quo_((quo_exp, quo_coe))            #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * did_.ecDict[exp] * quo_coe
-                rem_((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rem_.ecDict.keys())
-            except ValueError:
-                return quo_
-
-        return quo_
-
-    #求取rem_ = self % poly
-    def __mod__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
-
-        # quo_ = Polynomial()
-        did_ = __import__('copy').deepcopy(poly)
-        rem_ = __import__('copy').deepcopy(self)
-        rem_.var = 'x'
-
-        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若除式最高次冪的係數不為1，則需化簡
-        if poly.ecDict[b_exp[0]] != 1:
-            coe_ = poly.ecDict[b_exp[0]]
-
-            if self.ecDict[a_expmax] % coe_ == 0:
-                mul_ = self.ecDict[a_expmax] / coe_
-                if self == poly * mul_:
-                    rem_ = Polynomial()
-                    return rem_
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if poly.ecDict[exp] % coe_ != 0:
-                    return rem_
-                else:
-                    did_.ecDict[exp] /= coe_
-
-            #判斷被除式是否可化簡
-            for key in self.ecDict.keys():
-                if self.ecDict[key] % coe_ != 0:
-                    return rem_
-                else:
-                    rem_.ecDict[key] /= coe_
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rem_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * did_.ecDict[exp] * quo_coe
-                rem_((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rem_.ecDict.keys())
-            except ValueError:
-                # rem_ = Polynomial()
-                return rem_
-
-        return rem_
+    #求取_rem = self % poly
+    def _mod(self, poly):
+        _rem = self._divmod(poly)[1]
+        return _rem
 
     #求取rrem = poly % self
-    def __rmod__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
-
-        # rquo = Polynomial()
-        rdid = __import__('copy').deepcopy(self)
-        rrem = __import__('copy').deepcopy(poly)
-        rrem.var = 'x'
-
-        a_expmax = max(poly.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若除式最高次冪的係數不為1，則需化簡
-        if self.ecDict[b_exp[0]] != 1:
-            rcoe = self.ecDict[b_exp[0]]
-
-            if poly.ecDict[a_expmax] % rcoe == 0:
-                rmul = poly.ecDict[a_expmax] / rcoe
-                if poly == poly * rmul:
-                    rrem = Polynomial()
-                    return rrem
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if self.ecDict[exp] % rcoe != 0:
-                    return rrem
-                else:
-                    rdid.ecDict[exp] /= rcoe
-
-            #判斷被除式是否可化簡
-            for key in poly.ecDict.keys():
-                if poly.ecDict[key] % rcoe != 0:
-                    return rrem
-                else:
-                    rrem.ecDict[key] /= rcoe
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rem_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * rdid.ecDict[exp] * quo_coe
-                rrem((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rrem.ecDict.keys())
-            except ValueError:
-                # rrem = Polynomial()
-                return rrem
-
+    def rmod(self, poly):
+        rrem = poly % self
         return rrem
 
-    #求取self %= poly
-    def __imod__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
+    __mod__  = _mod
+    __rmod__ = rmod
 
-        if isinstance(poly, str):   poly = self.make_poly(poly)
+    #求取_pow = pow(self, exp[, mod])
+    def _pow(self, exp, mod=None):
+        int_check(exp);     _pow = copy.deepcopy(self)
+        for ctr in jsrange(1, _exp):        _pow *= _pow
+        if mod is not None: int_check(mod); _pow %= _mod
+        return _pow
 
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
+    __pow__  = _pow
 
-        # quo_ = Polynomial()
-        did_ = __import__('copy').deepcopy(poly)
-        rem_ = __import__('copy').deepcopy(self)
-        rem_.var = 'x'
+    #求取_neg = -self
+    def _neg(self):
+        _neg = copy.deepcopy(self)
+        for var in _neg._vec:
+            for exp in _neg._vec[var]:
+                _neg._vec[var][exp] = -_neg._vec[var][exp]
+        return _neg
 
-        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
+    #求取_pos = +self
+    def _pos(self):
+        _pos = copy.deepcopy(self)
+        return _pos
 
-        #若除式最高次冪的係數不為1，則需化簡
-        if poly.ecDict[b_exp[0]] != 1:
-            coe_ = poly.ecDict[b_exp[0]]
+    #求取_abs = abs(self)
+    def _abs(self):
+        _abs = copy.deepcopy(self)
+        for var in _abs._vec:
+            for exp in _abs._vec[var]:
+                _neg._vec[var][exp] = abs(_neg._vec[var][exp])
+        return _abs
 
-            if self.ecDict[a_expmax] % coe_ == 0:
-                mul_ = self.ecDict[a_expmax] / coe_
-                if self == poly * mul_:
-                    rem_ = Polynomial()
-                    return rem_
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if poly.ecDict[exp] % coe_ != 0:
-                    return rem_
-                else:
-                    did_.ecDict[exp] /= coe_
-
-            #判斷被除式是否可化簡
-            for key in self.ecDict.keys():
-                if self.ecDict[key] % coe_ != 0:
-                    return rem_
-                else:
-                    rem_.ecDict[key] /= coe_
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rem_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * did_.ecDict[exp] * quo_coe
-                rem_((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rem_.ecDict.keys())
-            except ValueError:
-                # rem_ = Polynomial()
-                return rem_
-
-        return rem_
-
-    #求取(quo_, rem_) = divmod(self, poly)
-    def __divmod__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The divisor must be an instance of Polynomial.')
-
-        quo_ = Polynomial()
-        did_ = __import__('copy').deepcopy(poly)
-        rem_ = __import__('copy').deepcopy(self)
-        rem_.var = 'x'
-
-        a_expmax = max(self.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(poly.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若除式最高次冪的係數不為1，則需化簡
-        if poly.ecDict[b_exp[0]] != 1:
-            coe_ = poly.ecDict[b_exp[0]]
-
-            if self.ecDict[a_expmax] % coe_ == 0:
-                mul_ = self.ecDict[a_expmax] / coe_
-                if self == poly * mul_:
-                    quo_ = Polynomial((0, mul_))
-                    rem_ = Polynomial()
-                    return quo_, rem_
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if poly.ecDict[exp] % coe_ != 0:
-                    return quo_, rem_
-                else:
-                    did_.ecDict[exp] /= coe_
-
-            #判斷被除式是否可化簡
-            for key in self.ecDict.keys():
-                if self.ecDict[key] % coe_ != 0:
-                    return quo_, rem_
-                else:
-                    rem_.ecDict[key] /= coe_
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rem_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            quo_((quo_exp, quo_coe))            #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * did_.ecDict[exp] * quo_coe
-                rem_((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rem_.ecDict.keys())
-            except ValueError:
-                # rem_ = Polynomial()
-                return quo_, rem_
-
-        return quo_, rem_
-
-    #求取(rquo, rrem) = rdivmod(poly, self)
-    def __rdivmod__(self, poly):
-        if numbercheck(poly):       poly = Polynomial((0, poly))
-
-        if isinstance(poly, str):   poly = self.make_poly(poly)
-
-        if not isinstance(poly, Polynomial):
-            raise NTLExceptions.PolyError('The dividend must be an instance of Polynomial.')
-
-        rquo = Polynomial()
-        rdid = __import__('copy').deepcopy(self)
-        rrem = __import__('copy').deepcopy(poly)
-        rrem.var = 'x'
-
-        a_expmax = max(poly.ecDict.keys())                  #獲取被除式的最高次數
-        b_exp = sorted(self.ecDict.keys(), reverse=True)    #獲取除式的指數列（降序）
-
-        #若除式最高次冪的係數不為1，則需化簡
-        if self.ecDict[b_exp[0]] != 1:
-            rcoe = self.ecDict[b_exp[0]]
-
-            if poly.ecDict[a_expmax] % rcoe == 0:
-                rmul = poly.ecDict[a_expmax] / rcoe
-                if poly == poly * rmul:
-                    rquo = Polynomial((0, rmul))
-                    rrem = Polynomial()
-                    return rquo, rrem
-
-            #判斷除式是否可化簡
-            for exp in b_exp:
-                if self.ecDict[exp] % rcoe != 0:
-                    return rquo, rrem
-                else:
-                    rdid.ecDict[exp] /= rcoe
-
-            #判斷被除式是否可化簡
-            for key in poly.ecDict.keys():
-                if poly.ecDict[key] % rcoe != 0:
-                    return rquo, rrem
-                else:
-                    rrem.ecDict[key] /= rcoe
-
-        #若被除式最高次冪小於除式最高次冪則終止迭代
-        while a_expmax >= b_exp[0]:
-            quo_coe = rem_.ecDict[a_expmax]     #計算商式的係數，即當前被除式最高次冪項的係數
-            quo_exp = a_expmax - b_exp[0]       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-            # quo_((quo_exp, quo_coe))          #將結果添入商式字典
-
-            #更新被除式係數及次冪狀態
-            for exp in b_exp:
-                rem_exp = exp + quo_exp
-                rem_coe = -1 * rdid.ecDict[exp] * quo_coe
-                rrem((rem_exp, rem_coe))
-                    
-            #更新被除式的最高次數
-            try:
-                a_expmax = max(rrem.ecDict.keys())
-            except ValueError:
-                # rrem = Polynomial()
-                return rquo, rrem
-
-        return rquo, rrem
-
-    #求取pow_ = pow(self, exp_[, mod_])
-    def __pow__(self, exp_, *args):
-        if len(args) > 1:
-            raise NTLExceptions.ArgumentError('Function \'pow\' expected at most 3 arguments, got %f.' %len(args))
-
-        if not isinstance(exp_, int):
-            raise NTLExceptions.IntError('The exponent must be integral.')
-
-        pow_ = __import__('copy').deepcopy(self)
-        pow_.var = 'x'
-
-        for ctr in range(1, exp_):      pow_ *= pow_
-        for mod_ in args:               pow_ %= mod_
-
-        return pow_
-
-    #求取self **= exp_
-    def __ipow__(self, exp_):
-        if not isinstance(exp_, int):
-            raise NTLExceptions.IntError('The exponent must be integral.')
-
-        pow_ = __import__('copy').deepcopy(self)
-        pow_.var = 'x'
-
-        for ctr in range(1, exp_):
-            pow_ *= pow_
-
-        return pow_
-
-    #求取neg_ = -self
-    def __neg__(self):
-        neg_ = __import__('copy').deepcopy(self)
-        for key in neg_.ecDict.keys():
-            neg_.ecDict[key] *= -1
-        return neg_
-
-    #求取pos_ = +self
-    def __pos__(self):
-        pos_ = __import__('copy').deepcopy(self)
-        return pos_
-
-    #求取abs_ = abs(self)
-    def __abs__(self):
-        abs_ = __import__('copy').deepcopy(self)
-        for key in abs_.ecDict.keys():
-            abs_.ecDict[key] *= -1 if abs_.ecDict[key] < 0 else 1
-        return abs_
+    __neg__ = _neg
+    __pos__ = _pos
+    __abs__ = _abs
 
     #求取self的導式
-    def diff(self):
-        de_ = Polynomial()
-
-        for key in self.ecDict.keys():
-            exp = key - 1 if key > 0 else 0
-            coe = self.ecDict[key] * key if key > 0 else 0
-            de_((exp, coe))
-
-        return de_
+    def _der(self):
+        vec = {};   _ec = {}
+        for var in self._vec:
+            for exp in self._vec[var]:
+                if exp:
+                    _exp = exp - 1
+                    _coe = self._vec[var][exp] * exp
+                else:
+                    _exp = 0;   _coe = 0
+                _ec[_exp] = [_coe]
+            vec[var] = _ec
+        _der = Polynomial(vec)
+        return _der
 
     #求取self的積分
-    def intg(self):
-        ie_ = Polynomial()
+    def _int(self):
+        vec = {};   _ec = {}
+        for var in self._vec:
+            for exp in self._vec[var]:
+                _exp = exp + 1
+                if exp:
+                    if sys.version_info[0] > 2:
+                        _coe = self._vec[var][exp] / key
+                    else:
+                        _coe = 1.0 * self._vec[var][exp] / key
+                else:
+                    _coe = self._vec[var][exp]
+                _ec[_exp] = [_coe]
+            vec[var] = _ec
+        _int = Polynomial(vec)
+        return _int
 
-        for key in self.ecDict.keys():
-            exp = key + 1
-            coe = 1.0 * self.ecDict[key] / key if key > 0 else self.ecDict[key]
-            ie_((exp, coe))
-
-        return ie_
-
-    #求取self在x=num_時的值
-    def eval(self, num_):
-        if not numbercheck:
-            raise NTLExceptions.NTLIntError('The argument must be a number.')
-
-        poly = self.make_eval()
-        rst_ = lambda x: eval(poly)
-
-        return rst_(num_)
-        # return (lambda x: eval(self.make_eval()))(num_)
-
-    #用模重複平方法求self在x=num_時求模mod後的值
-    def mod(self, num_, mod_):
-        rst_ = 0
-        for key_ in self.ecDict:
-            coe_ = self.ecDict[key_] % mod_
-            var_ = NTLRepetiveSquareModulo.repetiveSquareModulo(num_, key_, mod_)
-            rst_ += (coe_ * var_) % mod_
-        return rst_
-
-    #將多項式字典轉化為其係數與次冪數組
-    def dicttolist(self):
-        coe = []
-        exp = sorted(self.ecDict.keys(), reverse=True)
-        for expitem in exp:
-            coe.append(self.ecDict[expitem])
-
-        return exp, coe
-
-    #將字符串轉化為多項式
-    def make_poly(self, poly_str):
-        pass
-
-    #生成可計算的多項式
-    def make_eval(self):
-        (expList, coeList) = self.dicttolist()
-
-        polynomial = ''
-        for ptr in xrange(len(expList)):
-            polynomial += str(coeList[ptr]) + '*x**' + str(expList[ptr])
-            if ptr < len(expList) - 1:
-                polynomial += ' + '
-
-        return polynomial
-
-    #生成可計算的多項式的項
-    def make_item(self):
-        (expList, coeList) = self.dicttolist()
-
-        items = []
-        for ptr in xrange(len(expList)):
-            item = ''
-            item += str(coeList[ptr]) + '*x**' + str(expList[ptr])
-            items.append(item)
-
-        return items
-
-# Polynomial.register(__import__('types').ClassType)
-
-#數字參數檢查（整型、浮點、長整、複數）
-def numbercheck(*args):
-    for var in args:
-        if not (isinstance(var, int) or isinstance(var, long)\
-           or isinstance(var, float) or isinstance(var, complex)):
-            return False
-    return True
-
-def poly(poly):
-    if numbercheck(poly):       poly = Polynomial((0, poly))
-
-    if isinstance(poly, str):   poly = self.make_poly(poly)
-
-    if not isinstance(poly, Polynomial):
-        raise NTLExceptions.PolyError('The argument cannot be tranfered into a polynomial.')
-
-    return poly
-
-if __name__ == '__main__':
-    a = complex(1,3)
-    poly_1 = Polynomial((1,3), (3,4), (2,2), (34,a), var='a')
-    poly_2 = Polynomial((1,0), (4,-4), (2,3), (0,1))
-    poly_3 = Polynomial((2,-1), (0,1))
-    poly_4 = Polynomial((0,1))
-    poly_5 = Polynomial((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1))
-    poly_6 = Polynomial((7,1), (1,-1))
-    poly_7 = poly_1 / poly_2
+# if __name__ == '__main__':
+#     a = complex(1,3)
+#     poly_1 = Polynomial(('a', (1,3), (3,4), (2,2), (34,a)))
+#     poly_2 = Polynomial((1,0), (4,-4), (2,3), (0,1))
+#     poly_3 = Polynomial((2,-1), (0,1))
+#     poly_4 = Polynomial((0,1))
+#     poly_5 = Polynomial((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1))
+#     poly_6 = Polynomial((7,1), (1,-1))
+#     poly_7 = poly_1 / poly_2
     
-    print poly_1[:]
-    print poly_2
-    print poly_7
+#     print(poly_1[:])
+#     print(poly_2)
+#     print(poly_7)

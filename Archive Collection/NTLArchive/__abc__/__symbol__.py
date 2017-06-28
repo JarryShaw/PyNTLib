@@ -71,55 +71,55 @@ class ABCSymbol(object):
     def has_sametype(self, other):
         return isinstance(other, self.__class__)
 
-    def __new__(cls, _numerator, _denominator=None):
+    def __new__(cls, numerator, denominator=None):
         self = super(ABCSymbol, cls).__new__(cls)
 
-        if _denominator is None:
-            if isinstance(_numerator, ABCSymbol):
-                self = _numerator
+        if denominator is None:
+            if isinstance(numerator, ABCSymbol):
+                self = numerator
                 return self
 
             else:
                 # Handle construction from strings.
-                basestring_check(_numerator)
+                basestring_check(numerator)
                     
-                m = SYMBOL_FORMAT.match(_numerator)
+                m = SYMBOL_FORMAT.match(numerator)
                 if m is None:
-                    raise DefinitionError('Invalid literal for symbols: %r' %_numerator)
+                    raise DefinitionError('Invalid literal for symbols: %r' %numerator)
                 
-                numerator   = int(m.group('num'))
-                denominator = int(m.group('den'))
+                _numerator   = int(m.group('num'))
+                _denominator = int(m.group('den'))
 
                 if m.group('sign') == '-':
-                    numerator = -numerator
+                    _numerator = -_numerator
 
         else:
-            int_check(_numerator, _denominator)
-            if _denominator < 0:
-                numerator = -_numerator;    denominator = -_denominator
+            int_check(numerator, denominator)
+            if denominator < 0:
+                _numerator = -numerator;    _denominator = -denominator
             else:
-                numerator = _numerator;     denominator = _denominator
+                _numerator = numerator;     _denominator = denominator
 
-        if denominator == 0:
-            raise ResidueError('Symbol(%s, 0)' % numerator)
+        if _denominator == 0:
+            raise ResidueError('Symbol(%s, 0)' % _numerator)
 
-        self.numerator   = numerator
-        self.denominator = denominator
+        self._numerator   = _numerator
+        self._denominator = _denominator
         return self
 
     def __repr__(self):
         _ret = '%s(%d, %d)'
         name = self.__class__.__name__
-        _num = self.numerator
-        _den = self.denominator
+        _num = self._numerator
+        _den = self._denominator
         return _ret %(name, _num, _den)
 
     def __str__(self):
-        return '%d | %d' %(self.numerator, self.denominator)
+        return '%d | %d' %(self._numerator, self._denominator)
 
     def __eq__(self, other):
-        _ret = (self.numerator == other.numerator) and \
-               (self.denominator == other.denominator)
+        _ret = (self._numerator == other._numerator) and \
+               (self._denominator == other._denominator)
         return _ret
 
     def __ne__(self, other):
@@ -133,9 +133,9 @@ class ABCSymbol(object):
     def __copy__(self):
         if type(self) == ABCSymbol:
             return self     # I'm immutable; therefore I am my own clone
-        return self.__class__(self.numerator, self.denominator, self.nickname)
+        return self.__class__(self._numerator, self._denominator, self._nickname)
 
     def __deepcopy__(self, memo):
         if type(self) == ABCSymbol:
             return self     # My components are also immutable
-        return self.__class__(self.numerator, self.denominator, self.nickname)
+        return self.__class__(self._numerator, self._denominator, self._nickname)
