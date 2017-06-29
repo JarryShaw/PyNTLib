@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['leastCommonMultiple']
-nickname = 'lcm'
+nickname =  'lcm'
 
 #最小公倍數
 #返回任意兩整數的最小公倍數

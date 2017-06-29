@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['polyED', 'polyEDLoop']
-nickname = 'polydiv'
+nickname =  'polydiv'
 
 import copy
 
 #多項式歐幾里德除法
 #求解多項式的廣義歐幾里德除法
 
-# from .NTLExceptions  import ExponentError
-from .NTLValidations import list_check, int_check
+from .NTLValidations import int_check, list_check
 from .NTLUtilities   import jsrange
 
 def polyED(dvdExp, dvdCoe, dvsExp, dvsCoe):

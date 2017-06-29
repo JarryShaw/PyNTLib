@@ -4,7 +4,7 @@ __all__  = ['polynomialCongruence',
             'prmMCS', 'cpsMCS', 
             'prmMCSLite', 'prmMCSPro',
             'makePolynomial', 'polyDerivative']
-nickname = 'congsolve'
+nickname =  'congsolve'
 
 #同餘式求解
 #任意模的同餘式的求解

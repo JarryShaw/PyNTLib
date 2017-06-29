@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['coprimalityTest']
-nickname = 'coprime'
+nickname =  'coprime'
 
 #互素判斷
 #判斷整數a與整數m是否互素

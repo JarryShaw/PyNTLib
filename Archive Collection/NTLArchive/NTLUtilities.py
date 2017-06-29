@@ -3,8 +3,7 @@
 __all__ =  ['jsrange', 'jsstring', 'jsint', 'jsmaxint', 
             'jsfloor', 'jsceil', 'jsround',
             'jskeys', 'jsvalues', 'jsitems',
-            'jssquare', 'jssign',
-            'jsappend', 'jsupdate']
+            'jssquare', 'jssign', 'jsappend', 'jsupdate']
 
 import sys
 

@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 __all__  = ['order']
-nickname = 'ord'
+nickname =  'ord'
 
 #指數求取
 #計算整數a模m的指數

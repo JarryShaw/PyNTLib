@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['euclideanAlgorithm', 'EEALoop']
-nickname = 'eealist'
+nickname =  'eealist'
 
 #廣義歐幾里德除法
 #用輾轉相除法求出商數列

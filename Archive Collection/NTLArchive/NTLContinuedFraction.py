@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['continuedFraction']
-nickname = 'fraction'
+nickname =  'fraction'
 
 import fractions
 import math
@@ -10,7 +10,7 @@ import math
 #任意分數轉化為簡單連分數
 
 from .NTLUtilities   import jsfloor
-from .NTLValidations import real_check, notneg_check
+from .NTLValidations import notneg_check, real_check
 
 def continuedFraction(numerator, denominator=None):
     if denominator == None:     denominator = 1

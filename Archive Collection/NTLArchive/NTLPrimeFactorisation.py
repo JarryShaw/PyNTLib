@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['primeFactorisation', 'EDLoop', 'wrap']
-nickname = 'factor'
+nickname =  'factor'
 
 #素因數分解
 #返回一給定整數的標準（素因數）分解式
@@ -14,9 +14,9 @@ def primeFactorisation(N, **kwargs):
     int_check(N)
 
     p = [] 
-    if N < 0:   p.append(-1);   N = -1 * N                  #將負數轉化為正整數進行計算
+    if N < 0:   p.append(-1);   N = -N                      #將負數轉化為正整數進行計算
     
-    prmList = eratosthenesSieve(N)     #獲取素數表
+    prmList = eratosthenesSieve(N+1)     #獲取素數表
 
     for kw in kwargs:
         if kw != 'wrap':
@@ -24,9 +24,13 @@ def primeFactorisation(N, **kwargs):
         else:
             bool_check(kwargs[kw])
             if kwargs[kw]:
-                if N == 0:  p.append(0);    return p, [1]   #N為0時的分解
-                if N == 1:  p.append(1);    return p, [1]   #N為1時的分解
-                return wrap(EDLoop(N, prmList, p))          #獲取分解因數表
+                q = [1] if p == [-1] else []
+                #N為0時的分解
+                if N == 0:  p.append(0);    q.append(1);    return p, q
+                #N為1時的分解
+                if N == 1:  p.append(1);    q.append(1);    return p, q
+                #獲取分解因數表
+                return wrap(EDLoop(N, prmList, p))
 
     if N == 0:  p.append(0);    return p                    #N為0時的分解
     if N == 1:  p.append(1);    return p                    #N為1時的分解

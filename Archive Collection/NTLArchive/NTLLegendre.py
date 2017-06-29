@@ -5,7 +5,7 @@ from .__abc__ import __symbol__
 __all__  = ['Legendre',
             'default_numerator', 'default_denominator',
             'legendre_eval', 'legendre_simplify', 'legendre_reciprocate']
-nickname = 'Legendre'
+nickname =  'Legendre'
 
 #Legendre符號類
 #具備化簡、求值等基本功能
@@ -64,6 +64,18 @@ def legendre_reciprocate(legendre):
 
 class Legendre(Symbol):
 
+    @property
+    def nickname(a):
+        return a._nickname
+
+    @property
+    def numerator(a):
+        return a._numerator
+
+    @property
+    def denominator(a):
+        return a._denominator
+
     def __init__(self, numerator, denominator=None):
         prime_check(self._denominator)
 
@@ -90,10 +102,10 @@ class Legendre(Symbol):
     reciprocate = legendre_reciprocate
 
 # if __name__ == '__main__':
-#     l1 = Legendre(1, 2)
+#     l1 = Legendre(2, 3)
 #     l2 = Legendre('2|3')
 #     l3 = Legendre(l1)
 
 #     print(l1, l1.eval())
-#     print(l2, l2.eval())
-#     print(l3, l3.eval())
+#     print(l2, l2.simplify())
+#     print(l3, l3.reciprocate())

@@ -2,7 +2,7 @@
 
 __all__  = ['pseudoPrime',
             'fermatTest', 'solovay_stassenTest', 'miller_rabinTes']
-nickname = 'pseudo'
+nickname =  'pseudo'
 
 import random
 
@@ -14,7 +14,7 @@ from .NTLExceptions           import DefinitionError, KeywordError
 from .NTLJacobiSymbol         import jacobiSymbol
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLUtilities            import jsrange
-from .NTLValidations          import str_check, int_check, pos_check, bool_check
+from .NTLValidations          import bool_check, int_check, pos_check, str_check
 
 def pseudoPrime(**kwargs):
     flag = 0        #Fermat檢驗時，是否檢查Carmicheal數

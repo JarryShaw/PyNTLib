@@ -1,18 +1,12 @@
 #-*- coding: utf-8 -*-
 
 __all__  = ['jacobiSymbol']
-nickname = 'jacobi'
+nickname =  'jacobi'
 
 import math
 
 #Jacobi符號
 #計算Jacobi符號（定義求解）
-
-'''
-TODO:
-
-* Creat a Jacobi class to further tasks, like simplification.
-'''
 
 from .NTLCoprimalityTest    import coprimalityTest
 from .NTLLegendreSymbol     import legendreSymbol

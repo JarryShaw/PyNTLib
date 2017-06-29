@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['euclideanDivision']
-nickname = 'isdivisible'
+nickname =  'isdivisible'
 
 #歐幾里得除法
 #判斷是否整除，即b|a

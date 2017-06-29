@@ -1,14 +1,14 @@
 #-*- coding: utf-8 -*-
 
 __all__  = ['primitiveResidueClass']
-nickname = 'prc'
+nickname =  'prc'
 
 #簡化剩餘係
 #求整數m的簡化剩餘係
 
+from .NTLCoprimalityTest import coprimalityTest
 from .NTLUtilities       import jsrange
 from .NTLValidations     import int_check, pos_check
-from .NTLCoprimalityTest import coprimalityTest
 
 def primitiveResidueClass(n):
     int_check(n);   pos_check(n)

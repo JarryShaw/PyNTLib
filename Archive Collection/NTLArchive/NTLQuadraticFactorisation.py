@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['quadraticFactorisation', 'solve']
-nickname = 'decomposit'
+nickname =  'decomposit'
 
 import math
 
@@ -12,7 +12,7 @@ from .NTLExceptions         import DefinitionError
 from .NTLPrimeFactorisation import primeFactorisation
 from .NTLTrivialDivision    import trivialDivision
 from .NTLUtilities          import jsrange
-from .NTLValidations        import int_check, composit_check
+from .NTLValidations        import composit_check, int_check
 
 def quadraticFactorisation(N):
     int_check(N)

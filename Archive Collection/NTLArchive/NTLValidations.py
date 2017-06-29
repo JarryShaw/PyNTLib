@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__ = [ 'int_check', 'real_check', 'complex_check', 'number_check', 
-            'str_check', 'bool_check', 'list_check', 'tuple_check', 'dict_check', 
+            'str_check', 'basestring_check', 'bool_check', 'list_check', 'tuple_check', 'dict_check', 
             'neg_check', 'pos_check', 'notneg_check', 'notpos_check',
             'odd_check', 'even_check', 'prime_check', 'composit_check']
 
@@ -11,15 +11,7 @@ import sys
 #自定義模式化參數檢查
 #用於在NTL中進行模式化的參數檢查
 
-'''
-TODO:
-
-* Define decorators to do argument validation in library header i.e. jsntlib.py
-* Connect this file with NTLExceptions
-'''
-
-from .NTLExceptions import IntError, ListError, PCError, PNError, OEError, RealError, ComplexError, DigitError
-# from .NTLTrivialDivision import trivialDivision
+from .NTLExceptions import ComplexError, DigitError, IntError, ListError, OEError, PCError, PNError, RealError
 
 def int_check(*args):
     from numbers import Integral

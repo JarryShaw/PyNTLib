@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 __all__  = ['Index']
-nickname = 'Index'
+nickname =  'Index'
 
 #指標類
 #計算整數m的指標，並用於求模計算

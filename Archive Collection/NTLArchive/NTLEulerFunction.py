@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 __all__  = ['eulerFunction']
-nickname = 'euler'
+nickname =  'euler'
 
 #Euler函數
 #計算整數m的Euler函數

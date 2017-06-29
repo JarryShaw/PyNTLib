@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['CHNRemainderTheorem', 'solve', 'iterCalc', 'updateState']
-nickname = 'crt'
+nickname =  'crt'
 
 #中國剩餘定理
 #求基本同餘式組的通解

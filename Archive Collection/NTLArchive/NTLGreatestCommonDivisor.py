@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['greatestCommonDivisor']
-nickname = 'gcd'
+nickname =  'gcd'
 
 #廣義歐幾里德除法
 #返回任意兩整數的最大公因數

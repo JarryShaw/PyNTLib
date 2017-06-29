@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['quadraticEquation(']
-nickname = 'quadratic'
+nickname =  'quadratic'
 
 #二次同餘式與平方剩餘
 #求解方程x^2+y^2=p，其中p為素數
 
 from .NTLExceptions           import SolutionError
 from .NTLPolynomialCongruence import polynomialCongruence
-from .NTLTrivialDivision      import trivialDivision
 from .NTLValidations          import int_check, prime_check
 
 def quadraticEquation(p):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['Fraction']
-nickname = 'Fraction'
+nickname =  'Fraction'
 
 import fractions
 import math
@@ -13,18 +13,19 @@ import sys
 #基于分数類，增加转化、逼近等功能
 
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
-from .NTLUtilities             import jsstring, jsint, jsfloor, jsceil, jsround
+from .NTLUtilities             import jsceil, jsint, jsfloor, jsround, jsstring
 from .NTLValidations           import int_check
 
-_PyHASH_MODULUS = fractions._PyHASH_MODULUS
-_PyHASH_INF = fractions._PyHASH_INF
+if sys.version_info[0] > 2:
+    _PyHASH_MODULUS = fractions._PyHASH_MODULUS
+    _PyHASH_INF = fractions._PyHASH_INF
 
 class Fraction(fractions.Fraction):
 
     __all__   = ['numerator', 'denominator', 'fraction', 'convergent', 'number']
     __slots__ = ('_numerator', '_denominator', '_fraction', '_convergent', '_number')
 
-    def __new__(cls, numerator=0, denominator=None, *, _normalise=True):
+    def __new__(cls, numerator=0, denominator=None):
 
         # Expand into continued fraction.
         def expand(fraction):

@@ -13,8 +13,8 @@ import sys
 #Abstract Base Class for Polynomials
 
 from NTLArchive.NTLExceptions  import DefinitionError, KeywordError
-from NTLArchive.NTLUtilities   import jsstring, jsappend, jsupdate, jsint, jskeys
-from NTLArchive.NTLValidations import tuple_check, str_check, number_check, int_check, basestring_check, notneg_check, pos_check, dict_check
+from NTLArchive.NTLUtilities   import jsappend, jsint, jskeys, jsstring, jsupdate
+from NTLArchive.NTLValidations import basestring_check, dict_check, int_check, pos_check, notneg_check, number_check, str_check, tuple_check
 
 ABCMeta = abc.ABCMeta
 abstractmethod = abc.abstractmethod
@@ -71,9 +71,9 @@ class ABCPolynomial(object):
     def mod(self, *vars, **mods):
         pass
 
-    @abstractmethod
-    def convert(self, kind):
-        pass
+    # @abstractmethod
+    # def convert(self, kind):
+    #     pass
 
     @staticmethod
     def _complex_check(_dict):
@@ -419,6 +419,3 @@ class ABCPolynomial(object):
     @abstractmethod
     def _der(self):
         pass
-
-    polyder = _der
-    polyint = _int

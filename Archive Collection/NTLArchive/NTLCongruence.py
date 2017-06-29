@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['Congruence', 'Solution']
-nickname = 'Congruence'
+nickname =  'Congruence'
 
 import copy
 
 #同餘式類
 #由多項式衍生的同餘式
 
-from .NTLExceptions            import PolyError, PCError, SolutionError
+from .NTLExceptions            import PCError, PolyError, SolutionError
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
 from .NTLPolynomial            import Polynomial
 from .NTLPrimeFactorisation    import primeFactorisation
 from .NTLRepetiveSquareModulo  import repetiveSquareModulo
 from .NTLTrivialDivision       import trivialDivision
-from .NTLUtilities             import jsrange
-from .NTLValidations           import number_check, int_check
+from .NTLUtilities             import jsmaxint, jsrange
+from .NTLValidations           import int_check, number_check
 
 class Congruence(Polynomial):
 
@@ -83,7 +83,7 @@ class Congruence(Polynomial):
 
     #返回同餘式的算術形式
     def __str__(self):
-        _str = super().__str__()
+        _str = super(Congruence, self).__str__()
         _str += ' ≡ 0 (mod %d)' %self._modulo
         return _str
 
@@ -162,6 +162,7 @@ class Congruence(Polynomial):
             _rem = self._CTR(tmpRem, tmpMod)
 
         _var = self._var;   _mod = self._modulo
+        print('hi', _rem)
         _ret = Solution(_var, _mod, _rem)
         return _ret
 
@@ -171,7 +172,7 @@ class Congruence(Polynomial):
         tmpCgc._modulo = mod
         tmpCgc._pflag = True
 
-        tmpRem = tmpCgc._prime()                #獲取源素數模的同餘式的解
+        tmpRem = tmpCgc._prime()[:]             #獲取源素數模的同餘式的解
         if exp == 1:    return tmpRem
         
         _rem = tmpCgc._primePro(tmpRem, exp)    #作高次同餘式的提升，求出源素數次冪模的同餘式的解
@@ -277,9 +278,11 @@ class Congruence(Polynomial):
             return self     # My components are also immutable
         return self.__class__(self._vec, mod=self._modulo, dfvar=self._dfvar)
 
-class Solution:
+
+class Solution(object):
 
     __all__   = ['var', 'mod', 'rem', 'qflag']
+    __slots__ = ('_var', '_mod', '_rem', '_qflag')
 
     @property
     def var(a):
@@ -297,22 +300,25 @@ class Solution:
     def qflag(a):
         return a._qflag
 
-    def __new__(cls, var, mod, rem, qflag=False):
+    def __new__(cls, var, mod, rem, qflag=None):
         self = super(Solution, cls).__new__(cls)
 
         self._var = var
         self._mod = mod
         self._rem = sorted(rem)
-        self._qflag = False
 
-        if qflag:   self._qflag = qflag
+        if qflag is None:
+            self._qflag = False
+        else:
+            self._qflag = qflag
+
         return self
 
     def __call__(self):
         return self._rem
 
     def __repr__(self):
-        ret = 'Solution(%s, %d)' %(self._var, self._mod)
+        _ret = 'Solution(%s, %d)' %(self._var, self._mod)
         return _ret
 
     def __str__(self):
@@ -322,17 +328,17 @@ class Solution:
                 _ret.append(str(item))
             return _ret
 
-        if len(self._rem) == 0:
-            return 'No solution for %s modulo %d' %(self._var, self._mod)
-        _rem = _make_str(self._rem)
-
         if self._qflag:
             x = self._var[0];   y = self._var[1]
             a = self._rem[0];   b = self._rem[1]
             _str = '%s = ±%d\t%s = ±%d' %(x, a, y, b)
 
         else:
-            _str  = '%s ≡ ' %self._var
+            if len(self._rem) == 0:
+                return 'No solution for %s modulo %d' %(self._var, self._mod)
+            _rem = _make_str(self._rem)
+
+            _str  = '%s ≡ ' %self._var[0]
             _str += ', '.join(_rem)
             _str += ' (mod %d)' %self._mod
 
@@ -353,12 +359,32 @@ class Solution:
                 if _key in self._var:   return self._rem
                 else:                   return []
 
+        elif isinstance(_key, slice):
+            return self.__getslice__(_key.start, _key.stop, _key.step)
+
         else:
             int_check(_key)
             try:
                 return self._rem[_key]
             except IndexError:
                 raise SolutionError('Only %d solutions found.' %len(self._rem))
+
+    def __getslice__(self, i, j, k=None):
+        if i is None:   i = 0
+        if j is None:   j = len(self)
+        if k is None:   k = 1
+
+        int_check(i, j, k)
+
+        if j == jsmaxint:   j = len(self)
+        
+        _list = []
+        for ptr in jsrange(i, j, k):
+            try:
+                _list.append(self._rem[ptr])
+            except IndexError:
+                pass
+        return _list
 
     # support for pickling, copy, and deepcopy
 

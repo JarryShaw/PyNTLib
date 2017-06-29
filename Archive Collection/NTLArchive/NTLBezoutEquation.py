@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['bezoutEquation', 'coefficient_s', 'coefficient_t']
-nickname = 'bezout'
+nickname =  'bezout'
 
 #Bézout等式
 #對兩整數a與b，求出使得s*a+t*b=(a,b)的整數s和t

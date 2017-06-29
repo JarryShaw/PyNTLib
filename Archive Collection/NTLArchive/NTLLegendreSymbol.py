@@ -1,16 +1,10 @@
 #-*- coding: utf-8 -*-
 
 __all__  = ['legendreSymbol']
-nickname = 'legendre'
+nickname =  'legendre'
 
 #Legendre符號
 #計算Legendre符號（定義求解）
-
-'''
-TODO:
-
-* Creat a Legendre class to further tasks, like simplification.
-'''
 
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLValidations          import int_check, prime_check

@@ -5,7 +5,7 @@ from .__abc__ import __symbol__
 __all__  = ['Jacobi',
             'default_numerator', 'default_denominator',
             'jacobi_eval', 'jacobi_simplify', 'jacobi_reciprocate']
-nickname = 'Jacobi'
+nickname =  'Jacobi'
 
 #Jacobi符號類
 #具備化簡、求值等基本功能
@@ -64,6 +64,18 @@ def jacobi_reciprocate(jacobi):
 
 class Jacobi(Symbol):
 
+    @property
+    def nickname(a):
+        return a._nickname
+
+    @property
+    def numerator(a):
+        return a._numerator
+
+    @property
+    def denominator(a):
+        return a._denominator
+
     def convert(self, kind):
         str_check(kind)
 
@@ -87,10 +99,10 @@ class Jacobi(Symbol):
     reciprocate = jacobi_reciprocate
 
 # if __name__ == '__main__':
-#     l1 = Jacobi(1, 2)
-#     l2 = Jacobi('2|3')
-#     l3 = Jacobi(l1)
+#     j1 = Jacobi(2, 3)
+#     j2 = Jacobi('2|3')
+#     j3 = Jacobi(l1)
 
-#     print(l1, l1.eval())
-#     print(l2, l2.eval())
-#     print(l3, l3.eval())
+#     print(j1, j1.eval())
+#     print(j2, j2.simplify())
+#     print(j3, j3.reciprocate())

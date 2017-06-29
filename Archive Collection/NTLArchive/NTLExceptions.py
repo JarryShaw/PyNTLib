@@ -2,7 +2,8 @@
 
 from __future__ import print_function
 
-__all__ = [ 'BaseError', 'DigitError', 'IntError', 'RealError', 'ComplexError', 
+__all__ = [ 'BaseError',
+            'DigitError', 'IntError', 'RealError', 'ComplexError', 
             'BoolError', 'ListError', 'TupleError', 'StringError', 'PolyError',
             'PNError', 'OEError', 'PCError',
             'DefinitionError', 'ArgumentError', 'KeywordError',
@@ -11,32 +12,27 @@ __all__ = [ 'BaseError', 'DigitError', 'IntError', 'RealError', 'ComplexError',
 import sys
 import traceback
 
-'''
-* Turn off system-default traceback function.
-* Bugs appear in Python 3.6 when set sys.tracebacklimit to 0.
-
-sys.tracebacklimit = None if sys.version_info[0] > 2 else 0
-'''
-
 #自定義異常類型
 #用於在NTL中反饋用戶異常信息
 
 from .NTLUtilities import jsrange
 
-'''
-TODO:
-
-* Keep define and refine exceptions
-* Consider further functions besides error alarming
-'''
-
 class BaseError(Exception):
+
+    '''
+    Cautions:
+
+    * Turn off system-default traceback function by set `sys.tracebacklimit` to 0.
+    * But bugs appear in Python 3.6, so we have to set `sys.tracebacklimit` to None.
+    * In Python 2.7, `trace.print_stack(limit=None)` dose not support negative limit.
+    '''
+
     def tb_preparation(self):
         tb = traceback.extract_stack()
         length = len(tb)
 
         for ptr in jsrange(length):
-            if tb[ptr][0].rfind('NTLArchive.py'):
+            if 'NTLArchive' in tb[ptr][0]:
                 index = ptr;    break
 
         return length, index
@@ -44,18 +40,16 @@ class BaseError(Exception):
     def traceback_2(self):
         length, index = self.tb_preparation()
 
-        # print('Traceback (most recent call last):')
-        # stack_limit = length - index - 5
-        # print(''.join(traceback.format_stack()[:stack_limit])[:-1])
-        # sys.tracebacklimit = 0
+        print('Traceback (most recent call last):')
+        print(''.join(traceback.format_stack()[:index])[:-1])
+        sys.tracebacklimit = 0
 
     def traceback_3(self):
         length, index = self.tb_preparation()
 
-        # print('Traceback (most recent call last):')
-        # stack_limit = index + 5 - length
-        # traceback.print_stack(limit=stack_limit)
-        # sys.tracebacklimit = None
+        print('Traceback (most recent call last):')
+        traceback.print_stack(limit=-index)
+        sys.tracebacklimit = None
 
 #數字參數異常
 #The argument(s) must be (a) number(s).

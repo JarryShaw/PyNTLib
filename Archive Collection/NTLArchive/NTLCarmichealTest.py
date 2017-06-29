@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 __all__  = ['carmichealTest']
-nickname = 'carmicheal'
+nickname =  'carmicheal'
 
 #Carmicheal數檢驗
 #判斷奇整數n是否為Carmicheal數，即使得Fermat素性檢驗無效的數

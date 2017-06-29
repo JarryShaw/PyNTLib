@@ -2,14 +2,14 @@
 
 __all__  = ['primitiveRoot',
             'primePR', 'exponentPR', 'binaryPR']
-nickname = 'root'
+nickname =  'root'
 
 #任意數模原根求取
 #計算任意數m的原根
 
-from .NTLExceptions            import SolutionError
 from .NTLCoprimalityTest       import coprimalityTest
 from .NTLEulerFunction         import eulerFunction
+from .NTLExceptions            import SolutionError
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
 from .NTLPrimeFactorisation    import primeFactorisation
 from .NTLPrimitiveResidueClass import primitiveResidueClass

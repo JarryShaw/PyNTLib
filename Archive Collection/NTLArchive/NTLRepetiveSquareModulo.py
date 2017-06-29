@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['repetiveSquareModulo']
-nickname = 'modulo'
+nickname =  'modulo'
 
 #模重複平方法
 #求解b^n (mod m)的值
 
-from .NTLValidations import int_check, pos_check, notneg_check
+from .NTLValidations import int_check, notneg_check, pos_check
 
 def repetiveSquareModulo(base, exponent, modulo):
     int_check(base, exponent, modulo)

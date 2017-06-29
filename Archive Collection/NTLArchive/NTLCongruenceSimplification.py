@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['congruenceSimplification']
-nickname = 'simplify'
+nickname =  'simplify'
 
 #同餘式簡化
 #素數模的同餘式的簡化

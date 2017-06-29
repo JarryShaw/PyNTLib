@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['binaryEquation']
-nickname = 'binary'
+nickname =  'binary'
 
 #求解不定方程
 #求二元一次不定方程的特解
 
-from .NTLExceptions            import SolutionError
 from .NTLBezoutEquation        import bezoutEquation
+from .NTLExceptions            import SolutionError
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
 from .NTLValidations           import int_check
 

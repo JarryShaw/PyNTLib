@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__  = ['Quadratic']
-nickname = 'Quadratic'
+nickname =  'Quadratic'
 
 import copy
 import numbers
@@ -10,16 +10,32 @@ import numbers
 #由同餘式類衍生，型如x^2+y^2=p
 
 from .NTLCongruence         import Congruence, Solution
-from .NTLExceptions         import DefinitionError, PolyError, PCError
+from .NTLExceptions         import DefinitionError, PCError, PolyError
+from .NTLPolynomial         import Polynomial
 from .NTLPrimeFactorisation import primeFactorisation
 from .NTLTrivialDivision    import trivialDivision
 from .NTLUtilities          import jskeys, jssquare
-from .NTLValidations        import tuple_check, str_check
+from .NTLValidations        import str_check, tuple_check
 
-class Quadratic(Congruence):
+class Quadratic(Polynomial):
 
-    __all__   = ['constant', 'modulo', 'pflag', 'solution', 'cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
-    __slots__ = ('_constant', '_modulo', '_pflag', '_solution', '_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
+    __all__   = ['constant', 'pflag', 'solution', 'cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
+    __slots__ = ('_constant', '_pflag', '_solution', '_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
+
+    @property
+    def constant(a):
+        return a._constant
+
+    @property
+    def pflag(a):
+        return a._pflag
+
+    @property
+    def solution(a):
+        if a._solution is None:
+            return a._solve()
+        else:
+            return a._solution
 
     def __new__(cls, other=None, *items, **mods):
         if isinstance(other, Quadratic):
@@ -45,6 +61,7 @@ class Quadratic(Congruence):
             self = super(Quadratic, cls).__new__(cls, vec, **mods)
             self._pflag = trivialDivision(other)
             self._constant = other
+            self._solution = None
             return self
 
         else:
@@ -91,7 +108,7 @@ class Quadratic(Congruence):
             for item in zip(_p, _q):
                 if item[1] % 2 == 1:
                     p = item[0]
-                    q = self._constant // item[0]
+                    q = self._constant // p
                     if jssquare(q):     break
             else:
                 _var = self._var;   _mod = self._modulo;    _rem = []
@@ -101,7 +118,7 @@ class Quadratic(Congruence):
             p = self._constant
 
         if p % 4 != 1:
-            _var = self._var;   _mod = self._modulo;    _rem = []
+            _var = self._var;   _mod = None;    _rem = []
             _ret = Solution(_var, _mod, _rem)
             return _ret
 
@@ -127,7 +144,7 @@ class Quadratic(Congruence):
             m = (x**2 + y**2) // p                  #由x_i^2 + y_i^2 = m_i * p得m_i
 
         x *= _mul;  y *= _mul
-        _var = self._var;   _mod = self._modulo;    _rem = [abs(x), abs(y)]
+        _var = self._var;   _mod = None;    _rem = [abs(x), abs(y)]
         _ret = Solution(_var, _mod, _rem, True)
         return _ret
 

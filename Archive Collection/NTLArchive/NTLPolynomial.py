@@ -3,7 +3,7 @@
 from .__abc__ import __polynomial__
 
 __all__  = ['Polynomial']
-nickname = 'Polynomial'
+nickname =  'Polynomial'
 
 import copy
 import sys
@@ -11,19 +11,10 @@ import sys
 #複數域多項式類
 #具備基本運算的複數域多項式實現
 
-from .NTLExceptions           import ComplexError, PolyError, DefinitionError
+from .NTLExceptions           import ComplexError, DefinitionError, PolyError
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
-from .NTLUtilities            import jsitems, jsmaxint, jsappend, jsupdate, jsrange, jsint, jskeys
-from .NTLValidations          import int_check, number_check
-
-# class Polynomial(__import__('numbers').Number):
-#     __name__  = 'Polynomial()'
-#     __bases__ = '(Number)'
-#     __slots__ = ('var', 'ecDict', 'rcflag')
-
-# __all__     = ['']
-# __version__ = '1.0'
-# __auther__  = 'jsNBZH'
+from .NTLUtilities            import jsappend, jsint, jsitems, jskeys, jsmaxint, jsrange, jsupdate
+from .NTLValidations          import int_check, number_check, tuple_check
 
 PolyBase = __polynomial__.ABCPolynomial
 
@@ -235,7 +226,7 @@ class Polynomial(PolyBase):
             if self._vflag:
                 raise PolyError('Multi-variable polynomial does not support item assignment.')
 
-            if value == 0:
+            if key in self._vec[self._var[0]] and value == 0:
                 del self._vec[self._var[0]][key]
             else:
                 self._vec[self._var[0]][key] = value
@@ -290,7 +281,7 @@ class Polynomial(PolyBase):
     '''
 
     #返回i至j-1次項的多項式
-    def __getslice__(self, i, j, k):
+    def __getslice__(self, i, j, k=None):
         if i is None:   i = 0
         if j is None:   j = len(self)
         if k is None:   k = 1
@@ -313,27 +304,46 @@ class Polynomial(PolyBase):
         return poly
 
     #修改i至j-1次項的多項式
-    def __setslice__(self, i, j, k, coe):
-        if i is None:   i = 0
-        if j is None:   j = len(self)
-        if k is None:   k = 1
+    def __setslice__(self, i, j, k, coe=None):
+        if coe is None:
+            if i is None:   i = 0
+            if j is None:   j = len(self)
 
-        int_check(i, j, k);     list_check(coe)
+            int_check(i, j);     tuple_check(k)
 
-        if self._vflag:
-            raise PolyError('Multi-variable polynomial does not support item assignment.')
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial does not support item assignment.')
 
-        j = i + len(coe) * k
-        for ptr in jsrange(i, j, k):
-            if coe[ptr - i] == 0:
-                del self._vec[self._var[0]][ptr]
-            else:
-                self._vec[self._var[0]][ptr] = coe[ptr - i]
+            coe = k;    j = i + len(coe)
+            for ptr in jsrange(i, j):
+                if ptr in self._vec[self._var[0]] and coe[ptr-i] == 0:
+                    del self._vec[self._var[0]][ptr]
+                else:
+                    self._vec[self._var[0]][ptr] = coe[ptr-i]
 
-        self._update_state()
-           
+            self._update_state()
+        else:
+            if i is None:   i = 0
+            if j is None:   j = len(self)
+            if k is None:   k = 1
+
+            int_check(i, j, k);     tuple_check(coe)
+
+            if self._vflag:
+                raise PolyError('Multi-variable polynomial does not support item assignment.')
+
+            j = i + len(coe) * k;   ctr = -1
+            for ptr in jsrange(i, j, k):
+                ctr += 1
+                if ptr in self._vec[self._var[0]] and coe[ctr] == 0:
+                    del self._vec[self._var[0]][ptr]
+                else:
+                    self._vec[self._var[0]][ptr] = coe[ctr]
+
+            self._update_state()
+
     #刪除i至j-1次項的多項式       
-    def __delslice__(self, i, j, k):
+    def __delslice__(self, i, j, k=None):
         if i is None:   i = 0
         if j is None:   j = len(self)
         if k is None:   k = 1
@@ -345,7 +355,7 @@ class Polynomial(PolyBase):
         
         if j == jsmaxint:   j = len(self)
 
-        for ptr in range(i, j):
+        for ptr in range(i, j, k):
             try:
                 del self._vec[self._var[0]][ptr]
             except KeyError:
@@ -657,18 +667,21 @@ class Polynomial(PolyBase):
         _int = Polynomial(vec)
         return _int
 
+    polyder = _der
+    polyint = _int
+
     # support for pickling, copy, and deepcopy
 
     def __reduce__(self):
         return (self.__class__, (str(self),))
 
     def __copy__(self):
-        if type(self) == ABCPolynomial:
+        if type(self) == Polynomial:
             return self     # I'm immutable; therefore I am my own clone
         return self.__class__(self._vec, dfvar=self._dfvar)
 
     def __deepcopy__(self, memo):
-        if type(self) == ABCPolynomial:
+        if type(self) == Polynomial:
             return self     # My components are also immutable
         return self.__class__(self._vec, dfvar=self._dfvar)
 
@@ -676,7 +689,7 @@ class Polynomial(PolyBase):
 #     a = complex(1,3)
 #     poly_1 = Polynomial(('a', (1,3), (3,4), (2,2), (34,a)))
 #     poly_2 = Polynomial((1,0), (4,-4), (2,3), (0,1))
-#     poly_3 = Polynomial((2,-1), (0,1))
+#     poly_3 = Polynomial(((2,-1), (0,1)))
 #     poly_4 = Polynomial(((0,1)))
 #     poly_5 = Polynomial(((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1)))
 #     poly_6 = Polynomial(((7,1), (1,-1)))
