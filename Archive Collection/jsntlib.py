@@ -10,15 +10,15 @@ from NTLArchive import NTLPolynomial
 class Polynomial(NTLPolynomial.Polynomial):
     pass
 
-# #Derive from Congruence class.
-# from NTLArchive import NTLCongruence
-# class Congruence(NTLCongruence.Congruence):
-#     pass
+#Derive from Congruence class.
+from NTLArchive import NTLCongruence
+class Congruence(NTLCongruence.Congruence):
+    pass
 
-# #Derive from Quadratic class.
-# from NTLArchive import NTLQuadratic
-# class Quadratic(NTLQuadratic.Quadratic):
-#     pass
+#Derive from Quadratic class.
+from NTLArchive import NTLQuadratic
+class Quadratic(NTLQuadratic.Quadratic):
+    pass
 
 #Derive from Index class.
 from NTLArchive import NTLIndex

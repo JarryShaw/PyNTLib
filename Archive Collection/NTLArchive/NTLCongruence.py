@@ -1,256 +1,219 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['Congruence', 'Solution']
+nickname = 'Congruence'
+
+import copy
+
 #同餘式類
 #由多項式衍生的同餘式
 
-import NTLExceptions
-import NTLPolynomial
-import NTLTrivialDivision
-import NTLPrimeFactorisation
-import NTLRepetiveSquareModulo
-import NTLGreatestCommonDivisor
+from .NTLExceptions            import PolyError, PCError, SolutionError
+from .NTLGreatestCommonDivisor import greatestCommonDivisor
+from .NTLPolynomial            import Polynomial
+from .NTLPrimeFactorisation    import primeFactorisation
+from .NTLRepetiveSquareModulo  import repetiveSquareModulo
+from .NTLTrivialDivision       import trivialDivision
+from .NTLUtilities             import jsrange
+from .NTLValidations           import number_check, int_check
 
-class Congruence(NTLPolynomial.Polynomial):
+class Congruence(Polynomial):
 
-    __slots__ = ('modulo', 'pcflag', 'solution')
+    __all__   = ['modulo', 'pflag', 'solution', 'cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
+    __slots__ = ('_modulo', '_pflag', '_solution', '_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
 
-    def __init__(self, *args, **kwargs):
-        self.var = 'x'
-        self.ecDict = {}
-        self.modulo = None
-        self.rcflag = False
-        self.pcflag = False
-        self.solution = None
+    @property
+    def modulo(a):
+        return a._modulo
 
-        for tpl in args:
-            if not isinstance(tpl, tuple) or len(tpl) != 2:
-                raise NTLExceptions.TupleError('The arguments must be tuples of exponents and coefficients.')
+    @property
+    def pflag(a):
+        return a._pflag
 
-            if not numbercheck(tpl[1]):
-                raise NTLExceptions.DigitError('The coefficient must be a number.')
+    @property
+    def solution(a):
+        if a._solution is None:
+            return a._solve()
+        else:
+            return a._solution
 
-            if tpl[1] == 0:     continue
+    def __new__(cls, other=None, *items, **mods):
+        if isinstance(other, Congruence):
+            self = copy.deepcopy(other)
+            return self
 
-            if not isinstance(tpl[0], int):
-                raise NTLExceptions.IntError('The exponent must be integral.')
+        elif isinstance(other, Polynomial):
+            self = copy.deepcopy(other)
+            self._modulo = None
+            self._pflag = None
+            self._solution = None
+            return self
 
-            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be positive.')
+        else:
+            self = super(Congruence, cls).__new__(cls, other, *items, **mods)
+            self._modulo = None
+            self._pflag = None
+            self._solution = None
+            return self
 
-            if isinstance(tpl[1], complex):     self.rcflag = True
+    def __init__(self, other=None, *items, **mods):
+        self._update_state()
+        self._nickname = 'Congruence'
 
-            try:
-                self.ecDict[tpl[0]] += tpl[1]
-                if self.ecDict[tpl[0]] == 0:
-                    del self.ecDict[tpl[0]]
-            except KeyError:
-                self.ecDict[tpl[0]] = tpl[1]
+        if self._modulo is None:
+            self._modulo = self._read_mods(**mods)
+        if self._pflag is None:
+            self._pflag = trivialDivision(self._modulo) 
 
-        for kw in kwargs:
-            if kw == 'mod':
-                if not isinstance(kwargs[kw], int) and not isinstance(kwargs[kw], long):
-                    raise IntError('The modulo must be integral.')
-
-                if kwargs[kw] <= 0:
-                    raise PNError('The modulo must be positive')
-
-                self.modulo = kwargs[kw]
-                self.pcflag = NTLTrivialDivision.trivialDivision(self.modulo)
-
-            elif kw == 'var':
-                if not isinstance(kwargs[kw], str):
-                    raise NTLExceptions.StringError('The argument must be a string.')
-
-                self.var = kwargs[kw]
-
-            else:
-                raise NTLExceptions.KeywordError('Keyword \'%s\' is not defined.' %kw)
-
-        if self.modulo == None:
-            raise NTLExceptions.DefinitionError('The modulo of congruence must be assigned in advance.')
-
-        self.solution = Solution(self)
-
-    def __call__(self, *args):
-        for tpl in args:
-            if not isinstance(tpl, tuple) or len(tpl) != 2:
-                raise NTLExceptions.TupleError('The arguments must be tuples of exponents and coefficients.')
-
-            if not numbercheck(tpl[1]):
-                raise NTLExceptions.DigitError('The coefficient must be a number.')
-
-            if tpl[1] == 0:     continue
-
-            if not isinstance(tpl[0], int):
-                raise NTLExceptions.IntError('The exponent must be integral.')
-
-            if tpl[0] < 0:      raise NTLExceptions.PNError('The exponent must be positive.')
-
-            if isinstance(tpl[1], complex):     self.rcflag = True
-
-            try:
-                self.ecDict[tpl[0]] += tpl[1]
-                if self.ecDict[tpl[0]] == 0:
-                    del self.ecDict[tpl[0]]
-            except KeyError:
-                self.ecDict[tpl[0]] = tpl[1]
+    def __call__(self, *vars):
+        var = self._read_vars(*vars)
+        if var is None:
+            return self.solution
+        else:
+            _mod = self._modulo
+            return self._eval(var, mod=_mod)
 
     #返回同餘式對象的從屬
     def __repr__(self):
-        return 'Congruence(%s, mod=%d)' %(self.congeq.var, self.modulo)
+        _ret = '%s(%s, mod=%d)'
+        name = self.__class__.__name__
+        _var = ', '.join(self._var)
+        _mod = self._modulo
+        return _ret %(name, _var, _mod)
 
     #返回同餘式的算術形式
     def __str__(self):
-        if self.ecDict == {}:   return '0'
+        _str = super().__str__()
+        _str += ' ≡ 0 (mod %d)' %self._modulo
+        return _str
 
-        string = ''
-        (exp, coe) = self.dicttolist()
+    #用模重複平方法求self在x=_num時的值
+    def _eval(self, *vars):
+        _mod = self._modulo
+        return self.mod(*vars, mod=_mod)
 
-        for ptr in xrange(len(exp)):
-            exp_ = exp[ptr]
-
-            if isinstance(coe[ptr], complex):
-                coe_ = coe[ptr]
-                if coe_ == 0:   continue
-                if ptr > 0:     string += ' + '
-            else:
-                coe_ = abs(coe[ptr]) 
-                if coe_ == 0:   continue
-                if ptr == 0:  string += '-' if coe[0] < 0 else ''
-                if ptr > 0:     string += ' - ' if coe[ptr] < 0 else ' + '
-
-            if exp_ == 0:
-                string += str(coe_)
-            else:
-                string += '' if coe_ == 1 else (str(coe_))
-                string += self.var
-                string += ''  if exp_ == 1 else ('^' + str(exp_))
-
-        string += ' ≡ 0 (mod %d)' %self.modulo
-
-        return string
-
-    #用模重複平方法求self在x=num_時的值
-    def eval(self, num_):
-        rst_ = 0
-        for key in self.ecDict:
-            coe_ = self.ecDict[key] % self.modulo
-            var_ = NTLRepetiveSquareModulo.repetiveSquareModulo(num_, key, self.modulo)
-            rst_ += (coe_ * var_) % self.modulo
-        rst_ %= self.modulo
-
-        return rst_
-
-    #求取self在x=num_時（不取模）的值
-    def calc(self, num_):
-        if not numbercheck:
-            raise NTLExceptions.NTLIntError('The argument must be a number.')
-
-        poly = self.make_eval()
-        rst_ = lambda x: eval(poly)
-
-        return rst_(num_)
-        # return (lambda x: eval(self.make_eval()))(num_)
+    #求取self在x=_num時（不取模）的值
+    def _calc(self, *vars):
+        _ret = super().eval(*vars)
+        return _ret
 
     #素數模同餘式的簡化
-    def simplify(self):
-        if not self.pcflag:
-            raise NTLExceptions.PCError('The modulo must be prime for simplification.')
+    def _simplify(self):
+        if self._vflag:
+            raise PolyError('Multi-variable congruence dose not support simplification.')
+        if not self._iflag:
+            raise PolyError('Non-integral congruence does not support simplification.')
+        if not self.pflag:
+            raise PCError('Composit-modulo congruence does not support simplification.')
 
-        dvs_cong = Congruence((self.modulo,1), (1,-1), mod=self.modulo)
+        _mod = self._modulo;    _var = self._var[0]
+        dvs_cong = Congruence((_var, (_mod,1), (1,-1)), mod=_mod)
         rst_cong = self % dvs_cong
-
         return rst_cong
 
     #任意模同餘式的求解
-    def solve(self):
-        if self.pcflag:
-            return self.prime()
+    def _solve(self):
+        if self._vflag:
+            raise PolyError('Multi-variable congruence dose not support solution.')
+        if not self._iflag:
+            raise PolyError('Non-integral congruence does not support solution.')
+        
+        if self._pflag:
+            return self._prime()
         else:
-            return self.composit()
+            return self._composit()
 
     #素數模的同餘式求解
-    def prime(self):
-        ratio = []
+    def _prime(self):
+        _rem = []
 
         #同餘式簡化
-        rat_ = self.simplify()
+        rem = self._simplify()
         
-        for x in xrange(rat_.modulo):        #逐一驗算，如模為0則加入結果數組
-            if rat_.eval(x) == 0:
-                ratio.append(x)
+        #逐一驗算，如模為0則加入結果數組
+        for x in jsrange(rem._modulo):
+            if rem._eval(x) == 0:
+                _rem.append(x)
 
-        self.solution(ratio)
-        return self.solution
+        _var = self._var;   _mod = self._modulo
+        _ret = Solution(_var, _mod, _rem)
+        return _ret
 
     #合數模的同餘式求解
-    def composit(self):
-        (p, q) = NTLPrimeFactorisation.primeFactorisation(self.modulo, wrap=True)      #分解模，以便判斷求解方式
+    def _composit(self):
+        #分解模，以便判斷求解方式
+        (p, q) = primeFactorisation(self._modulo, wrap=True)
 
         if len(p) == 1:     #若模為單素數的次冪，則調用primeLite()函數求解
             tmpMod = p[0]
             tmpExp = q[0]
-            ratio = self.primeLite(tmpMod, tmpExp)
+            _rem = self._primeLite(tmpMod, tmpExp)
+        
         else:               #若模為多素數的次冪，則逐一對其素因數調用primeLite()函數求解，再用中國剩餘定理處理
-            tmpRto = []
+            tmpRem = []
             tmpMod = []
-            for ptr in xrange(len(p)):
+            for ptr in jsrange(len(p)):
                 tmpModVar = p[ptr]
                 tmpExpVar = q[ptr]
                 tmpMod.append(tmpModVar ** tmpExpVar)
-                tmpRto.append(self.primeLite(tmpModVar, tmpExpVar))
-            ratio = self.CTR(tmpRto, tmpMod)        #用中國剩餘定理處理上述結果，得到最終結果
+                tmpRem.append(self._primeLite(tmpModVar, tmpExpVar))
 
-        self.solution(ratio)
-        return self.solution
+            #用中國剩餘定理處理上述結果，得到最終結果
+            _rem = self._CTR(tmpRem, tmpMod)
+
+        _var = self._var;   _mod = self._modulo
+        _ret = Solution(_var, _mod, _rem)
+        return _ret
 
     #單素數的次冪模同餘式求解
-    def primeLite(self, mod, exp):
-        tmpCgc = __import__('copy').deepcopy(self)
-        tmpCgc.modulo = mod
-        tmpCgc.pcflag = True
+    def _primeLite(self, mod, exp):
+        tmpCgc = copy.deepcopy(self)
+        tmpCgc._modulo = mod
+        tmpCgc._pflag = True
 
-        tmpRto = tmpCgc.prime()                 #獲取源素數模的同餘式的解
-        if exp == 1:
-            return tmpRto
+        tmpRem = tmpCgc._prime()                #獲取源素數模的同餘式的解
+        if exp == 1:    return tmpRem
         
-        ratio = tmpCgc.primePro(tmpRto, exp)    #作高次同餘式的提升，求出源素數次冪模的同餘式的解
-        return ratio
+        _rem = tmpCgc._primePro(tmpRem, exp)    #作高次同餘式的提升，求出源素數次冪模的同餘式的解
+        return _rem
 
     #高次同餘式的提升
-    def primePro(self, rto, exp):
-        mod = self.modulo
-        drv = self.diff()   #求取原同餘式的導式
+    def _primePro(self, rem, exp):
+        mod = self._modulo
+        drv = self._der()   #求取原同餘式的導式
         
-        for tmpRto in rto:
+        for tmpRem in rem:
             #尋找滿足(f'(x1),p)=1的x1
-            if NTLGreatestCommonDivisor.greatestCommonDivisor(drv.eval(tmpRto), mod) == 1:
-                x = tmpRto
-                drvMod = drv.mod(tmpRto, mod) - mod #計算導式的值f'(x1) (mod p)，取其負值
-                drvRcp = 1 / polyDrvMod
+            if greatestCommonDivisor(drv._calc(tmpRem), mod) == 1:
+                x = tmpRem
+
+                #計算導式的值f'(x1) (mod p)，取其負值
+                drvMod = crv._eval(x) - mod
+                drvRcp = 1 // drvMod
                 break
 
-        for ctr in xrange(0, exp):
-            t = ((-1 * self.calc(x) / (mod**ctr)) * drvRcp) % mod       #t_(i-1) ≡ (-f(x_i)/p^i) * (f'(x1)^-1 (mod p)) (mod p)
-            x += (t * (mod**ctr)) % (mod**(ctr+1))                      #x_i ≡ x_(i-1) + t_(i-1) * p^(i-1) (mod p^i)
+        for ctr in jsrange(0, exp):
+            t = ((-self._calc(x) // (mod**ctr)) * drvRcp) % mod  #t_(i-1) ≡ (-f(x_i)/p^i) * (f'(x1)^-1 (mod p)) (mod p)
+            x += (t * (mod**ctr)) % (mod**(ctr+1))               #x_i ≡ x_(i-1) + t_(i-1) * p^(i-1) (mod p^i)
 
-        return x    #ratio = x
+        return x    #remainder = x
 
     #中國剩餘定理
-    def CTR(self, rto, mod):
-        modulo = self.modulo                                    #M(original modulo) = ∏m_i
+    def _CTR(self, rem, mod):
+        modulo = self._modulo                               #M(original modulo) = ∏m_i
 
         bList = []
         for tmpMod2 in mod:
-            M = modulo / tmpMod2                                #M_i = M / m_i
-            c = Congruence((1,M), (0,-1), mod=tmpMod2)
-            t = c.prime()[0]                                    #t_i * M_i ≡ 1 (mod m_i)
-            bList.append(t * M)                                 #b_i = t_i * M_i
+            M = modulo // tmpMod2                           #M_i = M / m_i
+            c = Congruence(((1,M), (0,-1)), mod=tmpMod2)
+            t = c._prime()[0]                               #t_i * M_i ≡ 1 (mod m_i)
+            bList.append(t * M)                             #b_i = t_i * M_i
 
-        ratio = self.iterCalc(rto, bList)                       #x_j = Σ(b_i * r_i) (mod M)                          
-        return ratio
+        _rem = self._iterCalc(rem, bList)                   #x_j = Σ(b_i * r_i) (mod M)                          
+        return _rem
 
     #對rto多維數組（層，號）中的數進行全排列並計算結果
-    def iterCalc(self, ognList, coeList):
+    def _iterCalc(self, ognList, coeList):
         ptrList = []                            #寄存指向每一數組層的號
         lvlList = []                            #寄存每一數組層的最大號
         for tmpList in ognList:
@@ -259,7 +222,7 @@ class Congruence(NTLPolynomial.Polynomial):
      
         flag = True
         rstList = []
-        modulo = self.modulo
+        modulo = self._modulo
 
         while flag:
             ptrNum = 0
@@ -268,13 +231,14 @@ class Congruence(NTLPolynomial.Polynomial):
                 rstNum += ognList[ptrNum][ptr] * coeList[ptrNum]    #計算結果
                 ptrNum += 1
 
-            rstList.append(rstNum % modulo)
-            (ptrList, flag) = self.updateState(ptrList, lvlList)         #更新ptrList的寄存值，並返回是否結束循環
+            x = rstNum % modulo
+            rstList.append(x)
+            (ptrList, flag) = self._updateState(ptrList, lvlList)   #更新ptrList的寄存值，並返回是否結束循環
 
         return rstList
 
     #更新ptrList的寄存值，並返回是否已遍歷所有組合
-    def updateState(self, ptrList, lvlList):
+    def _updateState(self, ptrList, lvlList):
         ptr = 0
         flag = True
         glbFlag = True
@@ -293,50 +257,127 @@ class Congruence(NTLPolynomial.Polynomial):
 
         return ptrList, glbFlag
 
-class Solution:
-    def __init__(self, con_):
-        self.rat_ = []
-        # self.con_ = con_
-        self.mod_ = con_.modulo
-        self.var_ = con_.var
+    calc     = _calc
+    eval     = _eval
+    simplify = _simplify
+    solve    = _solve
 
-    def __call__(self, rat_):
-        self.rat_ = sorted(rat_)
+    # support for pickling, copy, and deepcopy
+
+    def __reduce__(self):
+        return (self.__class__, (str(self),))
+
+    def __copy__(self):
+        if type(self) == Congruence:
+            return self     # I'm immutable; therefore I am my own clone
+        return self.__class__(self._vec, mod=self._modulo, dfvar=self._dfvar)
+
+    def __deepcopy__(self, memo):
+        if type(self) == Congruence:
+            return self     # My components are also immutable
+        return self.__class__(self._vec, mod=self._modulo, dfvar=self._dfvar)
+
+class Solution:
+
+    __all__   = ['var', 'mod', 'rem', 'qflag']
+
+    @property
+    def var(a):
+        return a._var
+
+    @property
+    def mod(a):
+        return a._mod
+
+    @property
+    def rem(a):
+        return a._rem
+
+    @property
+    def qflag(a):
+        return a._qflag
+
+    def __new__(cls, var, mod, rem, qflag=False):
+        self = super(Solution, cls).__new__(cls)
+
+        self._var = var
+        self._mod = mod
+        self._rem = sorted(rem)
+        self._qflag = False
+
+        if qflag:   self._qflag = qflag
+        return self
+
+    def __call__(self):
+        return self._rem
+
+    def __repr__(self):
+        ret = 'Solution(%s, %d)' %(self._var, self._mod)
+        return _ret
 
     def __str__(self):
-        if len(self.rat_) == 0:
-            return 'No solution'
+        def _make_str(_list):
+            _ret = []
+            for item in _list:
+                _ret.append(str(item))
+            return _ret
 
-        str_ = '%s ≡ ' %self.var_
-        for rst in self.rat_:
-            str_ += '%d ' %rst
-        str_ += '(mod %d)' %self.mod_
+        if len(self._rem) == 0:
+            return 'No solution for %s modulo %d' %(self._var, self._mod)
+        _rem = _make_str(self._rem)
 
-        return str_
+        if self._qflag:
+            x = self._var[0];   y = self._var[1]
+            a = self._rem[0];   b = self._rem[1]
+            _str = '%s = ±%d\t%s = ±%d' %(x, a, y, b)
+
+        else:
+            _str  = '%s ≡ ' %self._var
+            _str += ', '.join(_rem)
+            _str += ' (mod %d)' %self._mod
+
+        return _str
 
     def __len__(self):
-        return len(self.rat_)
+        return len(self._rem)
 
-    def __getitem__(self, key_):
-        return self.rat_[key_]
+    def __getitem__(self, _key):
+        if isinstance(_key, str):
+            if self._qflag:
+                try:
+                    return self._rem[self._var.find(_key)]
+                except IndexError:
+                    return None
+            
+            else:
+                if _key in self._var:   return self._rem
+                else:                   return []
 
-#數字參數檢查（整型、浮點、長整、複數）
-def numbercheck(*args):
-    for var in args:
-        if not (isinstance(var, int) or isinstance(var, long)\
-           or isinstance(var, float) or isinstance(var, complex)):
-            return False
-    return True
+        else:
+            int_check(_key)
+            try:
+                return self._rem[_key]
+            except IndexError:
+                raise SolutionError('Only %d solutions found.' %len(self._rem))
 
-if __name__ == '__main__':
-    con_ = Congruence((2,1), (0,-46), mod=105, var='z')
-    rat_ = con_.solve()
+    # support for pickling, copy, and deepcopy
 
-    print 'The solution of %s is\n\t' %str(con_),
-    print rat_
-    # ratio = con_.solve()
-    
-    # print 'The solution of %s is\n\t%s ≡' %(str(con_), con_.var),
-    # for rst in ratio:
-    #     print '%d' %rst,
-    # print '(mod %d)' %105
+    def __reduce__(self):
+        return (self.__class__, (str(self),))
+
+    def __copy__(self):
+        if type(self) == Congruence:
+            return self     # I'm immutable; therefore I am my own clone
+        return self.__class__(self._vec, self._mod, self._rem)
+
+    def __deepcopy__(self, memo):
+        if type(self) == Congruence:
+            return self     # My components are also immutable
+        return self.__class__(self._vec, self._mod, self._rem)
+
+# if __name__ == '__main__':
+#     _con = Congruence(('z', (2,1), (0,-46)), mod=105)
+#     print('The solution of %s is' %str(_con))
+
+#     _ret = _con.solution
+#     print('\t', _ret)

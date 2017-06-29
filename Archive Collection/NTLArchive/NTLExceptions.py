@@ -44,18 +44,18 @@ class BaseError(Exception):
     def traceback_2(self):
         length, index = self.tb_preparation()
 
-        print('Traceback (most recent call last):')
-        stack_limit = length - index - 5
-        print(''.join(traceback.format_stack()[:stack_limit])[:-1])
-        sys.tracebacklimit = 0
+        # print('Traceback (most recent call last):')
+        # stack_limit = length - index - 5
+        # print(''.join(traceback.format_stack()[:stack_limit])[:-1])
+        # sys.tracebacklimit = 0
 
     def traceback_3(self):
         length, index = self.tb_preparation()
 
-        print('Traceback (most recent call last):')
-        stack_limit = index + 5 - length
-        traceback.print_stack(limit=stack_limit)
-        sys.tracebacklimit = None
+        # print('Traceback (most recent call last):')
+        # stack_limit = index + 5 - length
+        # traceback.print_stack(limit=stack_limit)
+        # sys.tracebacklimit = None
 
 #數字參數異常
 #The argument(s) must be (a) number(s).

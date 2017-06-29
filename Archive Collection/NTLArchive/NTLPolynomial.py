@@ -60,24 +60,6 @@ class Polynomial(PolyBase):
     def nickname(self):
         return a._nickname
 
-    @staticmethod
-    def _complex_check(_dict):
-        for _key in _dict:
-            if isinstance(_dict[_key], complex):
-                _cflag = True;      break
-        else:
-            _cflag = False
-        return _cflag
-
-    @staticmethod
-    def _int_check(_dict):
-        for _key in _dict:
-            if not isinstance(_dict[_key], jsint):
-                _iflag = False;     break
-        else:
-            _iflag = True
-        return _iflag
-
     def _update_state(self):
         for var in self._var:
             for exp in jskeys(self._vec[var]):
@@ -103,7 +85,7 @@ class Polynomial(PolyBase):
             else:
                 self._iflag = True
 
-    def __init__(self, other=None, *items):
+    def __init__(self, other=None, *items, **kwargs):
         self._nickname = 'poly'
         self._update_state()
 
@@ -119,6 +101,8 @@ class Polynomial(PolyBase):
             return _eval
 
         _rst = 0;   _var = self._read_vars(*vars)
+        if _var is None:        return 0
+        if self._var == []:     return 0
         for var in _var:
             poly = make_eval(self._vec[var])
             _rst += (lambda x: eval(poly))(_var[var])
@@ -131,12 +115,15 @@ class Polynomial(PolyBase):
         _rst = 0
         _var = self._read_vars(*vars)
         _mod = self._read_mods(**mods)
+        if _var is None:        return 0
+        if self._var == []:     return 0
         for var in _var:
             for exp in self._vec[var]:
                 _coe = self._vec[var][exp] % _mod
                 base = _var[var]
                 _tmp = repetiveSquareModulo(base, exp, _mod)
                 _rst += (_coe * _tmp) % _mod
+        _rst %= _mod
         return _rst
 
     #返回self=poly的布爾值
@@ -470,7 +457,7 @@ class Polynomial(PolyBase):
                             except KeyError:
                                 _rem._vec[_var][rem_exp] = -rem_coe
                         _rem._update_state()
-                                
+
                         #更新被除式的最高次數
                         try:
                             a_expmax = max(_rem._vec[_var])
@@ -670,14 +657,29 @@ class Polynomial(PolyBase):
         _int = Polynomial(vec)
         return _int
 
+    # support for pickling, copy, and deepcopy
+
+    def __reduce__(self):
+        return (self.__class__, (str(self),))
+
+    def __copy__(self):
+        if type(self) == ABCPolynomial:
+            return self     # I'm immutable; therefore I am my own clone
+        return self.__class__(self._vec, dfvar=self._dfvar)
+
+    def __deepcopy__(self, memo):
+        if type(self) == ABCPolynomial:
+            return self     # My components are also immutable
+        return self.__class__(self._vec, dfvar=self._dfvar)
+
 # if __name__ == '__main__':
 #     a = complex(1,3)
 #     poly_1 = Polynomial(('a', (1,3), (3,4), (2,2), (34,a)))
 #     poly_2 = Polynomial((1,0), (4,-4), (2,3), (0,1))
 #     poly_3 = Polynomial((2,-1), (0,1))
-#     poly_4 = Polynomial((0,1))
-#     poly_5 = Polynomial((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1))
-#     poly_6 = Polynomial((7,1), (1,-1))
+#     poly_4 = Polynomial(((0,1)))
+#     poly_5 = Polynomial(((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1)))
+#     poly_6 = Polynomial(((7,1), (1,-1)))
 #     poly_7 = poly_1 / poly_2
     
 #     print(poly_1[:])

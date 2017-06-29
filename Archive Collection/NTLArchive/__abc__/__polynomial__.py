@@ -3,6 +3,7 @@
 __all__ = ['ABCPolynomial']
 
 import abc
+import copy
 import numbers
 import operator
 import re
@@ -12,7 +13,7 @@ import sys
 #Abstract Base Class for Polynomials
 
 from NTLArchive.NTLExceptions  import DefinitionError, KeywordError
-from NTLArchive.NTLUtilities   import jsstring, jsappend, jsupdate, jsint
+from NTLArchive.NTLUtilities   import jsstring, jsappend, jsupdate, jsint, jskeys
 from NTLArchive.NTLValidations import tuple_check, str_check, number_check, int_check, basestring_check, notneg_check, pos_check, dict_check
 
 ABCMeta = abc.ABCMeta
@@ -31,7 +32,7 @@ POLYNOMIAL_FORMAT = re.compile(r'''
     (?P<coe_>\d*)                   # coefficient
     (?:\*)                          # followed by an optional asterisk/multiplier, then
     (?=[a-z_]?)                     # lookahead for non-digit/letter
-    (?P<var_>[a-z_]?+)              # variable
+    (?P<var_>[a-z_]+)               # variable
     (?:\^)                          # followed by an optional caret, then
     (?=\d)                          # lookahead for digit
     (?P<exp_>\d*)                   # exponent
@@ -74,15 +75,34 @@ class ABCPolynomial(object):
     def convert(self, kind):
         pass
 
-    def _none_check(self, _dict):
-        if _dict == {}:
-            return True
+    @staticmethod
+    def _complex_check(_dict):
+        for _key in _dict:
+            if isinstance(_dict[_key], complex):
+                _cflag = True;      break
+        else:
+            _cflag = False
+        return _cflag
+
+    @staticmethod
+    def _int_check(_dict):
+        for _key in _dict:
+            if not isinstance(_dict[_key], jsint):
+                _iflag = False;     break
+        else:
+            _iflag = True
+        return _iflag
+
+    @staticmethod
+    def _none_check(_dict):
+        if _dict == {}:             return True
 
         for _key in _dict:
             if _dict[_key] != 0:    return False
         return True
 
-    def _read_item(self, item):
+    @staticmethod
+    def _read_item(item):
         m = POLYNOMIAL_FORMAT.match(item)
         if m is None:
             raise DefinitionError('Invalid literal for symbols: %r' %item)
@@ -95,6 +115,43 @@ class ABCPolynomial(object):
             coe = -coe
 
         return var, exp, coe
+
+    @staticmethod
+    def _read_dict(vec):
+        # DICT_FORMAT
+        #     {'variable': {exponent: coefficient, ...}, ...}
+
+        _var = [];      _vec = {}
+        for var in vec:
+            str_check(var);             dict_check(vec[var])
+            for exp in vec[var]:
+                int_check(exp);         number_check(vec[var][exp])
+            _var.append(var)
+        _vec.update(vec)
+        return _var, _vec
+
+    def _read_mods(self, **mods):
+        _mod = None
+        set_flag = False
+        for mod in mods:
+            if mod == 'mod':
+                if set_flag:
+                    raise DefinitionError('Only one modulo taken.')
+                else:
+                    int_check(mods[mod]);     pos_check(mods[mod])
+                    _mod = mods[mod];         set_flag = True;      break
+            elif mod == 'dfvar':
+                self._dfvar = mods[mod]
+            else:
+                raise KeywordError('Keyword \'%s\' is not defined.' %mod)
+        return _mod
+
+    @staticmethod
+    def _read_kwargs(**kwargs):
+        _dfvar = 'x'
+        for kw in kwargs:
+            if kw == 'dfvar':   _dfvar = kwargs[kw]
+        return _dfvar
 
     def _read_poly(self, poly):
         # TUPLE_FORMAT
@@ -124,19 +181,6 @@ class ABCPolynomial(object):
             vec[_var] = ec
         return var, vec
 
-    def _read_dict(self, vec):
-        # DICT_FORMAT
-        #     {'variable': {exponent: coefficient, ...}, ...}
-
-        _var = [];      _vec = {}
-        for var in vec:
-            str_check(var);             dict_check(vec[var])
-            for exp in vec[var]:
-                int_check(exp);         number_check(vec[var][exp])
-            _var.append(var)
-        _vec.update(vec)
-        return _var, _vec
-
     def _read_vars(self, *vars):
         _var = {}
         for var in vars:
@@ -147,6 +191,10 @@ class ABCPolynomial(object):
                     _var[self._var[0]] = var
                 else:
                     raise DefinitionError('Tuple of variable name and corresponding value in need.')
+            
+            elif isinstance(var, dict):
+                _var = var;     return var
+
             else:
                 tuple_check(var)
                 if len(var) != 2:
@@ -160,6 +208,8 @@ class ABCPolynomial(object):
                 else:
                     _var[var[0]] = var[1]
         
+        if _var == {}:  return None
+
         if len(_var) != len(self._var):
             for var in _var:
                 self._var.remove(var)
@@ -167,20 +217,6 @@ class ABCPolynomial(object):
             raise KeywordError('Variable \'%s\' should be assigned.' %var)
         
         return _var
-
-    def _read_mods(self, **mods):
-        _mod = None
-        set_flag = False
-        for mod in mods:
-            if mod == 'mod':
-                if set_flag:
-                    raise DefinitionError('Only one modulo taken.')
-                else:
-                    int_check(mod);     pos_check(mod)
-                    _mod = mod;         set_flag = True;    break
-            else:
-                raise KeywordError('Keyword \'%s\' is not defined.' %mod)
-        return _mod
 
     # Check is types match.
     def has_sametype(self, other):
@@ -194,11 +230,11 @@ class ABCPolynomial(object):
             str_check(var)
             self._dfvar = var
 
-    def __new__(cls, other=None, *items):
+    def __new__(cls, other=None, *items, **kwargs):
         self = super(ABCPolynomial, cls).__new__(cls)
 
         # Default variable
-        self._dfvar = 'x'
+        self._dfvar = self._read_kwargs(**kwargs)
 
         if other is None:
             self._var = []
@@ -207,7 +243,7 @@ class ABCPolynomial(object):
 
         else:
             if isinstance(other, ABCPolynomial):
-                self = other
+                self = copy.deepcopy(other)
                 return self
 
             elif isinstance(other, numbers.Number):
@@ -242,7 +278,7 @@ class ABCPolynomial(object):
                     _var, _vec = self._read_poly(_vec)
                     var = jsappend(var, _var);  vec = jsupdate(vec, _vec)
 
-        for key in vec:
+        for key in jskeys(vec):
             if self._none_check(vec[key]):  var.remove(key);    del vec[key]
         
         self._var = sorted(var)
@@ -253,10 +289,13 @@ class ABCPolynomial(object):
         _mod = self._read_mods(**mods)
         _var = self._read_vars(*vars)
 
-        if _mod is None:
-            return self._eval(_var)
+        if _var is None:
+            return 0
         else:
-            return self._mod(_var, _mod)
+            if _mod is None:
+                return self.eval(_var)
+            else:
+                return self.mod(_var, mod=_mod)
 
     def __repr__(self):
         _ret = '%s(%s)'

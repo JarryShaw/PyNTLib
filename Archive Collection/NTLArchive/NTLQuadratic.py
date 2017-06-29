@@ -1,144 +1,139 @@
 # -*- coding: utf-8 -*-
 
+__all__  = ['Quadratic']
+nickname = 'Quadratic'
+
+import copy
+import numbers
+
 #二次同餘式類
 #由同餘式類衍生，型如x^2+y^2=p
 
-import NTLExceptions
-import NTLCongruence
-import NTLTrivialDivision
-import NTLPrimeFactorisation
+from .NTLCongruence         import Congruence, Solution
+from .NTLExceptions         import DefinitionError, PolyError, PCError
+from .NTLPrimeFactorisation import primeFactorisation
+from .NTLTrivialDivision    import trivialDivision
+from .NTLUtilities          import jskeys, jssquare
+from .NTLValidations        import tuple_check, str_check
 
-class Quadratic(NTLCongruence.Congruence):
+class Quadratic(Congruence):
 
-    __slots__ = ('prime', 'pcflag', 'vars')
+    __all__   = ['constant', 'modulo', 'pflag', 'solution', 'cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
+    __slots__ = ('_constant', '_modulo', '_pflag', '_solution', '_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
 
-    def __init__(self, *args, **kwargs):
-        self.ctr_ = 0
-        self.vars = ('x', 'y')
-        self.prime = 0
-        self.pcflag = False
-        self.solution = None
+    def __new__(cls, other=None, *items, **mods):
+        if isinstance(other, Quadratic):
+            self = copy.deepcopy(other)
+            return self
 
-        for prime in args:
-            self.ctr_ += 1
-            if self.ctr_ > 1:
-                raise NTLExceptions.ArgumentError('Quadratic expected at most 1 arguments.')
+        elif isinstance(other, numbers.Number):
+            def _read_name(**mods):
+                for name in mods:
+                    if name == 'vars':
+                        tuple_check(mods[name])
+                        if len(mods[name]) != 2:
+                            raise DefinitionError('Only takes two variable names.')
 
-            if not isinstance(prime, int) and isinstance(prime, long):
-                raise NTLExceptions.IntError('The argument must be an integral.')
+                        v_1 = mods[name][0];    v_2 = mods[name][1]
+                        str_check(v_1, v_2);    _var = (v_1, v_2)
+                    else:
+                        raise KeywordError('Keyword \'%s\' is not defined.' %kw)
+                return _var
 
-            if NTLTrivialDivision.trivialDivision(prime):
-                self.pcflag = True
-            self.prime = prime
+            v_1, v_2 = _read_name(**mods)
+            vec = {v_1: {2: 1}, v_2: {2: 1}}
+            self = super(Quadratic, cls).__new__(cls, vec, **mods)
+            self._pflag = trivialDivision(other)
+            self._constant = other
+            return self
 
-        for kw in kwargs:
-            if kw == 'vars':
-                if not isinstance(kwargs[kw], tuple) or len(kwargs[kw]) != 2:
-                    raise NTLExceptions.TupleError('The argument must be a tuple of two variables.')
+        else:
+            self = super(Quadratic, cls).__new__(cls, other, *items, **mods)
+            self._pflag = None
+            self._constant = None
+            return self
 
-                if not isinstance(kwargs[kw][0], str) or not isinstance(kwargs[kw][1], str):
-                    raise NTLExceptions.StringError('The name of varibales must be string type.')
+    def __init__(self, other=None, *items, **mods):
+        self._update_state()
+        self._nickname = 'Quadratic'
 
-                self.vars = (kwargs[kw][0], kwargs[kw][1])
+        if len(self._var) != 2:
+            raise PolyError('Quadratic must take two variables.')
 
-            else:
-                raise NTLExceptions.KeywordError('Keyword \'%s\' is not defined.' %kw)
+        def _decline(_dict):
+            ctr = 0
+            for var in _dict:
+                for exp in jskeys(_dict[var]):
+                    if exp == 0:
+                        self._constant = _dict[var][exp]
+                        ctr += 1;   del _dict[exp]
+                    if ctr > 1:
+                        raise DefinitionError('Invalid literal for Quadratic.')
 
-        self.solution = Solution(self)
-
-    def __call__(self, *args):
-        for prime in args:
-            self.ctr_ += 1
-            if self.ctr_ > 1:
-                raise NTLExceptions.ArgumentError('Quadratic expected at most 1 arguments.')
-
-            if not isinstance(prime, int) and isinstance(prime, long):
-                raise NTLExceptions.IntError('The argument must be an integral.')
-
-            if NTLTrivialDivision.trivialDivision(prime):
-                self.pcflag = True
-            self.prime = prime
+        _decline(self._vec)
+        v_1 = self._var[0]; v_2 = self._var[1]
+        vec = {v_1: {2: 1}, v_2: {2: 1}}
+        if self._vec != vec:
+            raise DefinitionError('Invalid literal for Quadratic.')
+        
+        if self._constant is None:
+            raise DefinitionError('Invalid literal for Quadratic.')
+        if self._pflag is None:
+            self._pflag = trivialDivision(self._constant)
 
     def __str__(self):
-        return '%s^2 + %s^2 = %d' %(self.vars[0], self.vars[1], self.prime)
+        return '%s^2 + %s^2 = %d' %(self._var[0], self._var[1], self._constant)
 
-    def __repr__(self):
-        return 'Quodratic(%d, vars=%s)' %(self.prime, str(self.vars))
-
-    def solve(self):
-        mul_ = 1
-        if not self.pcflag:
-            (p_, q_) = NTLPrimeFactorisation.primeFactorisation(self.prime, wrap=True)
-
-            ctr_ = 0
-            for ptr_ in xrange(len(p_)):
-                if q_[ptr_] % 2 == 1:
-                    ctr_ += 1
-                    if ctr_ > 2:
-                        return self.solution
-                    if q_[ptr_] == 1:
-                        p = p_[ptr_]
-                    else:
-                        mul_ *= p_[ptr_] ** ((q_[ptr_]-1) / 2)
-                else:
-                    mul_ *= p_[ptr_] ** (q_[ptr_] / 2)
+    def _solve(self):
+        _mul = 1
+        if not self._pflag:
+            (_p, _q) = primeFactorisation(self._constant, wrap=True)
+            for item in zip(_p, _q):
+                if item[1] % 2 == 1:
+                    p = item[0]
+                    q = self._constant // item[0]
+                    if jssquare(q):     break
+            else:
+                _var = self._var;   _mod = self._modulo;    _rem = []
+                _ret = Solution(_var, _mod, _rem, True)
+                return _ret
         else:
-            p = self.prime
+            p = self._constant
 
         if p % 4 != 1:
-            return self.solution
+            _var = self._var;   _mod = self._modulo;    _rem = []
+            _ret = Solution(_var, _mod, _rem)
+            return _ret
 
         if p % 8 == 5:      #若p=8k+5為素數，有2為模p平方非剩餘，則同餘式x^2≡-1(mod p)的解為x=±2^((p-1)/4)(mod p)
             #令x_0 = 2^((p-1)/4)(mod p)
-            x = (2**((p-1)/4)) % p                          
+            x = (2**((p-1)//4)) % p
+
         else:               #反之，用同餘式求解函數求出結果
             #令x_0為x^2≡-1(mod p)的正解
-            x = NTLCongruence.Congruence((2,1), (0,1), mod=p).solve()[0]
+            x = Congruence(((2,1), (0,1)), mod=p).solution[0]
         
-        y = 1                                               #令y_0 = 1
-        m = (x**2 + y**2) / p                               #由x_0^2 + y_0^2 = m_0 * p得m_0
+        y = 1                                       #令y_0 = 1
+        m = (x**2 + y**2) // p                      #由x_0^2 + y_0^2 = m_0 * p得m_0
 
-        while m != 1:                                       #在x_i^2 + y_i^2 = p即m_0 = 1之後，退出循環
-            tmp_x = x                                       #寄存當前的x_i-1
-            u = x % m if (x%m - m != -1) else -1            #令u_i-1 ≡ x_i-1 (mod m_i-1)
-            v = y % m if (y%m - m != -1) else -1            #令v_i-1 ≡ y_i-1 (mod m_i-1)
-            x = (u*x + v*y) / m                             #則x_i = (u_i-1 * x_i-1 + v_i-1 * y_i-1) / m_i-1
-            y = (u*y - v*tmp_x) / m                         #則y_i = (u_i-1 * y_i-1 - v_i-1 * x_i-1) / m_i-1
-            m = (x**2 + y**2) / p                           #由x_i^2 + y_i^2 = m_i * p得m_i
+        while m != 1:                               #在x_i^2 + y_i^2 = p即m_0 = 1之後，退出循環
+            tmp_x = x                               #寄存當前的x_i-1
+            u = x % m                               #令u_i-1 ≡ x_i-1 (mod m_i-1)
+            if u - m == -1:     u = -1
+            v = y % m                               #令v_i-1 ≡ y_i-1 (mod m_i-1)
+            if v - m == -1:     v = -1
+            x = (u*x + v*y) // m                    #則x_i = (u_i-1 * x_i-1 + v_i-1 * y_i-1) / m_i-1
+            y = (u*y - v*tmp_x) // m                #則y_i = (u_i-1 * y_i-1 - v_i-1 * x_i-1) / m_i-1
+            m = (x**2 + y**2) // p                  #由x_i^2 + y_i^2 = m_i * p得m_i
 
-        x *= mul_
-        y *= mul_
-        self.solution(x, y)
-        return self.solution
+        x *= _mul;  y *= _mul
+        _var = self._var;   _mod = self._modulo;    _rem = [abs(x), abs(y)]
+        _ret = Solution(_var, _mod, _rem, True)
+        return _ret
 
-class Solution:
-    def __init__(self, qua_):
-        self.x = 0
-        self.y = 0
-        self.var_x = qua_.vars[0]
-        self.var_y = qua_.vars[1]
+# if __name__ == '__main__':
+#     _qua = Quadratic(8068, vars=('p', 'q'))
+#     _rst = _qua.solution
 
-    def __call__(self, x, y):
-        self.x = x if x > 0 else -1 * x
-        self.y = y if y > 0 else -1 * y
-
-    def __str__(self):
-        if self.x != 0 or self.y != 0:
-            return '%s = ±%d\t%s = ±%d' %(self.var_x, self.x, self.var_y, self.y) 
-        else:
-            return 'No solution'
-
-    def __getitem__(self, key_):
-        if key_ == 0:
-            return self.x
-        elif key_ == 1:
-            return self.y
-        else:
-            raise IndexError
-
-if __name__ == '__main__':
-    qua_ = Quadratic(8068, vars=('p', 'q'))
-    rst_ = qua_.solve()
-
-    print 'The solution of %s is' %str(qua_)
-    print rst_
+#     print('The solution of %s is\n\t' %str(_qua))
+#     print(_rst)
