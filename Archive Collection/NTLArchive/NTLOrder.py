@@ -7,14 +7,15 @@ nickname =  'ord'
 #計算整數a模m的指數
 
 from .NTLCoprimalityTest import coprimalityTest
-from .NTLUtilities   	 import jsrange
-from .NTLValidations 	 import int_check
+from .NTLExceptions      import DefinitionError
+from .NTLUtilities       import jsrange
+from .NTLValidations     import int_check
 
 def order(m, a):
     int_check(m, a)
 
     if not coprimalityTest(a, m):
-        raise NTLExceptions.DefinitionError('The arguments must be coprime.')
+        raise DefinitionError('The arguments must be coprime.')
     
     for e in jsrange(1, m):
         if a**e % m == 1:

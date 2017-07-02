@@ -11,7 +11,6 @@
 * Usage sample has been attached as `sample.py`.
 * TODO
 
-
   * Bug still remains in `__polynomial__.__new__()` when handling construction from strings.
   * `__polynomial__.__str__()` method need polish when handling multi-variable polynomials.
   * Manual still missing.

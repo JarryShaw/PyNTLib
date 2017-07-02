@@ -100,12 +100,12 @@ def modulo(b, e, m):
     from NTLArchive import NTLRepetiveSquareModulo
     return NTLRepetiveSquareModulo.repetiveSquareModulo(b, e, m)
 
-#Return the coefficients and exponents of quotient and ratio after polynomial Euclidean division.
+#Return the coefficients and exponents of quotient and remainder after polynomial Euclidean division.
 def polydiv(dvdExp, dvdCoe, dvsExp, dvsCoe):
     from NTLArchive import NTLPolynomialEuclideanDivision
     return NTLPolynomialEuclideanDivision.polyED(dvdExp, dvdCoe, dvsExp, dvsCoe)
 
-#Return the coefficients and exponents of quotient and ratio after congruence simplification.
+#Return the coefficients and exponents of result after congruence simplification.
 def simplify(cgcExp, cgcCoe, modulo):
     from NTLArchive import NTLCongruenceSimplification
     return NTLCongruenceSimplification.congruenceSimplification(cgcExp, cgcCoe, modulo)
@@ -156,9 +156,9 @@ def jacobi(a, m):
     return NTLJacobiSymbol.jacobiSymbol(a, m)
 
 #Return if an integer is a Carmicheal number.
-def carmicheal(n):
+def carmicheal(N):
     from NTLArchive import NTLCarmichealTest
-    return NTLCarmichealTest.carmichealTest(n)
+    return NTLCarmichealTest.carmichealTest(N)
 
 #Return a pseudo-prime number with certain paterns.
 def pseudo(**kwargs):

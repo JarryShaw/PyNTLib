@@ -141,10 +141,13 @@ def eratosthenesSieve(upper, lower=None):
         else:
             ulevel = None
 
-        rst = PRIME_LIST[_llevel][llevel:]
-        for _level in jsrange(_llevel, _ulevel):
-            rst += PRIME_LIST[_level]
-        rst += PRIME_LIST[_ulevel][:ulevel]
+        if _llevel != _ulevel:
+            rst = PRIME_LIST[_llevel][llevel:]
+            for _level in jsrange(_llevel+1, _ulevel):
+                rst += PRIME_LIST[_level]
+            rst += PRIME_LIST[_ulevel][:ulevel]
+        else:
+            rst = PRIME_LIST[_llevel][llevel:ulevel]
 
     else:
         table = [1]*(upper+1)                   #用於存儲upper個正整數的表格／狀態；其中，0表示篩去，1表示保留

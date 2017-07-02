@@ -18,8 +18,8 @@ def bezoutEquation(a, b):
     if a < b:   a, b = b, a;    pn_a, pn_b = pn_b, pn_a;    exflag = 1  #交換a與b的次序，使得a≥b
     
     q = [0] + euclideanAlgorithm(a, b)      #廣義歐幾里德除法（輾轉相除法），求不完全商數組q
-    s = coefficient_s(q, 0, 1, 0)           #求係數s
-    t = coefficient_t(q, 1, 0, 0)           #求係數t
+    s = coefficient_s(q, 1, 0, 0)           #求係數s
+    t = coefficient_t(q, 0, 1, 0)           #求係數t
 
     if exflag:
         s *= -1 if pn_b else 1;   t *= -1 if pn_a else 1
@@ -51,4 +51,4 @@ def coefficient_t(q_j, t_j1, t_j2, ctr):
     return coefficient_t(q_j, t_j1, t_j2, ctr)
 
 # if __name__ == '__main__':     
-#     print('%d*-179 + %d*-367 = (-179,-367)' %bezoutEquation(-367, -179))
+#     print('%d*-179 + %d*-367 = (-179,-367)' %bezoutEquation(-179,-367))

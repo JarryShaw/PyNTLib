@@ -24,15 +24,15 @@ def trivialDivision(N):
         #得出小於等於N的所有素數
         table = eratosthenesSieve(N+1)
 
-        #素性判斷，1為素數，0為合數
-        return 1 if (N in table) else 0
+        #素性判斷，True為素數，False為合數
+        return True if (N in table) else False
 
     except (OverflowError, MemoryError):
         byte = math.log(N, 2) - 1
         para = 3**jsfloor(math.log(2**byte, 10) // 3)
 
-        #素性判斷，1為素數，0為合數
-        return 1 if miller_rabinTest(N, para) else 0
+        #素性判斷，True為素數，False為合數
+        return True if miller_rabinTest(N, para) else False
 
 # if __name__ == '__main__':
 #     if trivialDivision(101):

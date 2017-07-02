@@ -12,7 +12,7 @@ from .NTLValidations           import int_check
 def coprimalityTest(a, b):
     int_check(a, b)
 
-    return 1 if greatestCommonDivisor(a, b) == 1 else 0     #互素定義，即(a,b) = 1
+    return True if greatestCommonDivisor(a, b) == 1 else False	#互素定義，即(a,b) = 1
 
 # if __name__ == '__main__':
 #     if coprimalityTest(53, 19):

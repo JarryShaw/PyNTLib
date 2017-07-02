@@ -11,9 +11,9 @@ from .NTLValidations import int_check
 def euclideanDivision(a, b):
     int_check(a, b)
 
-    if b > a:	a, b = b, a     #若b > a，則交換其次序
+    if b > a:	a, b = b, a     	#若b > a，則交換其次序
 
-    return not (a % b) or 0     #求餘數，判斷整除，1為整除，0為不整除
+    return bool(not (a % b) or 0)	#求餘數，判斷整除，1為整除，0為不整除
 
 # if __name__ == '__main__':
 #     if euclideanDivision(13, 24):
