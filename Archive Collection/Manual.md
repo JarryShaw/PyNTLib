@@ -4,7 +4,11 @@
 
 > `jsntlib` is an open sourse library for **number theory** written in Python, with compatibility in both 2.7.3 and 3.6.5 versions. The following is a manual for this library. Usage instructions and samples attached.
 
+
+
 ### Functions
+
+
 
 *  `primelist(upper[, lower])`
 
@@ -17,6 +21,8 @@
 
 
 
+
+
 * `isdivisible(a, b)`
 
   Return `bool` type if integers `a` and `b` are **divisible**, i.o.w. whether `b|a` or `b∤a`, when `b` is greater than `a`, and in other cases, vice versa.
@@ -25,6 +31,8 @@
   >>> isdivisible(983, 234)
   >>> False
   ```
+
+
 
 
 
@@ -61,6 +69,8 @@
 
 
 
+
+
 * `coprime(a, b)`
 
   Return `bool` type if integers `a` and `b` are **coprime**, i.e. which greatest common divisor is one(1).
@@ -72,14 +82,18 @@
 
 
 
+
+
 * `eealist(a, b)`
 
   Return `list` type containing quotients for integers `a/b` with **extended Euclidean Algorithm**.
 
   ```python
-  eealist(23, 984)
+  >>> eealist(23, 984)
   >>> [0, 42, 1, 3, 1, 1]
   ```
+
+
 
 
 
@@ -87,10 +101,12 @@
 
   Return `tuple` type containing parameters for **Bézout equition** of integers `a` and `b`.
 
-  ```Python
+  ```python
   >>> bezout(-367, 179)
   >>> (-20, -41)        # -20*-367 + -41*179 = (-367, 179)
   ```
+
+
 
 
 
@@ -107,6 +123,8 @@
 
 
 
+
+
 * `decomposit(N)`
 
   Return `tuple` type containing two(2) integers, which are the **decoposition** results of coposit number `N`, i.e. `(a, b)` where `N|a^2-b^2` but `N∤a+b` nor `N∤a-b`.
@@ -118,14 +136,18 @@
 
 
 
+
+
 * `binary(a, b, c)`
 
   Return `tuple` type containing special solutions for an **indefinite binary equation**, i.e. `a*x + b*y = c`.
 
-  ```Python
+  ```python
   >>> binary(7,24,-3) # 7*x + b*24 = -3
   >>> (6, -21)        # x = 6 + 24*t; y = -21 - 7*t (t∈Z)
   ```
+
+
 
 
 
@@ -133,10 +155,12 @@
 
   Return `int` type for the result of `b^e (mod m)`.
 
-  ```Python
+  ```python
   >>> modulo(-765, 264, 597)
   >>> -291                   # -765^264 = -291 (mod 597)
   ```
+
+
 
 
 
@@ -144,10 +168,12 @@
 
   Return `tuple` type containing the lists of exponents and coefficients of **quotient** and **remainder** polynomials, which are the **division** results of **dividend** and **divisor** polynomials.
 
-  ```Python
+  ```python
   >>> polydiv([1, 3, 2, 34], [-2, 4, 3, 1], [7,  1], [1, -1])           # (x^34 + 4x^3 + 3x^2 - 2x) ÷ (x^7 - x)
   >>> ([27, 21, 15, 9, 3], [1, 1, 1, 1, 1], [4, 3, 2, 1], [1, 4, 3, -2]) # = (x^27 + x^21 + x^15 + x^9 +x^3) •••••• (x^4 + 4x^3 + 3x^2 - 2x)
   ```
+
+
 
 
 
@@ -157,8 +183,10 @@
 
   ```python
   >>> simplify([14, 13, 11,  9,  6,  3,  2,  1], [ 3,  4,  2,  1,  1,  1, 12,  1], 5) # (3x^14 + 4x^13 + 2x^11 + x^9 + x^6 + x^3 + 12x^2 + x) mod 5
-  >>> ([3, 2, 1], [3, 16, 6])                                                    # ≡ (3x^3 + 16x^2 + 6x) mod 5
+  >>> ([3, 2, 1], [3, 16, 6])                                                         # ≡ (3x^3 + 16x^2 + 6x) mod 5
   ```
+
+
 
 
 
@@ -173,6 +201,8 @@
 
 
 
+
+
 * `congsolve(cgcExp, cgcCoe, modulo)`
 
   Return `list` type containing all solutions of an **polynomial congruence**.
@@ -181,6 +211,8 @@
   >>> congsolve([2, 0], [1, -46], 105) # x^2 - 46 ≡ 0 (mod 105)
   >>> [16, 19, 26, 44, 61, 79, 86, 89]
   ```
+
+
 
 
 
@@ -195,6 +227,8 @@
 
 
 
+
+
 * `ord(m, a)`
 
   Return `int` type for the **order** of an integer `a` modulo `m`, i.e. `ord_m(a)`.
@@ -203,6 +237,8 @@
   >>> ord(9, 2) # ord_9(a) = 6
   >>> 6
   ```
+
+
 
 
 
@@ -217,6 +253,8 @@
 
 
 
+
+
 * `prc(m)`
 
   Return `list` type for the **primitive residue class** of an integer`m`.
@@ -228,14 +266,18 @@
 
 
 
+
+
 * `root(m)`
 
   Return `list` type for **primitive roots** of modulo `m`.
 
-  ```Python
+  ```python
   >>> root(25)
   >>> [2, 3, 8, 12, 13, 17, 22, 23]
   ```
+
+
 
 
 
@@ -250,6 +292,8 @@
 
 
 
+
+
 * `jacobi(a, m)`
 
   Return `int` type for the result of **Jacobi symbol** `(a|m)`.
@@ -261,6 +305,8 @@
 
 
 
+
+
 * `carmicheal(N)`
 
   Return `bool` type if an integer `N` is a **Carmicheal number**.
@@ -269,6 +315,8 @@
   >>> carmicheal(3499)
   >>> False
   ```
+
+
 
 
 
@@ -286,12 +334,14 @@
 
   ```python
   >>> pseudo(mode='Fermat')
-  >>> 
+  >>> 56629
   >>> pseudo(mode='Euler')
-  >>> 
+  >>> 38231
   >>> pseudo(mode='Strong')
-  >>> 
+  >>> 42451
   ```
+
+
 
 
 
@@ -306,3 +356,19 @@
 
 
 
+
+### Classes
+
+
+
+* `Fraction`
+
+  > An extended `Fraction` class derived from system internal class `fractions.Fraction`.
+
+  * Properties of `Fraction` are described as followed:
+    * `numerator` —— 
+    * `denominator` —— 
+    * `fraction` —— 
+    * `convergent` —— 
+    * `number` —— 
+  * `
