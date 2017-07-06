@@ -8,7 +8,7 @@ import copy
 #同餘式類
 #由多項式衍生的同餘式
 
-from .NTLExceptions            import PCError, PolyError, SolutionError
+from .NTLExceptions            import DefinitionError, PCError, PolyError, SolutionError
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
 from .NTLPolynomial            import Polynomial
 from .NTLPrimeFactorisation    import primeFactorisation
@@ -19,7 +19,7 @@ from .NTLValidations           import int_check, number_check
 
 class Congruence(Polynomial):
 
-    __all__   = ['modulo', 'pflag', 'solution', 'cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
+    __all__   = ['modulo', 'isprime', 'solution', 'iscomplex', 'isinteger', 'ismultivar', 'var', 'vector', 'dfvar', 'nickname']
     __slots__ = ('_modulo', '_pflag', '_solution', '_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
 
     @property
@@ -27,7 +27,7 @@ class Congruence(Polynomial):
         return a._modulo
 
     @property
-    def pflag(a):
+    def isprime(a):
         return a._pflag
 
     @property
@@ -58,10 +58,12 @@ class Congruence(Polynomial):
 
     def __init__(self, other=None, *items, **mods):
         self._update_state()
-        self._nickname = 'Congruence'
+        self._nickname = 'cong'
 
         if self._modulo is None:
             self._modulo = self._read_mods(**mods)
+            if self._modulo is None:
+                raise DefinitionError('The modulo of congruence is missing.')
         if self._pflag is None:
             self._pflag = trivialDivision(self._modulo) 
 
@@ -103,7 +105,7 @@ class Congruence(Polynomial):
             raise PolyError('Multi-variable congruence dose not support simplification.')
         if not self._iflag:
             raise PolyError('Non-integral congruence does not support simplification.')
-        if not self.pflag:
+        if not self._pflag:
             raise PCError('Composit-modulo congruence does not support simplification.')
 
         _mod = self._modulo;    _var = self._var[0]
@@ -162,7 +164,6 @@ class Congruence(Polynomial):
             _rem = self._CTR(tmpRem, tmpMod)
 
         _var = self._var;   _mod = self._modulo
-        print('hi', _rem)
         _ret = Solution(_var, _mod, _rem)
         return _ret
 
@@ -285,20 +286,16 @@ class Solution(object):
     __slots__ = ('_var', '_mod', '_rem', '_qflag')
 
     @property
-    def var(a):
+    def variables(a):
         return a._var
 
     @property
-    def mod(a):
+    def modulo(a):
         return a._mod
 
     @property
-    def rem(a):
+    def solutions(a):
         return a._rem
-
-    @property
-    def qflag(a):
-        return a._qflag
 
     def __new__(cls, var, mod, rem, qflag=None):
         self = super(Solution, cls).__new__(cls)

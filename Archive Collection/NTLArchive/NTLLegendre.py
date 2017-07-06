@@ -3,8 +3,8 @@
 from .__abc__ import __symbol__
 
 __all__  = ['Legendre',
-            'default_numerator', 'default_denominator',
-            'legendre_eval', 'legendre_simplify', 'legendre_reciprocate']
+            '_default_numerator', '_default_denominator',
+            '_legendre_eval', '_legendre_simplify', '_legendre_reciprocate']
 nickname =  'Legendre'
 
 #Legendre符號類
@@ -12,6 +12,7 @@ nickname =  'Legendre'
 
 from .NTLExceptions           import DefinitionError, KeywordError
 from .NTLPrimeFactorisation   import primeFactorisation
+from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLTrivialDivision      import trivialDivision
 from .NTLUtilities            import jssign
 from .NTLValidations          import prime_check, str_check
@@ -21,11 +22,11 @@ from .NTLValidations          import prime_check, str_check
 Symbol = __symbol__.ABCSymbol
 
 # Legendre default form.
-default_numerator   = 1
-default_denominator = 2
+_default_numerator   = 1
+_default_denominator = 2
 
-def legendre_eval(legendre):
-    _ret = legendre_simplify(legendre)
+def _legendre_eval(legendre):
+    _ret = _legendre_simplify(legendre)
 
     a = _ret._numerator
     p = _ret._denominator
@@ -40,8 +41,9 @@ def legendre_eval(legendre):
 
     return r if r != p-1 else -1
 
-def legendre_simplify(legendre):
+def _legendre_simplify(legendre):
     _ret = legendre
+    _ret._numerator %= _ret._denominator
 
     while abs(_ret._numerator) not in [0, 1, 2]\
             and trivialDivision(abs(_ret._numerator)):
@@ -49,11 +51,11 @@ def legendre_simplify(legendre):
         _den = _ret._denominator
 
         if _den > abs(_num):
-            _ret = legendre_reciprocate(_ret)
+            _ret = _legendre_reciprocate(_ret)
 
     return _ret
 
-def legendre_reciprocate(legendre):
+def _legendre_reciprocate(legendre):
     _den = legendre._numerator
     _num = legendre._denominator * (-1)**((_den-1)//2) % _den
 
@@ -79,27 +81,43 @@ class Legendre(Symbol):
     def __init__(self, numerator, denominator=None):
         prime_check(self._denominator)
 
-    def convert(self, kind):
-        str_check(kind)
+    def __call__(self):
+        a = self._numerator
+        p = self._denominator
+        a %= p
 
-        if kind == 'Legendre':
+        if a == 1:      return 1
+        if a == p - 1:  return (-1)**((p-1)//2)
+        if a == 2:      return (-1)**((p**2-1)//8)
+
+        mod = repetiveSquareModulo(a, ((p-1)//2), p)
+        return mod if mod != p-1 else -1
+
+    def convert(self, kind=None):
+        if kind is None:
             return self
-        elif kind == 'Jacobi':
-            from .NTLJacobi import Jacobi
-            _ret = Jacobi(self._numerator, self._denominator)
-            return _ret
+
         else:
-            raise KeywordError('%s is an unknown type of symbol.' %kind)
+            str_check(kind)
+
+            if kind == 'Legendre':
+                return self
+            elif kind == 'Jacobi':
+                from .NTLJacobi import Jacobi
+                _ret = Jacobi(self._numerator, self._denominator)
+                return _ret
+            else:
+                raise KeywordError('%s is an unknown type of symbol.' %kind)
 
     # Virtual properties.
     _nickname    = 'Legendre'
-    _numerator   = default_numerator
-    _denominator = default_denominator
+    _numerator   = _default_numerator
+    _denominator = _default_denominator
 
     # Virtual functions.
-    eval = legendre_eval
-    simplify = legendre_simplify
-    reciprocate = legendre_reciprocate
+    eval = _legendre_eval
+    simplify = _legendre_simplify
+    reciprocate = _legendre_reciprocate
 
 # if __name__ == '__main__':
 #     l1 = Legendre(2, 3)

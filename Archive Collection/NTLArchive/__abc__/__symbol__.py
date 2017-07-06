@@ -1,20 +1,26 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-__all__ = ['ABCSymbol']
 
 import abc
 import re
 
-#Legendre及Jacobi符號基類
-#Abstract Base Class for Legendre & Jacobi Symbols
 
 from NTLArchive.NTLExceptions  import DefinitionError, ResidueError
 from NTLArchive.NTLValidations import basestring_check, int_check
+
+
+__all__ = ['ABCSymbol']
+
+
+# Legendre及Jacobi符號基類
+# Abstract Base Class for Legendre & Jacobi Symbols
+
 
 '''
 SYMBOL_FORMAT
     (+\-) numerator (/\|) denominator
 '''
+
 
 SYMBOL_FORMAT = re.compile(r'''
     \A\s*                       # optional whitespace at the start, then
@@ -27,9 +33,11 @@ SYMBOL_FORMAT = re.compile(r'''
     \s*\Z                       # and optional whitespace to finish
 ''', re.VERBOSE | re.IGNORECASE)
 
+
 ABCMeta = abc.ABCMeta
 abstractmethod = abc.abstractmethod
 abstractproperty = abc.abstractproperty
+
 
 class ABCSymbol(object):
 
@@ -82,11 +90,11 @@ class ABCSymbol(object):
             else:
                 # Handle construction from strings.
                 basestring_check(numerator)
-                    
+
                 m = SYMBOL_FORMAT.match(numerator)
                 if m is None:
-                    raise DefinitionError('Invalid literal for symbols: %r' %numerator)
-                
+                    raise DefinitionError('Invalid literal for symbols: %r' % numerator)
+
                 _numerator   = int(m.group('num'))
                 _denominator = int(m.group('den'))
 
@@ -112,10 +120,10 @@ class ABCSymbol(object):
         name = self.__class__.__name__
         _num = self._numerator
         _den = self._denominator
-        return _ret %(name, _num, _den)
+        return _ret % (name, _num, _den)
 
     def __str__(self):
-        return '%d | %d' %(self._numerator, self._denominator)
+        return '%d | %d' % (self._numerator, self._denominator)
 
     def __eq__(self, other):
         _ret = (self._numerator == other._numerator) and \

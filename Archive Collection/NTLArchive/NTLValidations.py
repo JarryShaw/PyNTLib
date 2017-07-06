@@ -11,7 +11,7 @@ import sys
 #自定義模式化參數檢查
 #用於在NTL中進行模式化的參數檢查
 
-from .NTLExceptions import ComplexError, DigitError, IntError, ListError, OEError, PCError, PNError, RealError
+from .NTLExceptions import BoolError, ComplexError, DigitError, IntError, ListError, OEError, PCError, PNError, RealError
 
 def int_check(*args):
     from numbers import Integral
@@ -53,7 +53,7 @@ def str_check(*args):
 
     for var in args:
         if not isinstance(var, str):
-            raise BoolError('Function %s expected str, %s got instead.' %(func,  type(var).__name__))
+            raise StringError('Function %s expected str, %s got instead.' %(func,  type(var).__name__))
 
 def basestring_check(*args):
     func = inspect.stack()[2][3]
@@ -61,11 +61,11 @@ def basestring_check(*args):
     if sys.version_info[0] > 2:
         for var in args:
             if not isinstance(var, str):
-                raise BoolError('Function %s expected str, %s got instead.' %(func,  type(var).__name__))
+                raise StringError('Function %s expected str, %s got instead.' %(func,  type(var).__name__))
     else:
         for var in args:
             if not isinstance(var, basestring):
-                raise BoolError('Function %s expected basestring, %s got instead.' %(func,  type(var).__name__))
+                raise StringError('Function %s expected basestring, %s got instead.' %(func,  type(var).__name__))
 
 def bool_check(*args):
     func = inspect.stack()[2][3]

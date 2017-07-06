@@ -10,35 +10,62 @@ from .NTLEulerFunction        import eulerFunction
 from .NTLPrimitiveRoot        import primitiveRoot
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLUtilities            import jsrange
-from .NTLValidations          import int_check
+from .NTLValidations          import int_check, pos_check
 
 class Index:
 
-    __all__ = ['mul_', 'mod_', 'pmr_', 'phi_', 'ind_', 'tab_']
+    __all__ = ['_mul', '_mod', '_pmr', '_phi', '_ind', '_tab']
 
     def __init__(self, modulo):
-        self.mul_ = []
-        self.mod_ = modulo
-        self.pmr_ = primitiveRoot(modulo)[0]
-        self.phi_ = eulerFunction(self.mod_)
-        self.ind_ = self.index()
-        self.tab_ = self.table()
+        int_check(modulo);  pos_check(modulo)
+
+        self._mul = []
+        self._mod = modulo
+        self._pmr = primitiveRoot(modulo)[0]
+        self._phi = eulerFunction(self._mod)
+        self._ind = self._make_index()
+        self._tab = self._make_table()
+
+    @property
+    def modulo(a):
+        return a._mod
+
+    @property
+    def root(a):
+        return a._pmr
+
+    @property
+    def phi(a):
+        return a._phi
+
+    @property
+    def index(a):
+        return a._ind
+
+    @property
+    def table(a):
+        return a._tab
 
     def __call__(self, *args):
-        for int_ in args:
-            int_check(int_)
-            self.mul_.append(int_)
+        self._mul = []
+        for _int in args:
+            int_check(_int)
+            if _int == 0:   return 0
+            self._mul.append(_int)
+        
+        if self._mul == []: return None
+        _product = self._calc_multi()
 
-        return self.multiply()
+        return _product
 
     def __repr__(self):
-        return 'Index(%d)' %self.mod_
+        return 'Index(%d)' %self_.mod
 
     def __str__(self):
         string = '\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9'
-        for i in jsrange(len(self.tab_)):
+        for i in jsrange(len(self._tab)):
             string += '\n%d\t' %i
-            for j in self.tab_[i]:
+            for j in self._tab[i]:
                 if j == 0:
                     string += '\t'
                 else:
@@ -47,29 +74,30 @@ class Index:
 
         return string
 
-    def index(self):
-        ind_ = [0]*self.mod_
-        for num_ in jsrange(1, self.mod_):
-            index = repetiveSquareModulo(self.pmr_, num_, self.mod_)
-            ind_[index] = num_
+    def _make_index(self):
+        _ind = [0]*self._mod
+        for _num in jsrange(1, self._mod):
+            ptr = repetiveSquareModulo(self._pmr, _num, self._mod)
+            _ind[ptr] = _num
 
-        return ind_
+        return _ind
 
-    def table(self):
-        tab_ = []
-        for ctr in jsrange(0, self.phi_+1, 10):
-            tab_.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-        for ptr in jsrange(1, self.mod_):
-            tab_[ptr//10][ptr%10] = self.ind_[ptr]
+    def _make_table(self):
+        _tab = []
+        for ctr in jsrange(0, self._phi+1, 10):
+            _tab.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        for ptr in jsrange(1, self._mod):
+            _tab[ptr//10][ptr%10] = self._ind[ptr]
 
-        return tab_
+        return _tab
 
-    def multiply(self):
-        index_a = self.ind_[self.mul_[0] % self.mod_]
-        index_b = self.ind_[self.mul_[1] % self.mod_]
+    def _calc_multi(self):
+        _all_index = 0
+        for _mul in self._mul:
+            _all_index += self._ind[_mul % self._mod]
+        _product = (self._pmr ** (_all_index % self._phi)) % self._mod
 
-        return (self.pmr_ ** ((index_a + index_b) % self.phi_)) % self.mod_
-
+        return _product
 # if __name__ == '__main__':
 #     index = Index(41)
 #     print(index)

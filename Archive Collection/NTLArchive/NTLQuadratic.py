@@ -7,7 +7,7 @@ import copy
 import numbers
 
 #二次同餘式類
-#由同餘式類衍生，型如x^2+y^2=p
+#由多項式式類衍生，型如x^2+y^2=p
 
 from .NTLCongruence         import Congruence, Solution
 from .NTLExceptions         import DefinitionError, PCError, PolyError
@@ -19,7 +19,7 @@ from .NTLValidations        import str_check, tuple_check
 
 class Quadratic(Polynomial):
 
-    __all__   = ['constant', 'pflag', 'solution', 'cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
+    __all__   = ['constant', 'isprime', 'solution', 'iscomplex', 'isinteger', 'ismultivar', 'var', 'vector', 'dfvar', 'nickname']
     __slots__ = ('_constant', '_pflag', '_solution', '_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
 
     @property
@@ -27,7 +27,7 @@ class Quadratic(Polynomial):
         return a._constant
 
     @property
-    def pflag(a):
+    def isprime(a):
         return a._pflag
 
     @property
@@ -51,9 +51,11 @@ class Quadratic(Polynomial):
                             raise DefinitionError('Only takes two variable names.')
 
                         v_1 = mods[name][0];    v_2 = mods[name][1]
-                        str_check(v_1, v_2);    _var = (v_1, v_2)
+                        str_check(v_1, v_2);    _var = (v_1, v_2);  break
                     else:
                         raise KeywordError('Keyword \'%s\' is not defined.' %kw)
+                else:
+                    _var = ('x', 'y')
                 return _var
 
             v_1, v_2 = _read_name(**mods)
@@ -72,7 +74,7 @@ class Quadratic(Polynomial):
 
     def __init__(self, other=None, *items, **mods):
         self._update_state()
-        self._nickname = 'Quadratic'
+        self._nickname = 'quad'
 
         if len(self._var) != 2:
             raise PolyError('Quadratic must take two variables.')
@@ -82,7 +84,7 @@ class Quadratic(Polynomial):
             for var in _dict:
                 for exp in jskeys(_dict[var]):
                     if exp == 0:
-                        self._constant = _dict[var][exp]
+                        self._constant = -_dict[var][exp]
                         ctr += 1;   del _dict[exp]
                     if ctr > 1:
                         raise DefinitionError('Invalid literal for Quadratic.')
@@ -147,6 +149,8 @@ class Quadratic(Polynomial):
         _var = self._var;   _mod = None;    _rem = [abs(x), abs(y)]
         _ret = Solution(_var, _mod, _rem, True)
         return _ret
+
+    solve = _solve
 
 # if __name__ == '__main__':
 #     _qua = Quadratic(8068, vars=('p', 'q'))

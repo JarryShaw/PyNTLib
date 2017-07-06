@@ -20,7 +20,9 @@ if sys.version_info[0] > 2:
     _PyHASH_MODULUS = fractions._PyHASH_MODULUS
     _PyHASH_INF = fractions._PyHASH_INF
 
-class Fraction(fractions.Fraction):
+FractionBase = fractions.Fraction
+
+class Fraction(FractionBase):
 
     __all__   = ['numerator', 'denominator', 'fraction', 'convergent', 'number']
     __slots__ = ('_numerator', '_denominator', '_fraction', '_convergent', '_number')
@@ -36,7 +38,7 @@ class Fraction(fractions.Fraction):
 
             p_1 = a;    p_2 = 1
             q_1 = 1;    q_2 = 0
-            _convergent = [fractions.Fraction(a, 1)]
+            _convergent = [FractionBase(a, 1)]
 
             while x != 0:
                 x = 1 / x
@@ -46,7 +48,7 @@ class Fraction(fractions.Fraction):
 
                 p_1, p_2 = p_1 * a + p_2, p_1
                 q_1, q_2 = q_1 * a + q_2, q_1
-                _convergent.append(fractions.Fraction(p_1, q_1))
+                _convergent.append(FractionBase(p_1, q_1))
             return _fraction, _convergent
 
         if denominator is None:
@@ -72,24 +74,24 @@ class Fraction(fractions.Fraction):
                     for a_0 in cfList:
                         p_1, p_2 = p_1 * a_0 + p_2, p_1
                         q_1, q_2 = q_1 * a_0 + q_2, q_1
-                        _convergent.append(fractions.Fraction(p_1, q_1))
+                        _convergent.append(FractionBase(p_1, q_1))
                     _numerator = p_1;   _denominator = q_1
                     return _convergent, _numerator, _denominator
 
                 self._fraction = numerator
-                self._convergent, self._numerator, self._denominator = expand(self._fraction)
-                self._number = fractions.Fraction(self._numerator, self._denominator)
+                self._convergent, self._numerator, self._denominator = extract(self._fraction)
+                self._number = FractionBase(self._numerator, self._denominator)
                 return self
 
             else:
                 self = super(Fraction, cls).__new__(cls, numerator, denominator)
-                self._number = fractions.Fraction(self._numerator, self._denominator)
+                self._number = FractionBase(self._numerator, self._denominator)
                 self._fraction, self._convergent = expand(self._number)
                 return self
 
         else:
             self = super(Fraction, cls).__new__(cls, numerator, denominator)
-            self._number = fractions.Fraction(self._numerator, self._denominator)
+            self._number = FractionBase(self._numerator, self._denominator)
             self._fraction, self._convergent = expand(self._number)
             return self
 
@@ -105,14 +107,10 @@ class Fraction(fractions.Fraction):
     def convergent(a):
         return a._convergent
 
-    def __str__(self):
-        return str(self._fraction)
-
-    def __repr__(self):
-        return repr(self._number)
-
     # Get certain level of convergents.
-    def get_convergent(self, level=None):
+    def __getitem__(self, level=None):
+        int_check(level)
+        
         if level is None:
             return self._number
         else:

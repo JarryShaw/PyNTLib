@@ -21,11 +21,11 @@ from .NTLValidations          import prime_check, str_check
 Symbol = __symbol__.ABCSymbol
 
 # Jacobi default form.
-default_numerator   = 1
-default_denominator = 2
+_default_numerator   = 1
+_default_denominator = 2
 
-def jacobi_eval(jacobi):
-    _ret = jacobi_simplify(jacobi)
+def _jacobi_eval(jacobi):
+    _ret = _jacobi_simplify(jacobi)
 
     a = _ret._numerator
     p = _ret._denominator
@@ -40,8 +40,9 @@ def jacobi_eval(jacobi):
 
     return r if r != p-1 else -1
 
-def jacobi_simplify(jacobi):
+def _jacobi_simplify(jacobi):
     _ret = jacobi
+    _ret._numerator %= _ret._denominator
 
     while abs(_ret._numerator) not in [0, 1, 2]\
             and trivialDivision(abs(_ret._numerator)):
@@ -49,11 +50,11 @@ def jacobi_simplify(jacobi):
         _den = _ret._denominator
 
         if _den > abs(_num):
-            _ret = jacobi_reciprocate(_ret)
+            _ret = _jacobi_reciprocate(_ret)
 
     return _ret
 
-def jacobi_reciprocate(jacobi):
+def _jacobi_reciprocate(jacobi):
     _den = jacobi._numerator
     _num = jacobi._denominator * (-1)**((_den-1)//2) % _den
 
@@ -76,32 +77,57 @@ class Jacobi(Symbol):
     def denominator(a):
         return a._denominator
 
-    def convert(self, kind):
-        str_check(kind)
+    def __call__(self):
+        from .NTLLegendre import Legendre
+        
+        a = self._numerator
+        m = self._denominator
+        a %= m
 
-        if kind == 'Jacobi':
+        if a == 1:      return 1
+        if a == m - 1:  return (-1)**((m-1)//2)
+        if a == 2:      return (-1)**((m**2-1)//8)
+        if coprimalityTest(a, m) and jssquare(a):   return 1
+
+        (p, q) = primeFactorisation(m, wrap=True)
+
+        rst = 1
+        for ptr in jsrange(len(p)):
+            rst *= Legendre(a, p[ptr])() ** q[ptr]
+
+        return rst
+
+    def convert(self, kind=None):
+        if kind is None:
             return self
-        elif kind == 'Legendre':
-            from .NTLLegendre import Legendre
-            _ret = Legendre(self._numerator, self._denominator)
-            return _ret
+
         else:
-            raise KeywordError('%s is an unknown type of symbol.' %kind)
+            str_check(kind)
+
+            if kind == 'Jacobi':
+                return self
+            elif kind == 'Legendre':
+                from .NTLLegendre import Legendre
+                _ret = Legendre(self._numerator, self._denominator)
+                return _ret
+            else:
+                raise KeywordError('%s is an unknown type of symbol.' %kind)
+
 
     # Virtual properties.
     _nickname    = 'Jacobi'
-    _numerator   = default_numerator
-    _denominator = default_denominator
+    _numerator   = _default_numerator
+    _denominator = _default_denominator
 
     # Virtual functions.
-    eval = jacobi_eval
-    simplify = jacobi_simplify
-    reciprocate = jacobi_reciprocate
+    eval = _jacobi_eval
+    simplify = _jacobi_simplify
+    reciprocate = _jacobi_reciprocate
 
 # if __name__ == '__main__':
 #     j1 = Jacobi(2, 3)
 #     j2 = Jacobi('2|3')
-#     j3 = Jacobi(l1)
+#     j3 = Jacobi(j1)
 
 #     print(j1, j1.eval())
 #     print(j2, j2.simplify())

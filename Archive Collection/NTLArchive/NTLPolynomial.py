@@ -20,19 +20,19 @@ PolyBase = __polynomial__.ABCPolynomial
 
 class Polynomial(PolyBase):
 
-    __all__   = ['cflag', 'iflag', 'vflag', 'var', 'vec', 'dfvar', 'nickname']
+    __all__   = ['iscomplex', 'isinteger', 'ismultivar', 'var', 'vector', 'dfvar', 'nickname']
     __slots__ = ('_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
 
     @property
-    def cflag(a):
+    def iscomplex(a):
         return a._cflag
 
     @property
-    def iflag(a):
+    def isinteger(a):
         return a._iflag
 
     @property
-    def vflag(a):
+    def ismultivar(a):
         return a._vflag
 
     @property
@@ -40,15 +40,15 @@ class Polynomial(PolyBase):
         return a._var
 
     @property
-    def vec(self):
+    def vector(a):
         return a._vec
 
     @property
-    def dfvar(self):
+    def dfvar(a):
         return a._dfvar
 
     @property
-    def nickname(self):
+    def nickname(a):
         return a._nickname
 
     def _update_state(self):
@@ -104,8 +104,9 @@ class Polynomial(PolyBase):
         #生成可計算的多項式的項
 
         _rst = 0
-        _var = self._read_vars(*vars)
         _mod = self._read_mods(**mods)
+        if _mod is None:        return self.eval(*vars)
+        _var = self._read_vars(*vars)
         if _var is None:        return 0
         if self._var == []:     return 0
         for var in _var:
@@ -277,7 +278,7 @@ class Polynomial(PolyBase):
     '''
     特別注意：
     1. 當下標值（key\i&j）小於零時，系統自動調用__len__()函數，並自增轉化為正數下標，即 key += len；
-    2. 若下標缺省，起始地址模認為0，而終止地址將被模認為最大整型數，即9223372036854775807。
+    2. 若下標缺省，起始地址模認為0，而終止地址將被模認為最大整型數，即sys.maxint=9223372036854775807。
     '''
 
     #返回i至j-1次項的多項式
@@ -556,7 +557,7 @@ class Polynomial(PolyBase):
                         #更新被除式的最高次數
                         try:
                             a_expmax = max(_rem._vec[_var])
-                        except ValueError:
+                        except (ValueError, KeyError):
                             break
                     _quo = Polynomial(_vec)
                     return _quo, _rem
