@@ -1,11 +1,16 @@
 # JSNTLIB Manual
 
 
+
 > `jsntlib` is an open sourse library for **number theory** written in Python, with compatibility in both 2.7.3 and 3.6.5 versions. The following is a manual for this library. Usage instructions and samples attached.
 
 
 
+
+
+
 ### Functions
+
 
 
   * `primelist(upper[, lower])`
@@ -54,7 +59,7 @@
     73
     ```
 
-  ​
+
 
   * `lcm(a, b)`
 
@@ -319,11 +324,17 @@
     Returns `int` type for a **pseudo prime number**, which is `byte` long, using `mode` test with `para` times and (for `Fermat` test) Carmicheal number check set in`flag`.
 
     * `mode` can be set to the followings (`Fermat` in default)
+    
       * `Fermat` —— using **Fermat test** for Fermat pseudo primes
+      
       * `Euler` or `Solovay-Stassen` —— using **Solovay-Stassen test** for Euler pseudo primes
+      
       * `Strong` or `Miller-Rabin` —— using **Miller-Rabin test** for strong pseudo primes
+      
     * `byte` is the **binary length** of expected pseudo primes (`16` in default)
+    
     * `para` is the **security parameter** for repetition in tests (`10000` in default)
+    
     * `flag` is to decide if **Carmicheal numbers** will be checked in Fermat test (`False` in default)
 
     ```python
@@ -351,7 +362,11 @@
 
 
 
+
+
+
 ### Classes
+
 
 
   * `Fraction`
@@ -404,6 +419,7 @@
       ```
 
 
+
     * `numerator`
 
       Numerator of the Fraction in lowest term.
@@ -423,6 +439,7 @@
     * `number`
 
       Original fraction number of the Fraction in `fractions.Fraction`.
+
 
 
     * `__getitem__(level)`
@@ -457,6 +474,9 @@
 
 
 
+
+
+
   * `Index`
 
     The `Index` class provides support for integer **modulo index**.
@@ -468,6 +488,7 @@
       >>> Index(41)
       Index(41)
       ```
+
 
 
     * `modulo`
@@ -491,6 +512,7 @@
       Formatted table of indexes to modulo in the Index in `list` type.
 
 
+
     * `__call__([a, b, …])`
 
       Returns the product of multiplication with integers a, b, … after modulo of the Index. When omitted, returns `None`.
@@ -500,6 +522,9 @@
       >>> Index(41)(105, 276)
       34
       ```
+
+
+
 
 
 
@@ -530,6 +555,7 @@
       ```
 
 
+
     * `numerator`
 
       Numerator of the Legendre symbol in lowest term.
@@ -541,6 +567,7 @@
     * `nickname`
 
       Returns `'Legendre'`.
+
 
 
     * `__call__()`
@@ -583,6 +610,9 @@
 
 
 
+
+
+
   * `Jacobi`
 
     The `Jacobi` class implements **Jacobi symbol**.
@@ -610,6 +640,7 @@
       ```
 
 
+
     * `numerator`
 
       Numerator of the Jacobie symbol in lowest term.
@@ -621,6 +652,7 @@
     * `nickname`
 
       Returns `'Jacobi'`.
+
 
 
     * `__call__()`
@@ -660,6 +692,9 @@
       >>> Jacobi(47, 5).convert('Legendre')
       Legendre(47, 5)
       ```
+
+
+
 
 
 
@@ -715,6 +750,7 @@
         ```
 
 
+
     * `iscomplex`
 
       If coefficients of the Polynomial are in **complex** field.
@@ -742,6 +778,7 @@
     * `nickname`
 
       Returns `poly`.
+
 
 
     * `eval(dict)`
@@ -786,6 +823,8 @@
       1
       ```
 
+
+
     * `__reduce__()`
 
     * `__copy__()`
@@ -793,6 +832,8 @@
     * `__deepcopy__()`
 
       Support for pickling, copy, and deepcopy.
+
+
 
 
     * Rich comparison is implemented.
@@ -812,6 +853,9 @@
 
 
 
+
+
+
   * `Congruence`
 
     The `Congruence` class, derived from `Polynomial` class, implements solution for mono-variable congruence in integer field.
@@ -819,7 +863,8 @@
     * `Congruence(dfvar='x')`
 
     * `default([var])`
-      ​
+    
+    
 
     * `Congruence(number)`
 
@@ -848,6 +893,7 @@
         >>> Congruence({'y': {2: 1}, 'x': {1: 1}}, mod=90)
         Congruence(x, y, mod=90)
         ```
+
 
 
     * `iscomplex`
@@ -891,6 +937,7 @@
       Returns `cong`.
 
 
+
     * `simplify()`
 
       Returns the Congruence after simplification.
@@ -913,6 +960,7 @@
       >>> Congruence(('z', (2,1), (0,-46)), mod=105).solve()
       z ≡ 16, 19, 26, 44, 61, 79, 86, 89 (mod 105)
       ```
+
 
 
     * `eval(dict)`
@@ -949,6 +997,8 @@
       11
       ```
 
+
+
     * `__reduce__()`
 
     * `__copy__()`
@@ -956,6 +1006,9 @@
     * `__deepcopy__()`
 
       Support for pickling, copy, and deepcopy.
+
+
+
 
 
 
@@ -988,6 +1041,7 @@
         ```
 
 
+
     * `var`
 
       Name of variables in the Polynomial within `list` type.
@@ -1009,6 +1063,7 @@
       Returns `quad`.
 
 
+
     * `solve()`
 
       Returns the `Solution` of the Quadratic.
@@ -1025,6 +1080,7 @@
       >>> Quadratic(8068, vars=('p', 'q')).solve()
       p = ±9  q = ±44
       ```
+
 
 
     * `eval(dict)`
@@ -1052,6 +1108,8 @@
       >>> Quadratic(4).mod(('x', 2), ('y', 3), mod=3)
       1
       ```
+      
+
 
     * `__reduce__()`
 
