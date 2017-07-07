@@ -1,14 +1,12 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 
 from .__abc__ import __symbol__
 
-__all__  = ['Legendre',
-            '_default_numerator', '_default_denominator',
-            '_legendre_eval', '_legendre_simplify', '_legendre_reciprocate']
-nickname =  'Legendre'
 
-#Legendre符號類
-#具備化簡、求值等基本功能
+# Legendre符號類
+# 具備化簡、求值等基本功能
+
 
 from .NTLExceptions           import DefinitionError, KeywordError
 from .NTLPrimeFactorisation   import primeFactorisation
@@ -19,11 +17,34 @@ from .NTLValidations          import prime_check, str_check
 
 # from .NTLJacobi import Jacobi
 
+
+__all__  = ['Legendre',
+            '_default_numerator', '_default_denominator',
+            '_legendre_eval', '_legendre_simplify', '_legendre_reciprocate']
+nickname =  'Legendre'
+
+
+'''Usage sample:
+
+l1 = Legendre(2, 3)
+l2 = Legendre('2|3')
+l3 = Legendre(l1)
+
+print(l1, l1.eval())
+print(l2, l2.simplify())
+print(l3, l3.reciprocate())
+
+'''
+
+
+# Abstract base class of symbol.
 Symbol = __symbol__.ABCSymbol
+
 
 # Legendre default form.
 _default_numerator   = 1
 _default_denominator = 2
+
 
 def _legendre_eval(legendre):
     _ret = _legendre_simplify(legendre)
@@ -41,6 +62,7 @@ def _legendre_eval(legendre):
 
     return r if r != p-1 else -1
 
+
 def _legendre_simplify(legendre):
     _ret = legendre
     _ret._numerator %= _ret._denominator
@@ -55,14 +77,16 @@ def _legendre_simplify(legendre):
 
     return _ret
 
+
 def _legendre_reciprocate(legendre):
     _den = legendre._numerator
     _num = legendre._denominator * (-1)**((_den-1)//2) % _den
 
     if _num == _den - 1:    _num = -1
     _ret = Legendre(_num, _den)
-    
+
     return _ret
+
 
 class Legendre(Symbol):
 
@@ -107,7 +131,7 @@ class Legendre(Symbol):
                 _ret = Jacobi(self._numerator, self._denominator)
                 return _ret
             else:
-                raise KeywordError('%s is an unknown type of symbol.' %kind)
+                raise KeywordError('%s is an unknown type of symbol.' % kind)
 
     # Virtual properties.
     _nickname    = 'Legendre'
@@ -118,12 +142,3 @@ class Legendre(Symbol):
     eval = _legendre_eval
     simplify = _legendre_simplify
     reciprocate = _legendre_reciprocate
-
-# if __name__ == '__main__':
-#     l1 = Legendre(2, 3)
-#     l2 = Legendre('2|3')
-#     l3 = Legendre(l1)
-
-#     print(l1, l1.eval())
-#     print(l2, l2.simplify())
-#     print(l3, l3.reciprocate())

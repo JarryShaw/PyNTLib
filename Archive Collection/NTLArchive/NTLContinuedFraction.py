@@ -1,19 +1,33 @@
 # -*- coding: utf-8 -*-
 
-__all__  = ['continuedFraction']
-nickname =  'fraction'
 
 import fractions
 import math
 
-#連分數
-#任意分數轉化為簡單連分數
+
+# 連分數
+# 任意分數轉化為簡單連分數
+
 
 from .NTLUtilities   import jsfloor
 from .NTLValidations import notneg_check, real_check
 
+
+__all__  = ['continuedFraction']
+nickname =  'fraction'
+
+
+'''Usage sample:
+
+print('7700/2145 = ', end=' ')
+rst_ = fraction(7700, 2145)
+print(rst_)
+
+'''
+
+
 def continuedFraction(numerator, denominator=None):
-    if denominator == None:     denominator = 1
+    if denominator is None:     denominator = 1
 
     real_check(numerator, denominator); notneg_check(numerator, denominator)
 
@@ -30,8 +44,3 @@ def continuedFraction(numerator, denominator=None):
 
     if cf_[-1] == 2:    cf_[-1:] = [1, 1]
     return cf_
-
-# if __name__ == '__main__':
-#     print('7700/2145 = ', end=' ')
-#     rst_ = continuedFraction(7700, 2145)
-#     print(rst_)

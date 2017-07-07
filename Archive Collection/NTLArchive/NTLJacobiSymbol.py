@@ -1,18 +1,27 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-__all__  = ['jacobiSymbol']
-nickname =  'jacobi'
 
-import math
+# Jacobi符號
+# 計算Jacobi符號（定義求解）
 
-#Jacobi符號
-#計算Jacobi符號（定義求解）
 
 from .NTLCoprimalityTest    import coprimalityTest
 from .NTLLegendreSymbol     import legendreSymbol
 from .NTLPrimeFactorisation import primeFactorisation
 from .NTLUtilities          import jsrange, jssquare
 from .NTLValidations        import int_check, pos_check
+
+
+__all__  = ['jacobiSymbol']
+nickname =  'jacobi'
+
+
+'''Usage sample:
+
+print('(286 | 563) = %d' % jacobi(286, 563))
+
+'''
+
 
 def jacobiSymbol(a, m):
     int_check(a, m);    pos_check(m)
@@ -31,6 +40,3 @@ def jacobiSymbol(a, m):
         rst *= legendreSymbol(a, p[ptr]) ** q[ptr]
 
     return rst
-
-# if __name__ == '__main__':
-#     print('(286 | 563) = %d' %jacobiSymbol(286, 563))

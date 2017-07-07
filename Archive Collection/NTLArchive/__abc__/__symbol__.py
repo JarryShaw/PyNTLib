@@ -5,15 +5,15 @@ import abc
 import re
 
 
+# Legendre及Jacobi符號基類
+# Abstract Base Class for Legendre & Jacobi Symbols
+
+
 from NTLArchive.NTLExceptions  import DefinitionError, ResidueError
 from NTLArchive.NTLValidations import basestring_check, int_check
 
 
 __all__ = ['ABCSymbol']
-
-
-# Legendre及Jacobi符號基類
-# Abstract Base Class for Legendre & Jacobi Symbols
 
 
 '''

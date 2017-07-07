@@ -9,6 +9,10 @@ import re
 import sys
 
 
+# 多項式基類
+# Abstract Base Class for Polynomials
+
+
 from NTLArchive.NTLExceptions  import \
     DefinitionError, KeywordError
 from NTLArchive.NTLUtilities   import \
@@ -19,10 +23,6 @@ from NTLArchive.NTLValidations import \
 
 
 __all__ = ['ABCPolynomial']
-
-
-# 多項式基類
-# Abstract Base Class for Polynomials
 
 
 ABCMeta = abc.ABCMeta
@@ -42,8 +42,8 @@ POLYNOMIAL_FORMAT = re.compile(r'''
     (?=\d)                          # lookahead for digit
     (?P<coe_>\d*)                   # coefficient
     (?:\*)                          # followed by an optional asterisk/multiplier, then
-    (?=[a-z_]?)                     # lookahead for non-digit/letter
-    (?P<var_>[a-z_]+)               # variable
+    (?=[a-zA-Z_])                   # lookahead for non-digit/letter
+    (?P<var_>\w*)                   # variable
     (?:\^)                          # followed by an optional caret, then
     (?=\d)                          # lookahead for digit
     (?P<exp_>\d*)                   # exponent
@@ -117,6 +117,7 @@ class ABCPolynomial(object):
     @staticmethod
     def _read_item(item):
         m = POLYNOMIAL_FORMAT.match(item)
+        print(m)
         if m is None:
             raise DefinitionError('Invalid literal for symbols: %r' % item)
 
@@ -353,6 +354,7 @@ class ABCPolynomial(object):
             for _var in self._var:
                 _str.append(str_ec(self._vec[_var], _var))
             _str = ' + '.join(_str)
+            _str = _str.replace(' + -', ' - ')
         return _str if _str != '' else '0'
 
     @abstractmethod

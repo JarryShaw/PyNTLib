@@ -1,16 +1,27 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-__all__  = ['legendreSymbol']
-nickname =  'legendre'
 
-#Legendre符號
-#計算Legendre符號（定義求解）
+# Legendre符號
+# 計算Legendre符號（定義求解）
+
 
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLValidations          import int_check, prime_check
 
+
+__all__  = ['legendreSymbol']
+nickname =  'legendre'
+
+
+'''Usage sample:
+
+print('(3 | 17) = %d' % legendre(3, 17))
+
+'''
+
+
 def legendreSymbol(a, p):
-    int_check(a, p);    prime_check(p)
+    int_check(a);	prime_check(p)
 
     a %= p
 
@@ -20,6 +31,3 @@ def legendreSymbol(a, p):
 
     mod = repetiveSquareModulo(a, ((p-1)//2), p)
     return mod if mod != p-1 else -1
-
-# if __name__ == '__main__':
-#     print('(3 | 17) = %d' %legendreSymbol(3, 17))

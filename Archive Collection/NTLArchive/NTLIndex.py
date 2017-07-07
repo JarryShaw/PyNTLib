@@ -1,16 +1,28 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-__all__  = ['Index']
-nickname =  'Index'
-
-#指標類
-#計算整數m的指標，並用於求模計算
+# 指標類
+# 計算整數m的指標，並用於求模計算
 
 from .NTLEulerFunction        import eulerFunction
 from .NTLPrimitiveRoot        import primitiveRoot
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLUtilities            import jsrange
 from .NTLValidations          import int_check, pos_check
+
+
+__all__  = ['Index']
+nickname =  'Index'
+
+
+'''Usage sample:
+
+index = Index(41)
+print(index, '\n')
+rst = index(4, 8)
+print('4 * 8 ≡ %d' % rst)
+
+'''
+
 
 class Index:
 
@@ -52,24 +64,24 @@ class Index:
             int_check(_int)
             if _int == 0:   return 0
             self._mul.append(_int)
-        
+
         if self._mul == []: return None
         _product = self._calc_multi()
 
         return _product
 
     def __repr__(self):
-        return 'Index(%d)' %self_.mod
+        return 'Index(%d)' % self_.mod
 
     def __str__(self):
         string = '\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9'
         for i in jsrange(len(self._tab)):
-            string += '\n%d\t' %i
+            string += '\n%d\t' % i
             for j in self._tab[i]:
                 if j == 0:
                     string += '\t'
                 else:
-                    string += '%d\t' %j
+                    string += '%d\t' % j
             string = string[:-1]
 
         return string
@@ -98,9 +110,3 @@ class Index:
         _product = (self._pmr ** (_all_index % self._phi)) % self._mod
 
         return _product
-# if __name__ == '__main__':
-#     index = Index(41)
-#     print(index)
-#     print()
-#     rst = index(4, 8)
-#     print('4 * 8 ≡ %d' %rst)

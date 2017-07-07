@@ -1,26 +1,40 @@
 # -*- coding: utf-8 -*-
 
-__all__  = ['Fraction']
-nickname =  'Fraction'
-
 import fractions
 import math
 import numbers
 import operator
 import sys
 
-#連分數類
-#基于分数類，增加转化、逼近等功能
+# 連分數類
+# 基于分数類，增加转化、逼近等功能
 
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
 from .NTLUtilities             import jsceil, jsint, jsfloor, jsround, jsstring
 from .NTLValidations           import int_check
 
+
+__all__  = ['Fraction']
+nickname =  'Fraction'
+
+
+'''Usage sample:
+
+print('7700/2145 = ', end=' ')
+rst_ = Fraction('7699/2145')
+dst_ = Fraction(1, 2145)
+print(rst_ + dst_)
+
+'''
+
+
 if sys.version_info[0] > 2:
     _PyHASH_MODULUS = fractions._PyHASH_MODULUS
     _PyHASH_INF = fractions._PyHASH_INF
 
+
 FractionBase = fractions.Fraction
+
 
 class Fraction(FractionBase):
 
@@ -110,7 +124,7 @@ class Fraction(FractionBase):
     # Get certain level of convergents.
     def __getitem__(self, level=None):
         int_check(level)
-        
+
         if level is None:
             return self._number
         else:
@@ -231,9 +245,3 @@ class Fraction(FractionBase):
 
     def __nonzero__(a):
         return (a._number != 0)
-
-# if __name__ == '__mian__':
-#     print('7700/2145 = ', end=' ')
-#     rst_ = Fraction('7699/2145')
-#     dst_ = Fraction(1, 2145)
-#     print(rst_ + dst_)

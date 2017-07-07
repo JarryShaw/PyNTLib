@@ -2,21 +2,47 @@
 
 from .__abc__ import __polynomial__
 
-__all__  = ['Polynomial']
-nickname =  'Polynomial'
 
 import copy
 import sys
 
-#複數域多項式類
-#具備基本運算的複數域多項式實現
+
+# 複數域多項式類
+# 具備基本運算的複數域多項式實現
+
 
 from .NTLExceptions           import ComplexError, DefinitionError, PolyError
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLUtilities            import jsappend, jsint, jsitems, jskeys, jsmaxint, jsrange, jsupdate
 from .NTLValidations          import int_check, number_check, tuple_check
 
+
+__all__  = ['Polynomial']
+nickname =  'Polynomial'
+
+
+'''Usage sample:
+
+a = complex(1,3)
+poly_1 = Polynomial(('a', (1,3), (3,4), (2,2), (34,a)))
+poly_2 = Polynomial((1,0), (4,-4), (2,3), (0,1))
+poly_3 = Polynomial(((2,-1), (0,1)))
+poly_4 = Polynomial(((0,1)))
+poly_5 = Polynomial(
+    ((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1)))
+poly_6 = Polynomial(((7,1), (1,-1)))
+poly_7 = poly_1 / poly_2
+
+print(poly_1[:])
+print(poly_2)
+print(poly_7)
+
+'''
+
+
+# Abstract base class of polynomial.
 PolyBase = __polynomial__.ABCPolynomial
+
 
 class Polynomial(PolyBase):
 
@@ -80,9 +106,9 @@ class Polynomial(PolyBase):
         self._nickname = 'poly'
         self._update_state()
 
-    #求取self的值
+    # 求取self的值
     def eval(self, *vars):
-        #生成可計算的多項式
+        # 生成可計算的多項式
         def make_eval(_dict):
             poly = []
             for exp in _dict:
@@ -99,10 +125,8 @@ class Polynomial(PolyBase):
             _rst += (lambda x: eval(poly))(_var[var])
         return _rst
 
-    #用模重複平方法求self取模後的值
+    # 用模重複平方法求self取模後的值
     def mod(self, *vars, **mods):
-        #生成可計算的多項式的項
-
         _rst = 0
         _mod = self._read_mods(**mods)
         if _mod is None:        return self.eval(*vars)
@@ -118,7 +142,7 @@ class Polynomial(PolyBase):
         _rst %= _mod
         return _rst
 
-    #返回self=poly的布爾值
+    # 返回self=poly的布爾值
     def __eq__(self, other):
         if isinstance(other, Polynomial):
             if self._var == other._var and self._vec == other._vec:
@@ -128,11 +152,11 @@ class Polynomial(PolyBase):
         else:
             return (self == Polynomial(other))
 
-    #返回self≠poly的布爾值
+    # 返回self≠poly的布爾值
     def __ne__(self, poly):
         return (not (self == poly))
 
-    #返回self<poly的布爾值
+    # 返回self<poly的布爾值
     def __lt__(self, poly):
         if self.has_sametype(poly):
             if self._cflag or poly._cflag:
@@ -143,7 +167,7 @@ class Polynomial(PolyBase):
 
             if len(self) > len(poly):       return False
             if len(self) < len(poly):       return True
-        
+
             a_ec = self._vec[self._var[0]]
             b_ec = poly._vec[poly._var[0]]
 
@@ -157,26 +181,26 @@ class Polynomial(PolyBase):
         else:
             return (self < Polynomial(poly))
 
-    #返回self≤poly的布爾值
+    # 返回self≤poly的布爾值
     def __le__(self, poly):
         return ((self == poly) or (self < poly))
 
-    #返回self>poly的布爾值
+    # 返回self>poly的布爾值
     def __gt__(self, poly):
         return (not (self <= poly))
 
-    #返回self≥poly的布爾值
+    # 返回self≥poly的布爾值
     def __ge__(self, poly):
         return (not (self < poly))
 
-    #返回最高次項的次冪加一
+    # 返回最高次項的次冪加一
     def __len__(self):
         if self._vflag:
             raise PolyError('Multi-variable polynomial has no len().')
         else:
             return (max(self._vec[self._var[0]]) + 1)
 
-    #返回key次項的係數或關於key變量的多項式
+    # 返回key次項的係數或關於key變量的多項式
     def __getitem__(self, key):
         if isinstance(key, str):
             if key in self._var:
@@ -192,9 +216,9 @@ class Polynomial(PolyBase):
 
         else:
             int_check(key)
-            if sys.version_info[0] > 2: 
+            if sys.version_info[0] > 2:
                 if key < 0:     key += len(self)
-                
+
             if self._vflag:
                 raise PolyError('Multi-variable polynomial has no attribute \'__getitem__\'.')
             else:
@@ -203,14 +227,15 @@ class Polynomial(PolyBase):
                 except KeyError:
                     return 0
 
-    #修改key次項的係數或關於key變量的項為value
+    # 修改key次項的係數或關於key變量的項為value
     def __setitem__(self, key, value):
         if isinstance(key, str):
             tuple_check(value);     _ec = {}
             for item in value:
                 tuple_check()
                 if len(item) != 2:
-                    raise DefinitionError('Tuple of coeffients and corresponding exponents in need.')
+                    raise DefinitionError(
+                        'Tuple of coeffients and corresponding exponents in need.')
                 _ec[item[0]] = item[1]
 
             jsappend(self._var, key)
@@ -220,8 +245,8 @@ class Polynomial(PolyBase):
             self.__setslice__(key.start, key.stop, key.step, value)
 
         else:
-            int_check(key);     number_check(value)
-            if sys.version_info[0] > 2: 
+            int_check(key);         number_check(value)
+            if sys.version_info[0] > 2:
                     if key < 0:     key += len(self)
 
             if self._vflag:
@@ -234,7 +259,7 @@ class Polynomial(PolyBase):
 
         self._update_state()
 
-    #刪去key次項
+    # 刪去key次項
     def __delitem__(self, key):
         if isinstance(key, str):
             if key in self._var:
@@ -257,7 +282,7 @@ class Polynomial(PolyBase):
 
         self._update_state()
 
-    #判斷一多項式是否含於多項式中
+    # 判斷一多項式是否含於多項式中
     def __contains__(self, poly):
         if isinstance(poly, Polynomial):
             if (poly._var in self._var):
@@ -281,19 +306,19 @@ class Polynomial(PolyBase):
     2. 若下標缺省，起始地址模認為0，而終止地址將被模認為最大整型數，即sys.maxint=9223372036854775807。
     '''
 
-    #返回i至j-1次項的多項式
+    # 返回i至j-1次項的多項式
     def __getslice__(self, i, j, k=None):
         if i is None:   i = 0
         if j is None:   j = len(self)
         if k is None:   k = 1
 
         int_check(i, j, k)
-        
+
         if self._vflag:
             raise PolyError('Multi-variable polynomial has no attribute \'__getitem__\'.')
 
         if j == jsmaxint:   j = len(self)
-        
+
         _list = [self._var[0]]
         for ptr in jsrange(i, j, k):
             try:
@@ -304,7 +329,7 @@ class Polynomial(PolyBase):
         poly = Polynomial(tuple(_list))
         return poly
 
-    #修改i至j-1次項的多項式
+    # 修改i至j-1次項的多項式
     def __setslice__(self, i, j, k, coe=None):
         if coe is None:
             if i is None:   i = 0
@@ -343,7 +368,7 @@ class Polynomial(PolyBase):
 
             self._update_state()
 
-    #刪除i至j-1次項的多項式       
+    # 刪除i至j-1次項的多項式
     def __delslice__(self, i, j, k=None):
         if i is None:   i = 0
         if j is None:   j = len(self)
@@ -353,7 +378,7 @@ class Polynomial(PolyBase):
 
         if self._vflag:
             raise PolyError('Multi-variable polynomial does not support item deletion.')
-        
+
         if j == jsmaxint:   j = len(self)
 
         for ptr in range(i, j, k):
@@ -364,7 +389,7 @@ class Polynomial(PolyBase):
 
         self._update_state()
 
-    #求取_sum = self + poly
+    # 求取_sum = self + poly
     def _add(self, poly):
         if isinstance(poly, Polynomial):
             _sum = copy.deepcopy(self)
@@ -375,7 +400,7 @@ class Polynomial(PolyBase):
             _sum = self + Polynomial(poly)
         return _sum
 
-    #求取rsum = poly + self
+    # 求取rsum = poly + self
     def radd(self, poly):
         rsum = poly + self
         return rsum
@@ -383,7 +408,7 @@ class Polynomial(PolyBase):
     __add__  = _add
     __radd__ = radd
 
-    #求取_dif = self - poly
+    # 求取_dif = self - poly
     def _sub(self, poly):
         if isinstance(poly, Polynomial):
             _dif = copy.deepcopy(self);     _poly = -poly
@@ -392,11 +417,10 @@ class Polynomial(PolyBase):
             _dif._update_state()
         else:
             _dif = self - Polynomial(poly)
-        
+
         return _dif
 
-     #求取rdif = poly - self
-    
+    # 求取rdif = poly - self
     def rsub(self, poly):
         rdif = poly - self
         return rdif
@@ -404,7 +428,7 @@ class Polynomial(PolyBase):
     __sub__  = _sub
     __rsub__ = rsub
 
-    #求取_pro = self * poly
+    # 求取_pro = self * poly
     def _mul(self, poly):
         if isinstance(poly, Polynomial):
             if self._vflag:
@@ -426,7 +450,7 @@ class Polynomial(PolyBase):
             _pro = self * Polynomial(poly)
         return _pro
 
-    #求取rpro = poly * self
+    # 求取rpro = poly * self
     def rmul(self, poly):
         rpro = poly * self
         return rpro
@@ -434,7 +458,7 @@ class Polynomial(PolyBase):
     __mul__  = _mul
     __rmul__ = rmul
 
-    #求取_quo = self / poly
+    # 求取_quo = self / poly
     def _div(self, poly):
         if sys.version_info[0] < 3 and self._iflag and poly._iflag:
             _quo = self // poly
@@ -449,17 +473,21 @@ class Polynomial(PolyBase):
                     _did = copy.deepcopy(poly)
                     _rem = copy.deepcopy(self)
 
-                    a_expmax = max(self._vec[_var])                         #獲取被除式的最高次數
-                    b_exp = sorted(jskeys(_did._vec[_var]), reverse=True)   #獲取除式的指數列（降序）
+                    # 獲取被除式的最高次數
+                    a_expmax = max(self._vec[_var])
+                    # 獲取除式的指數列（降序）
+                    b_exp = sorted(jskeys(_did._vec[_var]), reverse=True)
 
-                    #若被除式最高次冪小於除式最高次冪則終止迭代
+                    # 若被除式最高次冪小於除式最高次冪則終止迭代
                     while a_expmax >= b_exp[0]:
-                        quo_coe = _rem._vec[_var][a_expmax] / \
-                                    _did._vec[_var][b_exp[0]]               #計算商式的係數，即當前被除式最高次冪項係數與除式最高次冪的項係數的商值
-                        quo_exp = a_expmax - b_exp[0]                       #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-                        _vec[_var][quo_exp] = quo_coe                       #將結果添入商式多項式
+                        # 計算商式的係數，即當前被除式最高次冪項係數與除式最高次冪的項係數的商值
+                        quo_coe = _rem._vec[_var][a_expmax] / _did._vec[_var][b_exp[0]]
+                        # 計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+                        quo_exp = a_expmax - b_exp[0]
+                        # 將結果添入商式多項式
+                        _vec[_var][quo_exp] = quo_coe
 
-                        #更新被除式係數及次冪狀態
+                        # 更新被除式係數及次冪狀態
                         for exp in b_exp:
                             rem_exp = exp + quo_exp
                             rem_coe = _did._vec[_var][exp] * quo_coe
@@ -469,7 +497,7 @@ class Polynomial(PolyBase):
                                 _rem._vec[_var][rem_exp] = -rem_coe
                         _rem._update_state()
 
-                        #更新被除式的最高次數
+                        # 更新被除式的最高次數
                         try:
                             a_expmax = max(_rem._vec[_var])
                         except ValueError:
@@ -483,7 +511,7 @@ class Polynomial(PolyBase):
             _quo = self / Polynomial(poly)
             return _quo
 
-    #求取rquo = poly / self
+    # 求取rquo = poly / self
     def rdiv(self, poly):
         rquo = poly / self
         return rquo
@@ -495,7 +523,7 @@ class Polynomial(PolyBase):
         __div__  = _div
         __rdiv__ = rdiv
 
-    #求取(_quo, _rem) = divmod(self, poly)
+    # 求取(_quo, _rem) = divmod(self, poly)
     def _divmod(self, poly):
         if isinstance(poly, Polynomial):
             if self._vflag:
@@ -506,10 +534,12 @@ class Polynomial(PolyBase):
                     _did = copy.deepcopy(poly)
                     _rem = copy.deepcopy(self)
 
-                    a_expmax = max(self._vec[_var])                         #獲取被除式的最高次數
-                    b_exp = sorted(jskeys(_did._vec[_var]), reverse=True)   #獲取除式的指數列（降序）
+                    # 獲取被除式的最高次數
+                    a_expmax = max(self._vec[_var])
+                    # 獲取除式的指數列（降序）
+                    b_exp = sorted(jskeys(_did._vec[_var]), reverse=True)
 
-                    #若除式最高次冪的係數不為1，則需化簡
+                    # 若除式最高次冪的係數不為1，則需化簡
                     if _did._vec[_var][b_exp[0]] != 1:
                         _coe = _did._vec[_var][b_exp[0]]
 
@@ -520,7 +550,7 @@ class Polynomial(PolyBase):
                                 _rem = Polynomial()
                                 return _quo, _rem
 
-                        #判斷除式是否可化簡
+                        # 判斷除式是否可化簡
                         for exp in b_exp:
                             if _did._vec[_var][exp] % _coe != 0:
                                 _quo = Polynomial()
@@ -529,7 +559,7 @@ class Polynomial(PolyBase):
                             else:
                                 _did._vec[_var][exp] //= _coe
 
-                        #判斷被除式是否可化簡
+                        # 判斷被除式是否可化簡
                         for key in self._vec[_var]:
                             if self._vec[_var][key] % _coe != 0:
                                 _quo = Polynomial()
@@ -538,13 +568,16 @@ class Polynomial(PolyBase):
                             else:
                                 _rem._vec[_var][key] //= _coe
 
-                    #若被除式最高次冪小於除式最高次冪則終止迭代
+                    # 若被除式最高次冪小於除式最高次冪則終止迭代
                     while a_expmax >= b_exp[0]:
-                        quo_coe = _rem._vec[_var][a_expmax]     #計算商式的係數，即當前被除式最高次冪項係數
-                        quo_exp = a_expmax - b_exp[0]           #計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
-                        _vec[_var][quo_exp] = quo_coe           #將結果添入商式多項式
+                        # 計算商式的係數，即當前被除式最高次冪項係數
+                        quo_coe = _rem._vec[_var][a_expmax]
+                        # 計算商式的次冪，即當前被除式最高次冪與除式最高次冪的差值
+                        quo_exp = a_expmax - b_exp[0]
+                        # 將結果添入商式多項式
+                        _vec[_var][quo_exp] = quo_coe
 
-                        #更新被除式係數及次冪狀態
+                        # 更新被除式係數及次冪狀態
                         for exp in b_exp:
                             rem_exp = exp + quo_exp
                             rem_coe = _did._vec[_var][exp] * quo_coe
@@ -553,8 +586,8 @@ class Polynomial(PolyBase):
                             except KeyError:
                                 _rem._vec[_var][rem_exp] = -rem_coe
                         _rem._update_state()
-                                
-                        #更新被除式的最高次數
+
+                        # 更新被除式的最高次數
                         try:
                             a_expmax = max(_rem._vec[_var])
                         except (ValueError, KeyError):
@@ -567,7 +600,7 @@ class Polynomial(PolyBase):
             _quo, _rem = self._divmod(Polynomial(poly))
             return _quo, _rem
 
-    #求取(_quo, _rem) = divmod(poly, self)
+    # 求取(_quo, _rem) = divmod(poly, self)
     def rdivmod(self, poly):
         (_quo, _rem) = divmod(poly, self)
         return _quo, _rem
@@ -575,12 +608,12 @@ class Polynomial(PolyBase):
     __divmod__  = _divmod
     __rdivmod__ = rdivmod
 
-    #求取_quo = self // poly
+    # 求取_quo = self // poly
     def _floordiv(self, poly):
         _quo = self._divmod(poly)[0]
         return _quo
 
-    #求取rquo = poly // self
+    # 求取rquo = poly // self
     def rfloordiv(self, poly):
         rquo = poly // self
         return rquo
@@ -588,12 +621,12 @@ class Polynomial(PolyBase):
     __floordiv__  = _floordiv
     __rfloordiv__ = rfloordiv
 
-    #求取_rem = self % poly
+    # 求取_rem = self % poly
     def _mod(self, poly):
         _rem = self._divmod(poly)[1]
         return _rem
 
-    #求取rrem = poly % self
+    # 求取rrem = poly % self
     def rmod(self, poly):
         rrem = poly % self
         return rrem
@@ -601,7 +634,7 @@ class Polynomial(PolyBase):
     __mod__  = _mod
     __rmod__ = rmod
 
-    #求取_pow = pow(self, exp[, mod])
+    # 求取_pow = pow(self, exp[, mod])
     def _pow(self, exp, mod=None):
         int_check(exp);     _pow = copy.deepcopy(self)
         for ctr in jsrange(1, _exp):        _pow *= _pow
@@ -610,7 +643,7 @@ class Polynomial(PolyBase):
 
     __pow__  = _pow
 
-    #求取_neg = -self
+    # 求取_neg = -self
     def _neg(self):
         _neg = copy.deepcopy(self)
         for var in _neg._vec:
@@ -618,12 +651,12 @@ class Polynomial(PolyBase):
                 _neg._vec[var][exp] = -_neg._vec[var][exp]
         return _neg
 
-    #求取_pos = +self
+    # 求取_pos = +self
     def _pos(self):
         _pos = copy.deepcopy(self)
         return _pos
 
-    #求取_abs = abs(self)
+    # 求取_abs = abs(self)
     def _abs(self):
         _abs = copy.deepcopy(self)
         for var in _abs._vec:
@@ -635,7 +668,7 @@ class Polynomial(PolyBase):
     __pos__ = _pos
     __abs__ = _abs
 
-    #求取self的導式
+    # 求取self的導式
     def _der(self):
         vec = {};   _ec = {}
         for var in self._vec:
@@ -650,7 +683,7 @@ class Polynomial(PolyBase):
         _der = Polynomial(vec)
         return _der
 
-    #求取self的積分
+    # 求取self的積分
     def _int(self):
         vec = {};   _ec = {}
         for var in self._vec:
@@ -685,17 +718,3 @@ class Polynomial(PolyBase):
         if type(self) == Polynomial:
             return self     # My components are also immutable
         return self.__class__(self._vec, dfvar=self._dfvar)
-
-# if __name__ == '__main__':
-#     a = complex(1,3)
-#     poly_1 = Polynomial(('a', (1,3), (3,4), (2,2), (34,a)))
-#     poly_2 = Polynomial((1,0), (4,-4), (2,3), (0,1))
-#     poly_3 = Polynomial(((2,-1), (0,1)))
-#     poly_4 = Polynomial(((0,1)))
-#     poly_5 = Polynomial(((20140515,20140515), (201405,201495), (2014,2014), (8,8), (6,1), (3,4), (1,1), (0,1)))
-#     poly_6 = Polynomial(((7,1), (1,-1)))
-#     poly_7 = poly_1 / poly_2
-    
-#     print(poly_1[:])
-#     print(poly_2)
-#     print(poly_7)
