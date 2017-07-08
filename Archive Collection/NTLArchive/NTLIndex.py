@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+
 # 指標類
 # 計算整數m的指標，並用於求模計算
+
 
 from .NTLEulerFunction        import eulerFunction
 from .NTLPrimitiveRoot        import primitiveRoot
@@ -28,15 +30,9 @@ class Index:
 
     __all__ = ['_mul', '_mod', '_pmr', '_phi', '_ind', '_tab']
 
-    def __init__(self, modulo):
-        int_check(modulo);  pos_check(modulo)
-
-        self._mul = []
-        self._mod = modulo
-        self._pmr = primitiveRoot(modulo)[0]
-        self._phi = eulerFunction(self._mod)
-        self._ind = self._make_index()
-        self._tab = self._make_table()
+    ##########################################################################
+    # Properties.
+    ##########################################################################
 
     @property
     def modulo(a):
@@ -57,6 +53,20 @@ class Index:
     @property
     def table(a):
         return a._tab
+
+    ##########################################################################
+    # Data models.
+    ##########################################################################
+
+    def __init__(self, modulo):
+        int_check(modulo);  pos_check(modulo)
+
+        self._mul = []
+        self._mod = modulo
+        self._pmr = primitiveRoot(modulo)[0]
+        self._phi = eulerFunction(self._mod)
+        self._ind = self._make_index()
+        self._tab = self._make_table()
 
     def __call__(self, *args):
         self._mul = []
@@ -85,6 +95,10 @@ class Index:
             string = string[:-1]
 
         return string
+
+    ##########################################################################
+    # Utilities.
+    ##########################################################################
 
     def _make_index(self):
         _ind = [0]*self._mod

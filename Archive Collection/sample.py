@@ -318,12 +318,12 @@ print()
 
 # Return a pseudo-prime number with certain paterns.
 print('Call pseudo.')
-print('A pseudo-prime number with Fermat test (t=100000) is \
-        %d.' % jsntlib.pseudo(byte=16, para=10000, mode='Fermat', flag=False))
-print('An Euler pseudo-prime number with Solovay-Stassen test (t=100000) is \
-        %d.' % jsntlib.pseudo(byte=16, para=10000, mode='Euler'))
-print('A strong pseudo-prime number with Miller-Rabin test (k=100000) is \
-        %d.' % jsntlib.pseudo(byte=16, para=10000, mode='Strong'))
+print('A pseudo-prime number with Fermat test (t=100000) is %d.'
+    % jsntlib.pseudo(byte=16, para=10000, mode='Fermat', flag=False))
+print('An Euler pseudo-prime number with Solovay-Stassen test (t=100000) is %d.'
+    % jsntlib.pseudo(byte=16, para=10000, mode='Euler'))
+print('A strong pseudo-prime number with Miller-Rabin test (k=100000) is %d.'
+    % jsntlib.pseudo(byte=16, para=10000, mode='Strong'))
 
 print()
 

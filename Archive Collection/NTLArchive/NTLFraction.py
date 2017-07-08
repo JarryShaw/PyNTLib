@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
+
 import fractions
 import math
 import numbers
 import operator
 import sys
 
+
 # 連分數類
 # 基于分数類，增加转化、逼近等功能
+
 
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
 from .NTLUtilities             import jsceil, jsint, jsfloor, jsround, jsstring
@@ -30,7 +33,7 @@ print(rst_ + dst_)
 
 if sys.version_info[0] > 2:
     _PyHASH_MODULUS = fractions._PyHASH_MODULUS
-    _PyHASH_INF = fractions._PyHASH_INF
+    _PyHASH_INF     = fractions._PyHASH_INF
 
 
 FractionBase = fractions.Fraction
@@ -40,6 +43,26 @@ class Fraction(FractionBase):
 
     __all__   = ['numerator', 'denominator', 'fraction', 'convergent', 'number']
     __slots__ = ('_numerator', '_denominator', '_fraction', '_convergent', '_number')
+
+    ##########################################################################
+    # Properties.
+    ##########################################################################
+
+    @property
+    def number(a):
+        return a._number
+
+    @property
+    def fraction(a):
+        return a._fraction
+
+    @property
+    def convergent(a):
+        return a._convergent
+
+    ##########################################################################
+    # Data models.
+    ##########################################################################
 
     def __new__(cls, numerator=0, denominator=None):
 
@@ -109,18 +132,6 @@ class Fraction(FractionBase):
             self._fraction, self._convergent = expand(self._number)
             return self
 
-    @property
-    def number(a):
-        return a._number
-
-    @property
-    def fraction(a):
-        return a._fraction
-
-    @property
-    def convergent(a):
-        return a._convergent
-
     # Get certain level of convergents.
     def __getitem__(self, level=None):
         int_check(level)
@@ -133,6 +144,10 @@ class Fraction(FractionBase):
                 return self.convergent[level]
             except IndexError:
                 return self._number
+
+    ##########################################################################
+    # Algebra.
+    ##########################################################################
 
     def _operator_fallbacks(monomorphic_operator, fallback_operator):
         def forward(a, b):

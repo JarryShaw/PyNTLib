@@ -16,11 +16,10 @@ from NTLArchive.NTLValidations import basestring_check, int_check
 __all__ = ['ABCSymbol']
 
 
-'''
-SYMBOL_FORMAT
-    (+\-) numerator (/\|) denominator
-'''
+'''SYMBOL_FORMAT:
 
+(+\-) numerator (/\|) denominator
+'''
 
 SYMBOL_FORMAT = re.compile(r'''
     \A\s*                       # optional whitespace at the start, then
@@ -47,6 +46,10 @@ class ABCSymbol(object):
     # Not hashable
     __hash__ = None
 
+    ##########################################################################
+    # Properties.
+    ##########################################################################
+
     @abstractproperty
     def numerator(self):
         pass
@@ -58,6 +61,10 @@ class ABCSymbol(object):
     @abstractproperty
     def nickname(self):
         pass
+
+    ##########################################################################
+    # Methods.
+    ##########################################################################
 
     @abstractmethod
     def eval(self):
@@ -78,6 +85,10 @@ class ABCSymbol(object):
     # Check is types match.
     def has_sametype(self, other):
         return isinstance(other, self.__class__)
+
+    ##########################################################################
+    # Data models.
+    ##########################################################################
 
     def __new__(cls, numerator, denominator=None):
         self = super(ABCSymbol, cls).__new__(cls)
@@ -124,6 +135,10 @@ class ABCSymbol(object):
 
     def __str__(self):
         return '%d | %d' % (self._numerator, self._denominator)
+
+    ##########################################################################
+    # Utilities.
+    ##########################################################################
 
     def __eq__(self, other):
         _ret = (self._numerator == other._numerator) and \

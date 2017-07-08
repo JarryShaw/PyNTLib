@@ -45,6 +45,7 @@ _default_numerator   = 1
 _default_denominator = 2
 
 
+# 計算Jacobi符號的值
 def _jacobi_eval(jacobi):
     _ret = _jacobi_simplify(jacobi)
 
@@ -62,6 +63,7 @@ def _jacobi_eval(jacobi):
     return r if r != p-1 else -1
 
 
+# 化簡Jacobi符號
 def _jacobi_simplify(jacobi):
     _ret = jacobi
     _ret._numerator %= _ret._denominator
@@ -77,6 +79,7 @@ def _jacobi_simplify(jacobi):
     return _ret
 
 
+# 二次互反律
 def _jacobi_reciprocate(jacobi):
     _den = jacobi._numerator
     _num = jacobi._denominator * (-1)**((_den-1)//2) % _den
@@ -89,6 +92,10 @@ def _jacobi_reciprocate(jacobi):
 
 class Jacobi(Symbol):
 
+    ##########################################################################
+    # Properties.
+    ##########################################################################
+
     @property
     def nickname(a):
         return a._nickname
@@ -100,6 +107,11 @@ class Jacobi(Symbol):
     @property
     def denominator(a):
         return a._denominator
+
+    ##########################################################################
+    # Data models.
+    ##########################################################################
+
 
     def __call__(self):
         from .NTLLegendre import Legendre
@@ -120,6 +132,10 @@ class Jacobi(Symbol):
             rst *= Legendre(a, p[ptr])() ** q[ptr]
 
         return rst
+
+    ##########################################################################
+    # Methods.
+    ##########################################################################
 
     def convert(self, kind=None):
         if kind is None:
@@ -143,6 +159,6 @@ class Jacobi(Symbol):
     _denominator = _default_denominator
 
     # Virtual functions.
-    eval = _jacobi_eval
-    simplify = _jacobi_simplify
+    eval        = _jacobi_eval
+    simplify    = _jacobi_simplify
     reciprocate = _jacobi_reciprocate

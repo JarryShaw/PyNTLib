@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 from .__abc__ import __polynomial__
 
 
@@ -49,6 +50,10 @@ class Polynomial(PolyBase):
     __all__   = ['iscomplex', 'isinteger', 'ismultivar', 'var', 'vector', 'dfvar', 'nickname']
     __slots__ = ('_cflag', '_iflag', '_vflag', '_var', '_vec', '_dfvar', '_nickname')
 
+    ##########################################################################
+    # Properties.
+    ##########################################################################
+
     @property
     def iscomplex(a):
         return a._cflag
@@ -77,34 +82,9 @@ class Polynomial(PolyBase):
     def nickname(a):
         return a._nickname
 
-    def _update_state(self):
-        for var in self._var:
-            for exp in jskeys(self._vec[var]):
-                if self._vec[var][exp] == 0:    del self._vec[var][exp]
-            if self._none_check(self._vec[var]):
-                self._var.remove(var);          del self._vec[var]
-
-        self._var.sort()
-        self._vflag = True if len(self._var) > 1 else False
-
-        for var in self._var:
-            if self._complex_check(self._vec[var]):
-                self._cflag = True;         break
-        else:
-            self._cflag = False
-
-        if self._cflag:
-            self._iflag = False
-        else:
-            for var in self._var:
-                if not self._int_check(self._vec[var]):
-                    self._iflag = False;    break
-            else:
-                self._iflag = True
-
-    def __init__(self, other=None, *items, **kwargs):
-        self._nickname = 'poly'
-        self._update_state()
+    ##########################################################################
+    # Methods.
+    ##########################################################################
 
     # 求取self的值
     def eval(self, *vars):
@@ -142,56 +122,42 @@ class Polynomial(PolyBase):
         _rst %= _mod
         return _rst
 
-    # 返回self=poly的布爾值
-    def __eq__(self, other):
-        if isinstance(other, Polynomial):
-            if self._var == other._var and self._vec == other._vec:
-                return True
+    ##########################################################################
+    # Utilities.
+    ##########################################################################
+
+    def _update_state(self):
+        for var in self._var:
+            for exp in jskeys(self._vec[var]):
+                if self._vec[var][exp] == 0:    del self._vec[var][exp]
+            if self._none_check(self._vec[var]):
+                self._var.remove(var);          del self._vec[var]
+
+        self._var.sort()
+        self._vflag = True if len(self._var) > 1 else False
+
+        for var in self._var:
+            if self._complex_check(self._vec[var]):
+                self._cflag = True;         break
+        else:
+            self._cflag = False
+
+        if self._cflag:
+            self._iflag = False
+        else:
+            for var in self._var:
+                if not self._int_check(self._vec[var]):
+                    self._iflag = False;    break
             else:
-                return False
-        else:
-            return (self == Polynomial(other))
+                self._iflag = True
 
-    # 返回self≠poly的布爾值
-    def __ne__(self, poly):
-        return (not (self == poly))
+    ##########################################################################
+    # Data models.
+    ##########################################################################
 
-    # 返回self<poly的布爾值
-    def __lt__(self, poly):
-        if self.has_sametype(poly):
-            if self._cflag or poly._cflag:
-                raise ComplexError('No ordering relation is defined for complex polynomial.')
-
-            if self._vflag or poly._vflag:
-                raise PolyError('No ordering relation is defined for multi-variable polynomial.')
-
-            if len(self) > len(poly):       return False
-            if len(self) < len(poly):       return True
-
-            a_ec = self._vec[self._var[0]]
-            b_ec = poly._vec[poly._var[0]]
-
-            for ptr in jsrange(len(self), -1, -1):
-                try:
-                    if ptr in a_ec and ptr not in b_ec:     return False
-                    if a_ec[ptr] > b_ec[ptr]:               return False
-                except KeyError:
-                    continue
-            return True
-        else:
-            return (self < Polynomial(poly))
-
-    # 返回self≤poly的布爾值
-    def __le__(self, poly):
-        return ((self == poly) or (self < poly))
-
-    # 返回self>poly的布爾值
-    def __gt__(self, poly):
-        return (not (self <= poly))
-
-    # 返回self≥poly的布爾值
-    def __ge__(self, poly):
-        return (not (self < poly))
+    def __init__(self, other=None, *items, **kwargs):
+        self._nickname = 'poly'
+        self._update_state()
 
     # 返回最高次項的次冪加一
     def __len__(self):
@@ -388,6 +354,10 @@ class Polynomial(PolyBase):
                 pass
 
         self._update_state()
+
+    ##########################################################################
+    # Algebra.
+    ##########################################################################
 
     # 求取_sum = self + poly
     def _add(self, poly):
@@ -703,6 +673,57 @@ class Polynomial(PolyBase):
 
     polyder = _der
     polyint = _int
+
+    # 返回self=poly的布爾值
+    def __eq__(self, other):
+        if isinstance(other, Polynomial):
+            if self._var == other._var and self._vec == other._vec:
+                return True
+            else:
+                return False
+        else:
+            return (self == Polynomial(other))
+
+    # 返回self≠poly的布爾值
+    def __ne__(self, poly):
+        return (not (self == poly))
+
+    # 返回self<poly的布爾值
+    def __lt__(self, poly):
+        if self.has_sametype(poly):
+            if self._cflag or poly._cflag:
+                raise ComplexError('No ordering relation is defined for complex polynomial.')
+
+            if self._vflag or poly._vflag:
+                raise PolyError('No ordering relation is defined for multi-variable polynomial.')
+
+            if len(self) > len(poly):       return False
+            if len(self) < len(poly):       return True
+
+            a_ec = self._vec[self._var[0]]
+            b_ec = poly._vec[poly._var[0]]
+
+            for ptr in jsrange(len(self), -1, -1):
+                try:
+                    if ptr in a_ec and ptr not in b_ec:     return False
+                    if a_ec[ptr] > b_ec[ptr]:               return False
+                except KeyError:
+                    continue
+            return True
+        else:
+            return (self < Polynomial(poly))
+
+    # 返回self≤poly的布爾值
+    def __le__(self, poly):
+        return ((self == poly) or (self < poly))
+
+    # 返回self>poly的布爾值
+    def __gt__(self, poly):
+        return (not (self <= poly))
+
+    # 返回self≥poly的布爾值
+    def __ge__(self, poly):
+        return (not (self < poly))
 
     # support for pickling, copy, and deepcopy
 

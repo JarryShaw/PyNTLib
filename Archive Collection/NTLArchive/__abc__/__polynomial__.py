@@ -30,24 +30,25 @@ abstractmethod = abc.abstractmethod
 abstractproperty = abc.abstractproperty
 
 
-'''
-POLYNOMIAL_FORMAT
-    (+\-) coeficient (*) variable (^\**) exponent
-'''
+'''POLYNOMIAL_FORMAT:
 
+(+\-) coeficient (*) variable (^\**) exponent
+
+'''
 
 POLYNOMIAL_FORMAT = re.compile(r'''
-    \A\s*                           # optional whitespace at the start, then
-    (?P<sign>[-+]?)                 # an optional sign, then
-    (?=\d)                          # lookahead for digit
-    (?P<coe_>\d*)                   # coefficient
-    (?:\*)                          # followed by an optional asterisk/multiplier, then
-    (?=[a-zA-Z_])                   # lookahead for non-digit/letter
-    (?P<var_>\w*)                   # variable
-    (?:\^)                          # followed by an optional caret, then
-    (?=\d)                          # lookahead for digit
-    (?P<exp_>\d*)                   # exponent
-    \s*\Z                           # and optional whitespace to finish
+    \A\s*                       # optional whitespace at the start, then
+    (?P<sgn_>[-+]?)             # an optional sign, and
+    \s*                         # optional whitespace after sign, then
+    (?=\d)?                     # lookahead for digit
+    (?P<coe_>\d+)?              # coefficient
+    (?:\*)?                     # followed by an optional asterisk/multiplier, then
+    (?=[A-Z_])?                 # lookahead for non-digit/letter
+    (?P<var_>\w+)?              # variable
+    (?:(?:\^)?|(?:\*\*))?       # followed by an optional caret or double asterisk, then
+    (?=\d)?                     # lookahead for digit
+    (?P<exp_>\d+)?              # exponent
+    \s*\Z                       # and optional whitespace to finish
 ''', re.VERBOSE | re.IGNORECASE)
 
 
@@ -58,6 +59,10 @@ class ABCPolynomial(object):
 
     # Not hashable
     __hash__ = None
+
+    ##########################################################################
+    # Properties.
+    ##########################################################################
 
     @abstractproperty
     def var(a):
@@ -75,6 +80,10 @@ class ABCPolynomial(object):
     def nickname(a):
         pass
 
+    ##########################################################################
+    # Methods.
+    ##########################################################################
+
     @abstractmethod
     def eval(self, *vars):
         pass
@@ -83,10 +92,23 @@ class ABCPolynomial(object):
     def mod(self, *vars, **mods):
         pass
 
-    # @abstractmethod
-    # def convert(self, kind):
-    #     pass
+    # Check is types match.
+    def has_sametype(self, other):
+        return isinstance(other, self.__class__)
 
+    # Set default variable.
+    def default(self, var=None):
+        if var is None:
+            self._dfvar = _dfvar
+        else:
+            str_check(var)
+            self._dfvar = var
+
+    ##########################################################################
+    # Validators.
+    ##########################################################################
+
+    # Check if in complex field.
     @staticmethod
     def _complex_check(_dict):
         for _key in _dict:
@@ -96,6 +118,7 @@ class ABCPolynomial(object):
             _cflag = False
         return _cflag
 
+    # Check if in integer field.
     @staticmethod
     def _int_check(_dict):
         for _key in _dict:
@@ -104,6 +127,7 @@ class ABCPolynomial(object):
         else:   _iflag = True
         return  _iflag
 
+    # Check if is none.
     @staticmethod
     def _none_check(_dict):
         if _dict == {}:
@@ -114,22 +138,36 @@ class ABCPolynomial(object):
                 return False
         return True
 
+    ##########################################################################
+    # Constructors.
+    ##########################################################################
+
+    # Read and construct from item strings.
     @staticmethod
     def _read_item(item):
         m = POLYNOMIAL_FORMAT.match(item)
-        print(m)
         if m is None:
             raise DefinitionError('Invalid literal for symbols: %r' % item)
 
-        var = m.group('var_')
-        coe = int(m.group('coe_'))
-        exp = int(m.group('exp_'))
+        t_v = m.group('var_')
+        t_c = m.group('coe_')
+        t_e = m.group('exp_')
 
-        if m.group('sign') == '-':
+        if t_v is None:
+            var = None
+            coe = int(t_c)
+            exp = 0
+        else:
+            var = t_v
+            coe = 1 if t_c is None else int(t_c)
+            exp = 1 if t_e is None else int(t_e)
+
+        if m.group('sgn_') == '-':
             coe = -coe
 
         return var, exp, coe
 
+    # Read and constrcut from item dictionaries.
     @staticmethod
     def _read_dict(vec):
         # DICT_FORMAT
@@ -144,26 +182,7 @@ class ABCPolynomial(object):
         _vec.update(vec)
         return _var, _vec
 
-    def _read_mods(self, **mods):
-        _mod = None
-        for mod in mods:
-            if mod == 'mod':
-                int_check(mods[mod]);   pos_check(mods[mod])
-                _mod = mods[mod];       break
-            elif mod == 'dfvar':
-                self._dfvar = mods[mod]
-            else:
-                raise KeywordError('Keyword \'%s\' is not defined.' % mod)
-        return _mod
-
-    @staticmethod
-    def _read_kwargs(**kwargs):
-        _dfvar = 'x'
-        for kw in kwargs:
-            if kw == 'dfvar':
-                _dfvar = kwargs[kw]
-        return _dfvar
-
+    # Read and construct from item tuples.
     def _read_poly(self, poly):
         # TUPLE_FORMAT
         #     (['variable',] (expnonet, coefficient), ...)
@@ -196,6 +215,33 @@ class ABCPolynomial(object):
             vec[_var] = ec
         return var, vec
 
+    ##########################################################################
+    # Utilities.
+    ##########################################################################
+
+    # Read modulo and default variable.
+    def _read_mods(self, **mods):
+        _mod = None
+        for mod in mods:
+            if mod == 'mod':
+                int_check(mods[mod]);   pos_check(mods[mod])
+                _mod = mods[mod];       break
+            elif mod == 'dfvar':
+                self._dfvar = mods[mod]
+            else:
+                raise KeywordError('Keyword \'%s\' is not defined.' % mod)
+        return _mod
+
+    # Read default variables only.
+    @staticmethod
+    def _read_kwargs(**kwargs):
+        _dfvar = 'x'
+        for kw in kwargs:
+            if kw == 'dfvar':
+                _dfvar = kwargs[kw]
+        return _dfvar
+
+    # Read variables for evaluation.
     def _read_vars(self, *vars):
         _var = {}
         for var in vars:
@@ -234,17 +280,9 @@ class ABCPolynomial(object):
 
         return _var
 
-    # Check is types match.
-    def has_sametype(self, other):
-        return isinstance(other, self.__class__)
-
-    # Set default variable.
-    def default(self, var=None):
-        if var is None:
-            self._dfvar = _dfvar
-        else:
-            str_check(var)
-            self._dfvar = var
+    ##########################################################################
+    # Data models.
+    ##########################################################################
 
     def __new__(cls, other=None, *items, **kwargs):
         self = super(ABCPolynomial, cls).__new__(cls)
@@ -272,15 +310,24 @@ class ABCPolynomial(object):
                 # Handle construction from strings.
 
                 # Slice polynomial into items.
-                other = other.replace('-', '+ -')
+                other = other.replace('-', ' + - ').strip(' ')
                 items = other.split('+')
 
-                var = [];   ec = {};    vec = {}
+                var = [];   vec = {}
                 for item in items:
+                    if item == '':  continue
                     _var, _exp, _coe = self._read_item(item)
+
+                    if _var is None:
+                        if var == []:   _var = self._dfvar
+                        else:           _var = var[0]
+
                     var = jsappend(var, _var)
-                    ec = jsupdate(ec, {_exp: _coe})
-                    vec[_var] = jsupdate(vec[_var], ec)
+                    ec = {_exp: _coe}
+                    if _var in vec:
+                        vec[_var] = jsupdate(vec[_var], ec)
+                    else:
+                        vec[_var] = ec
 
             elif isinstance(other, dict):
                 # Handle construction from dictionaries.
@@ -324,7 +371,7 @@ class ABCPolynomial(object):
             if _ec == {}:   return ''
 
             _str = ''
-            _exp = sorted(list(_ec), reverse=True)
+            _exp = sorted(_ec, reverse=True)
 
             for exp in _exp:
                 _coe = _ec[exp]
@@ -356,6 +403,10 @@ class ABCPolynomial(object):
             _str = ' + '.join(_str)
             _str = _str.replace(' + -', ' - ')
         return _str if _str != '' else '0'
+
+    ##########################################################################
+    # Algebra.
+    ##########################################################################
 
     @abstractmethod
     def _add(a, b):

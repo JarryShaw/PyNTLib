@@ -46,6 +46,7 @@ _default_numerator   = 1
 _default_denominator = 2
 
 
+# 計算Legendre符號的值
 def _legendre_eval(legendre):
     _ret = _legendre_simplify(legendre)
 
@@ -63,6 +64,7 @@ def _legendre_eval(legendre):
     return r if r != p-1 else -1
 
 
+#化簡Legendre符號
 def _legendre_simplify(legendre):
     _ret = legendre
     _ret._numerator %= _ret._denominator
@@ -78,6 +80,7 @@ def _legendre_simplify(legendre):
     return _ret
 
 
+# 二次互反律
 def _legendre_reciprocate(legendre):
     _den = legendre._numerator
     _num = legendre._denominator * (-1)**((_den-1)//2) % _den
@@ -90,6 +93,10 @@ def _legendre_reciprocate(legendre):
 
 class Legendre(Symbol):
 
+    ##########################################################################
+    # Properties.
+    ##########################################################################
+
     @property
     def nickname(a):
         return a._nickname
@@ -101,6 +108,10 @@ class Legendre(Symbol):
     @property
     def denominator(a):
         return a._denominator
+
+    ##########################################################################
+    # Data models.
+    ##########################################################################
 
     def __init__(self, numerator, denominator=None):
         prime_check(self._denominator)
@@ -116,6 +127,10 @@ class Legendre(Symbol):
 
         mod = repetiveSquareModulo(a, ((p-1)//2), p)
         return mod if mod != p-1 else -1
+
+    ##########################################################################
+    # Methods.
+    ##########################################################################
 
     def convert(self, kind=None):
         if kind is None:

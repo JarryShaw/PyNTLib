@@ -15,11 +15,16 @@ from .NTLUtilities import jsrange
 __all__  = [
     'BaseError',
     'DigitError', 'IntError', 'RealError', 'ComplexError',
-    'BoolError', 'ListError', 'TupleError', 'StringError', 'PolyError',
+    'BoolError', 'DictError', 'ListError', 'TupleError', 'StringError', 'PolyError',
     'PNError', 'OEError', 'PCError',
     'DefinitionError', 'ArgumentError', 'KeywordError',
     'ExponentError', 'ResidueError', 'SolutionError'
 ]
+
+
+##############################################################################
+# BaseError (abc of exceptions) session.
+##############################################################################
 
 
 class BaseError(Exception):
@@ -43,16 +48,21 @@ class BaseError(Exception):
     def traceback_2(self):
         index = self.tb_preparation()
 
-        # print('Traceback (most recent call last):')
-        # print(''.join(traceback.format_stack()[:index])[:-1])
-        # sys.tracebacklimit = 0
+        print('Traceback (most recent call last):')
+        print(''.join(traceback.format_stack()[:index])[:-1])
+        sys.tracebacklimit = 0
 
     def traceback_3(self):
         index = self.tb_preparation()
 
-        # print('Traceback (most recent call last):')
-        # traceback.print_stack(limit=-index)
-        # sys.tracebacklimit = None
+        print('Traceback (most recent call last):')
+        traceback.print_stack(limit=-index)
+        sys.tracebacklimit = None
+
+
+##############################################################################
+# TypeError session.
+##############################################################################
 
 
 # 數字參數異常
@@ -70,6 +80,18 @@ class DigitError(BaseError):
 # 整數參數異常
 # The argument(s) must be integral.
 class IntError(BaseError):
+    def __init__(self, message):
+        if sys.version_info[0] > 2:
+            self.traceback_3()
+        else:
+            self.traceback_2()
+
+        raise TypeError(message)
+
+
+# 字典參數異常
+# The argument(s) must be dict type.
+class DictError(BaseError):
     def __init__(self, message):
         if sys.version_info[0] > 2:
             self.traceback_3()
@@ -151,6 +173,11 @@ class ComplexError(BaseError):
         raise TypeError(message)
 
 
+##############################################################################
+# ValueError session.
+##############################################################################
+
+
 # 正／負值參數異常
 # The argument(s) must be positive/negative.
 class PNError(BaseError):
@@ -223,6 +250,11 @@ class DefinitionError(BaseError):
         raise ValueError(message)
 
 
+##############################################################################
+# RuntimeError session.
+##############################################################################
+
+
 # 方程無解異常
 # The polynomial has no integral solution.
 class SolutionError(BaseError):
@@ -233,6 +265,11 @@ class SolutionError(BaseError):
             self.traceback_2()
 
         raise RuntimeError(message)
+
+
+##############################################################################
+# KeyError session.
+##############################################################################
 
 
 # 係數參數異常
@@ -247,6 +284,11 @@ class ExponentError(BaseError):
         raise KeyError(message)
 
 
+##############################################################################
+# ZeroDivisionError session.
+##############################################################################
+
+
 # 取模參數異常
 # The modulo of residue should not be 0.
 class ResidueError(BaseError):
@@ -257,6 +299,11 @@ class ResidueError(BaseError):
             self.traceback_2()
 
         raise ZeroDivisionError(message)
+
+
+##############################################################################
+# AttributeError session.
+##############################################################################
 
 
 # 關鍵詞參數異常

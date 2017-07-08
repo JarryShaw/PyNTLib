@@ -40,6 +40,10 @@ class Congruence(Polynomial):
     __slots__ = ('_modulo', '_pflag', '_solution', '_cflag', '_iflag', '_vflag',
         '_var', '_vec', '_dfvar', '_nickname')
 
+    ##########################################################################
+    # Properties.
+    ##########################################################################
+
     @property
     def modulo(a):
         return a._modulo
@@ -54,6 +58,10 @@ class Congruence(Polynomial):
             return a._solve()
         else:
             return a._solution
+
+    ##########################################################################
+    # Data models.
+    ##########################################################################
 
     def __new__(cls, other=None, *items, **mods):
         if isinstance(other, Congruence):
@@ -106,6 +114,10 @@ class Congruence(Polynomial):
         _str = super(Congruence, self).__str__()
         _str += ' ≡ 0 (mod %d)' % self._modulo
         return _str
+
+    ##########################################################################
+    # Utilities.
+    ##########################################################################
 
     # 用模重複平方法求self在x=_num時的值
     def _eval(self, *vars):
@@ -279,6 +291,10 @@ class Congruence(Polynomial):
                     glbFlag = False
 
         return ptrList, glbFlag
+
+    ##########################################################################
+    # Methods.
+    ##########################################################################
 
     calc     = _calc
     eval     = _eval
