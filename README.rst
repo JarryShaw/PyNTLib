@@ -10,6 +10,6 @@ JSNTLIB Archive
 
 -  Usage sample has been attached as ``sample.py``.
 
--  Document can be found in ``Manual.md``.
+-  Document can be found in ``MANUAL.md``.
 
 -  Some tips on this repository will be present later.
