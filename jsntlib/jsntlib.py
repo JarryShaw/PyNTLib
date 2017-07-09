@@ -17,7 +17,7 @@ from .NTLArchive import NTLQuadratic
 
 
 __all__  = [
-    'Conruence', 'Fraction', 'Index', 'Jacobi', 'Legendre', 'Polynomial', 'Quadratic',
+    'Congruence', 'Fraction', 'Index', 'Jacobi', 'Legendre', 'Polynomial', 'Quadratic',
     'bezout', 'binary', 'carmicheal', 'congsolve', 'coprime', 'crt', 'decomposit',
     'eealist', 'euler', 'factor', 'fraction', 'gcd', 'isdivisible', 'isprime',
     'jacobi', 'lcm', 'legendre', 'modulo', 'ord', 'polydiv', 'prc', 'pseudo',

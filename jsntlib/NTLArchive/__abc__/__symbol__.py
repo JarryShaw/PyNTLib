@@ -9,8 +9,8 @@ import re
 # Abstract Base Class for Legendre & Jacobi Symbols
 
 
-from NTLArchive.NTLExceptions  import DefinitionError, ResidueError
-from NTLArchive.NTLValidations import basestring_check, int_check
+from ..NTLExceptions  import DefinitionError, ResidueError
+from ..NTLValidations import basestring_check, int_check
 
 
 __all__ = ['ABCSymbol']

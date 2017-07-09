@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
+# from __future__ import absolute_import
+
+
 import abc
 import copy
 import numbers
@@ -13,11 +16,11 @@ import sys
 # Abstract Base Class for Polynomials
 
 
-from NTLArchive.NTLExceptions  import \
+from ..NTLExceptions  import \
     DefinitionError, KeywordError
-from NTLArchive.NTLUtilities   import \
+from ..NTLUtilities   import \
     jsappend, jsint, jskeys, jsstring, jsupdate
-from NTLArchive.NTLValidations import \
+from ..NTLValidations import \
     basestring_check, dict_check, int_check, \
     pos_check, notneg_check, number_check, str_check, tuple_check
 
