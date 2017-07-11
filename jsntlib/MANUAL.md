@@ -6,6 +6,10 @@
 
 
 
+```python
+# Currently, we still have to import from a package.
+from jsntlib import ntl as jsntlib
+```
 
 
 
@@ -13,7 +17,7 @@
 
 
 
-  * `primelist(upper[, lower])`
+*   `primelist(upper[, lower])`
 
     Returns `list` type containing **prime numbers** within integer `upper` and `lower` bound, if `lower` is given. When `lower` is omitted, all prime numbers **less than** (bound excluded) the `upper` bound.
 
@@ -25,7 +29,7 @@
 
 
 
-  * `isdivisible(a, b)`
+*   `isdivisible(a, b)`
 
     Returns `bool` type if integers `a` and `b` are **divisible**, i.o.w. whether `b|a` or `b∤a`, when `b` is greater than `a`, and in other cases, vice versa.
 
@@ -37,7 +41,7 @@
 
 
 
-  * `isprime(N)`
+*   `isprime(N)`
 
     Returns `bool` type if integer `N` is a **prime number**.
 
@@ -49,7 +53,7 @@
 
 
 
-  * `gcd(a, b)`
+*   `gcd(a, b)`
 
     Returns `int` type of the **greatest common divisor** between integers `a` and `b`.
 
@@ -61,7 +65,7 @@
 
 
 
-  * `lcm(a, b)`
+*   `lcm(a, b)`
 
     Returns `int` type of the **least common multiplier** between integers `a` and `b`.
 
@@ -73,7 +77,7 @@
 
 
 
-  * `coprime(a, b)`
+*   `coprime(a, b)`
 
     Returns `bool` type if integers `a` and `b` are **coprime**, i.e. which greatest common divisor is one(1).
 
@@ -85,7 +89,7 @@
 
 
 
-  * `eealist(a, b)`
+*   `eealist(a, b)`
 
     Returns `list` type containing quotients for integers `a/b` with **extended Euclidean Algorithm**.
 
@@ -97,7 +101,7 @@
 
 
 
-  * `bezout(a, b)`
+*   `bezout(a, b)`
 
     Returns `tuple` type containing parameters for **Bézout equition** of integers `a` and `b`.
 
@@ -110,7 +114,7 @@
 
 
 
-  * `factor(N[, wrap=False])`
+*   `factor(N[, wrap=False])`
 
     Returns `list` type containing **prime factors** of integers `N`, if keyword `wrap` is `False` or omitted. Once set `True`, `tuple` type of two lists will be offered, which implies the factors and their exponents.
 
@@ -124,7 +128,7 @@
 
 
 
-  * `decomposit(N)`
+*   `decomposit(N)`
 
     Returns `tuple` type containing two(2) integers, which are the **decoposition** results of coposit number `N`, i.e. `(a, b)` where `N|a^2-b^2` but `N∤a+b` nor `N∤a-b`.
 
@@ -136,7 +140,7 @@
 
 
 
-  * `binary(a, b, c)`
+*   `binary(a, b, c)`
 
     Returns `tuple` type containing special solutions for an **indefinite binary equation**, i.e. `a*x + b*y = c`.
 
@@ -150,7 +154,7 @@
 
 
 
-  * `modulo(b, e, m)`
+*   `modulo(b, e, m)`
 
     Returns `int` type for the result of `b^e (mod m)`.
 
@@ -163,7 +167,7 @@
 
 
 
-  * `polydiv(dvdExp, dvdCoe, dvsExp, dvsCoe)`
+*   `polydiv(dvdExp, dvdCoe, dvsExp, dvsCoe)`
 
     Returns `tuple` type containing the lists of exponents and coefficients of **quotient** and **remainder** polynomials, which are the **division** results of **dividend** and **divisor** polynomials.
 
@@ -177,7 +181,7 @@
 
 
 
-   * `simplify(cgcExp, cgcCoe, modulo)`
+*    `simplify(cgcExp, cgcCoe, modulo)`
 
      Returns `tuple` type containing the lists of exponents and coefficients of result congruence after **congruence simplification**.
 
@@ -191,7 +195,7 @@
 
 
 
-  * `crt((mod, [x1, x2, …]), …)`
+*   `crt((mod, [x1, x2, …]), …)`
 
     Returns `list` type containing all solutions of a **naïve congruence set**.
 
@@ -204,7 +208,7 @@
 
 
 
-  * `congsolve(cgcExp, cgcCoe, modulo)`
+*   `congsolve(cgcExp, cgcCoe, modulo)`
 
     Returns `list` type containing all solutions of an **polynomial congruence**.
 
@@ -217,7 +221,7 @@
 
 
 
-  * `quadratic(p)`
+*   `quadratic(p)`
 
     Returns `tuple` type containing the solutions of a **quadratic polynomial**, i.e. `x^2 + y^2 = p`.
 
@@ -231,7 +235,7 @@
 
 
 
-  * `ord(m, a)`
+*   `ord(m, a)`
 
     Returns `int` type for the **order** of an integer `a` modulo `m`, i.e. `ord_m(a)`.
 
@@ -244,7 +248,7 @@
 
 
 
-  * `euler(m)`
+*   `euler(m)`
 
     Returns `int` type for the **Euler function** result of an integer `m`, i.e. `φ(m)`.
 
@@ -257,7 +261,7 @@
 
 
 
-  * `prc(m)`
+*   `prc(m)`
 
     Returns `list` type for the **primitive residue class** of an integer`m`.
 
@@ -269,7 +273,7 @@
 
 
 
-  * `root(m)`
+*   `root(m)`
 
     Returns `list` type for **primitive roots** of modulo `m`.
 
@@ -281,7 +285,7 @@
 
 
 
-  * `legendre(a, p)`
+*   `legendre(a, p)`
 
     Returns `int` type for the result of **Legendre symbol** `(a|p)`.
 
@@ -294,7 +298,7 @@
 
 
 
-  * `jacobi(a, m)`
+*   `jacobi(a, m)`
 
     Returns `int` type for the result of **Jacobi symbol** `(a|m)`.
 
@@ -307,7 +311,7 @@
 
 
 
-  * `carmicheal(N)`
+*   `carmicheal(N)`
 
     Returns `bool` type if an integer `N` is a **Carmicheal number**.
 
@@ -319,22 +323,22 @@
 
 
 
-  * `pseudo([mode='Fermat'][, byte=16][, para=10000][, flag=False])`
+*   `pseudo([mode='Fermat'][, byte=16][, para=10000][, flag=False])`
 
     Returns `int` type for a **pseudo prime number**, which is `byte` long, using `mode` test with `para` times and (for `Fermat` test) Carmicheal number check set in`flag`.
 
     * `mode` can be set to the followings (`Fermat` in default)
-    
+
       * `Fermat` —— using **Fermat test** for Fermat pseudo primes
-      
+
       * `Euler` or `Solovay-Stassen` —— using **Solovay-Stassen test** for Euler pseudo primes
-      
+
       * `Strong` or `Miller-Rabin` —— using **Miller-Rabin test** for strong pseudo primes
-      
+
     * `byte` is the **binary length** of expected pseudo primes (`16` in default)
-    
+
     * `para` is the **security parameter** for repetition in tests (`10000` in default)
-    
+
     * `flag` is to decide if **Carmicheal numbers** will be checked in Fermat test (`False` in default)
 
     ```python
@@ -349,7 +353,7 @@
 
 
 
-  * `fraction(n[, d])`
+*   `fraction(n[, d])`
 
     Returns `list` type representing the continued fraction form of `n|d`.
 
@@ -369,7 +373,7 @@
 
 
 
-  * `Fraction`
+*   `Fraction`
 
     An extended `Fraction` class with compability to **continued fraction** derived from system built-in class `fractions.Fraction`.
 
@@ -451,25 +455,25 @@
       >>> Fraction(-3, 7)[2]
       Fraction(-1, 2)
       ```
-
+    
     * `__floor__()`
-
+    
       Returns the greatest integer ` <= self`. This method can also be accessed through the `math.floor()` function:
-
+    
       ```python
       >>> from math import floor
       >>> floor(Fraction(355, 113))
       3
       ```
-
+    
     * `__ceil__()`
-
+    
       Returns the least integer ` <= self`.  This method can also be accessed through the `math.ceil()` function.
-
+    
     * `__round__()`
-
+    
     * `__round__(ndigits)`
-
+    
       The first version returns the nearest integer to `self`, rounding half to even. The second version rounds `self` to the nearest multiple of `Fraction(1, 10**ndigits^)` (logically, if `ndigits` is negative), again rounding half toward even. This method can also be accessed through the `round()` function.
 
 
@@ -477,7 +481,7 @@
 
 
 
-  * `Index`
+*   `Index`
 
     The `Index` class provides support for integer **modulo index**.
 
@@ -528,7 +532,7 @@
 
 
 
-  * `Legendre`
+*   `Legendre`
 
     The `Legendre` class implements **Legendre symbol**.
 
@@ -594,11 +598,11 @@
       >>> Legendre(47, 5).reciprocate()
       Legendre(42, 47)
       ```
-
+    
     * `convert([kind])`
-
+    
       Converts the Legendre symbol to another kind. When given `'Jacobi'`, returns Jacobi symbol with same numerator and denominator. When omitted or given `'Legendre'`, returns itself.
-
+    
       ```python
       >>> Legendre(47, 5).convert()
       Legendre(47, 5)
@@ -613,7 +617,7 @@
 
 
 
-  * `Jacobi`
+*   `Jacobi`
 
     The `Jacobi` class implements **Jacobi symbol**.
 
@@ -679,11 +683,11 @@
       >>> Jacobi(47, 6).reciprocate()
       Jacobi(41, 47)
       ```
-
+    
     * `convert([kind])`
-
+    
       Converts the Jacobi symbol to another kind. When given `'Legendre'`, returns Legendre symbol with same numerator and denominator (if the latter is prime). When omitted or given `'Jacobi'`, returns itself.
-
+    
       ```python
       >>> Jacobi(47, 6).convert()
       Jacobi(47, 6)
@@ -698,7 +702,7 @@
 
 
 
-  * `Polynomial`
+*   `Polynomial`
 
     A fully-functional **Polynomial** class with support for complex coefficients.
 
@@ -718,21 +722,21 @@
       > Default format of polynomial items:
       >
       > (+\\-) coeficient (\*) variable (^\\\*\*) exponent
-
+    
     * `Polynomial(tuple_0, [tuple_1, …])`
-
+    
       > Default format of polynomial item tuples:
       >
       > ( ' variable ' , ( exponent, coefficient ), … )
-
+    
     * `Polynomial(dict)`
-
+    
       > Default format of polynomial 'vec' dictionary:
       >
       > { ' variable ' : { exponent : coefficient, … } , … }
-
+    
     * `Polynomial(other_polynomial)`
-
+    
         ```python
         >>> from jsntlib import Polynomial
         >>> Polynomial(4.67, dfvar='var')
@@ -786,17 +790,17 @@
       > Default format for `dict` definition:
       >
       > { ' variable ' : value, … }
-
+    
     * `eval(number)`
-
+    
     * `eval(tuple_0[, tuple_1, …])`
-
+    
       > Default format for `tuple` definition:
       >
       > ( ' variable ', value ), …
-
+    
       Evaluate the Polynomial with the given values.
-
+    
       ```python
       >>> Polynomial({'y': {2: 1}, 'x': {1: 1}}).eval({'y': 2, 'x': 3})
       7
@@ -805,15 +809,15 @@
       >>> Polynomial(('x', (1,1)), ('y', (1, 0), (2, 1))).eval(('x', 2), ('y', 3))
       11
       ```
-
+    
     * `mod(dict, mod=None)`
-
+    
     * `mod(number, mod=None)`
-
+    
     * `mod(tuple_0[, tuple_1, …], mod=None)`
-
+    
       Evaluate the Polynomial with the given values after modulo. If `mod` omits or sets to None, returns `eval()`.
-
+    
       ```python
       >>> Polynomial({'y': {2: 1}, 'x': {1: 1}}).mod({'y': 2, 'x': 3}, mod=3)
       1
@@ -856,15 +860,15 @@
 
 
 
-  * `Congruence`
+*   `Congruence`
 
     The `Congruence` class, derived from `Polynomial` class, implements solution for mono-variable congruence in integer field.
 
     * `Congruence(dfvar='x')`
 
     * `default([var])`
-    
-    
+
+
 
     * `Congruence(number)`
 
@@ -953,7 +957,7 @@
       > * `solutions` : Ascending solutions of the Solution in `list` type.
       >
       > The Solution is callable which returns `solutions` within. Length (`len()` method) of the Solutions returns number of `solutions`. Slice and item can also be accessed with subscripts.
-
+    
       ```python
       >>> Congruence(('z', (2014,2014), (8,8)), mod=7).simplify()
       2014z^4 + 8z^2 ≡ 0 (mod 7)
@@ -979,15 +983,15 @@
       >>> Congruence(('x', (1,1)), ('y', (1, 0), (2, 1)), mod=5).eval(('x', 2), ('y', 3))
       1
       ```
-
+    
     * `calc(dict)`
-
+    
     * `calc(number)`
-
+    
     * `calc(tuple_0[, tuple_1, …])`
-
+    
       Evaluate the Congruence with the given values but without modulo.
-
+    
       ```python
       >>> Congruence({'y': {2: 1}, 'x': {1: 1}}, mod=3).calc({'y': 2, 'x': 3})
       7
@@ -1012,7 +1016,7 @@
 
 
 
-  * `Quadratic`
+*   `Quadratic`
 
     The `Quadratic` class, derived from `Polynomial` class, implements solution for quadratic polynomials.
 
@@ -1075,7 +1079,7 @@
       > * `solutions` : Ascending solutions of the Solution in `list` type.
       >
       > The Solution is callable which returns `solutions` within. Slice and item can also be accessed with subscripts.
-
+    
       ```python
       >>> Quadratic(8068, vars=('p', 'q')).solve()
       p = ±9  q = ±44
@@ -1095,20 +1099,20 @@
       >>> Quadratic(4).eval(('x', 3), ('y', 2))
       13
       ```
-
+    
     * `mod(dict, mod=None)`
-
+    
     * `mod(tuple_0[, tuple_1, …], mod=None)`
-
+    
       Evaluate the Quadratic with the given values after modulo. If `mod` omits or sets to None, returns `eval()`.
-
+    
       ```python
       >>> Quadratic(4).mod({'y': 2, 'x': 3}, mod=3)
       1
       >>> Quadratic(4).mod(('x', 2), ('y', 3), mod=3)
       1
       ```
-      
+
 
 
     * `__reduce__()`
