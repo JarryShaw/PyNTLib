@@ -648,7 +648,7 @@ class Polynomial(PolyBase):
                     _coe = self._vec[var][exp] * exp
                 else:
                     _exp = 0;   _coe = 0
-                _ec[_exp] = [_coe]
+                _ec[_exp] = _coe
             vec[var] = _ec
         _der = Polynomial(vec)
         return _der

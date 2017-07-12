@@ -115,6 +115,7 @@ def cpsMCS(cgcExp, cgcCoe, modulo):
             tmpExpVar = q[ptr]
             tmpMod.append(tmpModVar ** tmpExpVar)
             tmpRmd.append(prmMCSLite(cgcExp, cgcCoe, tmpModVar, tmpExpVar))
+
         # 用中國剩餘定理處理上述結果，得到最終結果
         remainder = CHNRemainderTheorem(*zip(tmpMod, tmpRmd))
 
@@ -160,7 +161,7 @@ def prmMCSPro(cgcExp, cgcCoe, rmd, mod, exp):
         # x_i ≡ x_(i-1) + t_(i-1) * p^(i-1) (mod p^i)
         x += (t * (mod**ctr)) % (mod**(ctr+1))
 
-    return x    # remainder = x
+    return [x]    # remainder = x
 
 
 # 求取多項式的導式

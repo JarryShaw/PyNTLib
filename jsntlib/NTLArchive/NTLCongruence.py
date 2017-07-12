@@ -126,7 +126,7 @@ class Congruence(Polynomial):
 
     # 求取self在x=_num時（不取模）的值
     def _calc(self, *vars):
-        _ret = super().eval(*vars)
+        _ret = super(Congruence, self).eval(*vars)
         return _ret
 
     # 素數模同餘式的簡化
@@ -216,11 +216,11 @@ class Congruence(Polynomial):
 
         for tmpRem in rem:
             # 尋找滿足(f'(x1),p)=1的x1
-            if greatestCommonDivisor(drv._calc(tmpRem), mod) == 1:
+            if greatestCommonDivisor(drv.mod(tmpRem), mod) == 1:
                 x = tmpRem
 
                 # 計算導式的值f'(x1) (mod p)，取其負值
-                drvMod = crv._eval(x) - mod
+                drvMod = drv.mod(x, mod=mod) - mod
                 drvRcp = 1 // drvMod
                 break
 
@@ -231,20 +231,29 @@ class Congruence(Polynomial):
             # x_i ≡ x_(i-1) + t_(i-1) * p^(i-1) (mod p^i)
             x += (t * (mod**ctr)) % (mod**(ctr+1))
 
-        return x    # remainder = x
+        return [x]      # remainder = x
 
     # 中國剩餘定理
     def _CTR(self, rem, mod):
-        modulo = self._modulo                               # M(original modulo) = ∏m_i
+
+        # 求解M_i^-1 (mod m_i)
+        def solve(variable, modulo):
+            polyCgc = '%d*x - 1' % variable             # 將係數與指數數組生成多項式
+
+            r = lambda x: eval(polyCgc)                 # 用於計算多項式的取值
+            for x in jsrange(modulo):                   # 逐一驗算，如模為0則加入結果數組
+                if r(x) % modulo == 0:
+                    return x
+
+        modulo = self._modulo                           # M(original modulo) = ∏m_i
 
         bList = []
-        for tmpMod2 in mod:
-            M = modulo // tmpMod2                           # M_i = M / m_i
-            c = Congruence(((1, M), (0, -1)), mod=tmpMod2)
-            t = c._prime()[0]                               # t_i * M_i ≡ 1 (mod m_i)
-            bList.append(t * M)                             # b_i = t_i * M_i
+        for tmpMod in mod:
+            M = modulo // tmpMod                        # M_i = M / m_i
+            t = solve(M, tmpMod)                        # t_i * M_i ≡ 1 (mod m_i)
+            bList.append(t * M)                         # b_i = t_i * M_i
 
-        _rem = self._iterCalc(rem, bList)                   # x_j = Σ(b_i * r_i) (mod M)
+        _rem = self._iterCalc(rem, bList)               # x_j = Σ(b_i * r_i) (mod M)
         return _rem
 
     # 對rto多維數組（層，號）中的數進行全排列並計算結果

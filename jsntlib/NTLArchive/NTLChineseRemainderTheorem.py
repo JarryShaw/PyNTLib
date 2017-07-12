@@ -63,7 +63,7 @@ def CHNRemainderTheorem(*args):
 def solve(variable, modulo):
     polyCgc = '%d*x - 1' % variable             # 將係數與指數數組生成多項式
 
-    r = lambda x: eval(polyCgc)                # 用於計算多項式的取值
+    r = lambda x: eval(polyCgc)                 # 用於計算多項式的取值
     for x in jsrange(modulo):                   # 逐一驗算，如模為0則加入結果數組
         if r(x) % modulo == 0:
             return x

@@ -36,6 +36,10 @@ def trivialDivision(N):
         raise DefinitionError('The argument must be a natural number greater than 1.')
 
     try:
+        # 若輸入的常數過大，則採用強偽素數判斷
+        if math.log(N, 10) > 4.0:
+            raise MemoryError
+
         # 得出小於等於N的所有素數
         table = eratosthenesSieve(N+1)
 
