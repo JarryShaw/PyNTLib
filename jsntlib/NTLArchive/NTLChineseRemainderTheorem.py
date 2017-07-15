@@ -5,6 +5,7 @@
 # 求基本同餘式組的通解
 
 
+from .NTLBezoutEquation       import bezoutEquation
 from .NTLExceptions           import DefinitionError
 from .NTLUtilities            import jsrange
 from .NTLValidations          import int_check, list_check, tuple_check
@@ -50,23 +51,13 @@ def CHNRemainderTheorem(*args):
         modulo *= tmpMod1                       # M(original modulo) = ∏m_i
 
     bList = []
-    for tmpMod2 in mod:
-        M = modulo // tmpMod2                   # M_i = M / m_i
-        t = solve(M, tmpMod2)                   # t_i * M_i ≡ 1 (mod m_i)
+    for tmpMod in mod:
+        M = modulo // tmpMod                    # M_i = M / m_i
+        t = bezoutEquation(M, tmpMod)[0]        # t_i * M_i ≡ 1 (mod m_i)
         bList.append(t * M)                     # b_i = t_i * M_i
 
     remainder = iterCalc(rmd, bList, modulo)    # x_j = Σ(b_i * r_i) (mod M)
     return sorted(remainder)
-
-
-# 求解M_i^-1 (mod m_i)
-def solve(variable, modulo):
-    polyCgc = '%d*x - 1' % variable             # 將係數與指數數組生成多項式
-
-    r = lambda x: eval(polyCgc)                 # 用於計算多項式的取值
-    for x in jsrange(modulo):                   # 逐一驗算，如模為0則加入結果數組
-        if r(x) % modulo == 0:
-            return x
 
 
 # 對rmd多維數組（層，號）中的數進行全排列並計算結果

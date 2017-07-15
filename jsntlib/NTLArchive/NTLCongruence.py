@@ -8,6 +8,7 @@ import copy
 # 由多項式衍生的同餘式
 
 
+from .NTLBezoutEquation        import bezoutEquation
 from .NTLExceptions            import DefinitionError, PCError, PolyError, SolutionError
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
 from .NTLPolynomial            import Polynomial
@@ -235,22 +236,12 @@ class Congruence(Polynomial):
 
     # 中國剩餘定理
     def _CTR(self, rem, mod):
-
-        # 求解M_i^-1 (mod m_i)
-        def solve(variable, modulo):
-            polyCgc = '%d*x - 1' % variable             # 將係數與指數數組生成多項式
-
-            r = lambda x: eval(polyCgc)                 # 用於計算多項式的取值
-            for x in jsrange(modulo):                   # 逐一驗算，如模為0則加入結果數組
-                if r(x) % modulo == 0:
-                    return x
-
         modulo = self._modulo                           # M(original modulo) = ∏m_i
 
         bList = []
         for tmpMod in mod:
             M = modulo // tmpMod                        # M_i = M / m_i
-            t = solve(M, tmpMod)                        # t_i * M_i ≡ 1 (mod m_i)
+            t = bezoutEquation(M, tmpMod)[0]            # t_i * M_i ≡ 1 (mod m_i)
             bList.append(t * M)                         # b_i = t_i * M_i
 
         _rem = self._iterCalc(rem, bList)               # x_j = Σ(b_i * r_i) (mod M)

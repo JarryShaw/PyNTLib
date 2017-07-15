@@ -11,6 +11,8 @@ import math
 from .NTLUtilities   import jsrange
 from .NTLValidations import int_check, pos_check
 
+# from NTLTrivialDivision import trivialDivision
+
 
 __all__  = ['eratosthenesSieve']
 nickname =  'primelist'
@@ -24,7 +26,7 @@ print(primeList(-2, 101))
 
 
 # 前1280個素數表，簡化小素數的求取
-PRIME_LIST = [
+_PRIME_LIST = [
     [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97],
     [101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199],
     [211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293],
@@ -142,42 +144,63 @@ def eratosthenesSieve(upper, lower=None):
     if upper <= 10100:
         _llevel = lower // 100;  _ulevel = upper // 100
 
-        for ptr_1 in jsrange(len(PRIME_LIST[_llevel])):
-            if PRIME_LIST[_llevel][ptr_1] >= lower:
+        for ptr_1 in jsrange(len(_PRIME_LIST[_llevel])):
+            if _PRIME_LIST[_llevel][ptr_1] >= lower:
                 llevel = ptr_1;     break
         else:
             _llevel += 1;   llevel = 0
 
-        for ptr_2 in jsrange(len(PRIME_LIST[_ulevel])):
-            if PRIME_LIST[_ulevel][ptr_2] >= upper:
+        for ptr_2 in jsrange(len(_PRIME_LIST[_ulevel])):
+            if _PRIME_LIST[_ulevel][ptr_2] >= upper:
                 ulevel = ptr_2;     break
         else:
             ulevel = None
 
         if _llevel != _ulevel:
-            rst = PRIME_LIST[_llevel][llevel:]
+            rst = _PRIME_LIST[_llevel][llevel:]
             for _level in jsrange(_llevel+1, _ulevel):
-                rst += PRIME_LIST[_level]
-            rst += PRIME_LIST[_ulevel][:ulevel]
+                rst += _PRIME_LIST[_level]
+            rst += _PRIME_LIST[_ulevel][:ulevel]
         else:
-            rst = PRIME_LIST[_llevel][llevel:ulevel]
+            rst = _PRIME_LIST[_llevel][llevel:ulevel]
 
     else:
-        # 用於存儲upper個正整數的表格／狀態；其中，0表示篩去，1表示保留
-        table = [1]*(upper+1)
+        from NTLTrivialDivision import trivialDivision
 
-        # 篩法（平凡除法）
-        for index in jsrange(2, int(math.sqrt(upper))+1):
-            tmp = index * 2
-            if table[index] == 1:
-                while tmp <= upper:
-                    # 將index的倍數篩去
-                    table[tmp] = 0;     tmp += index
+        def _eratosthenesSieve(upper, lower):
+            # 用於存儲upper個正整數的表格／狀態；其中，0表示篩去，1表示保留
+            table = [1]*(upper+1)
 
-        # 獲取結果
-        rst = []
-        for ptr in jsrange(lower, upper+1):
-            if table[ptr] == 1:
-                rst.append(ptr)
+            # 篩法（平凡除法）
+            for index in jsrange(2, int(math.sqrt(upper))+1):
+                tmp = index * 2
+                if table[index] == 1:
+                    while tmp <= upper:
+                        # 將index的倍數篩去
+                        table[tmp] = 0;     tmp += index
+
+            # 獲取結果
+            rst = []
+            for ptr in jsrange(lower, upper+1):
+                if table[ptr] == 1:
+                    rst.append(ptr)
+
+            return rst
+
+        if math.log(upper, 10) > 4.0:
+            if math.log(lower, 10) > 4.0:
+                rst = []
+                start = lower if lower % 2 == 1 else lower + 1
+
+            else:
+                rst = _eratosthenesSieve(10000, lower)
+                start = 10001
+
+            for _int in jsrange(start, upper, 2):
+                if trivialDivision(_int):
+                    rst.append(_int)
+
+        else:
+            rst = _eratosthenesSieve(upper, lower)
 
     return rst
