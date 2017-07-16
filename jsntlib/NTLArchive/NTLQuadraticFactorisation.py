@@ -3,6 +3,7 @@
 
 import math
 
+
 # 求取係數
 # 求a和b使得N|a^2-b^2但N∤a+b與N∤a-b
 

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-from .NTLExceptions  import DefinitionError
-from .NTLValidations import int_check
-
-
 # 廣義歐幾里德除法
 # 用輾轉相除法求出商數列
+
+
+from .NTLExceptions  import DefinitionError
+from .NTLValidations import int_check
 
 
 __all__  = ['euclideanAlgorithm', 'EEALoop']

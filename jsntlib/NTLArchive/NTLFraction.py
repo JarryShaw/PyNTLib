@@ -5,7 +5,6 @@ import fractions
 import math
 import numbers
 import operator
-import sys
 
 
 # 連分數類
@@ -13,7 +12,7 @@ import sys
 
 
 from .NTLGreatestCommonDivisor import greatestCommonDivisor
-from .NTLUtilities             import jsceil, jsint, jsfloor, jsround, jsstring
+from .NTLUtilities             import jsceil, jsint, jsfloor, jsround, jsstring, ispy3
 from .NTLValidations           import int_check
 
 
@@ -31,7 +30,7 @@ print(rst_ + dst_)
 '''
 
 
-if sys.version_info[0] > 2:
+if ispy3:
     _PyHASH_MODULUS = fractions._PyHASH_MODULUS
     _PyHASH_INF     = fractions._PyHASH_INF
 
@@ -195,7 +194,7 @@ class Fraction(FractionBase):
     def _div(a, b):
         return Fraction(a._number / b._number)
 
-    if sys.version_info[0] > 2:
+    if ispy3:
         __truediv__, __rtruediv__ = _operator_fallbacks(_div, operator.truediv)
     else:
         __truediv__, __rtruediv__ = _operator_fallbacks(_div, operator.truediv)

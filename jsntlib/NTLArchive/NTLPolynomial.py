@@ -5,7 +5,6 @@ from .__abc__ import __polynomial__
 
 
 import copy
-import sys
 
 
 # 複數域多項式類
@@ -14,7 +13,8 @@ import sys
 
 from .NTLExceptions           import ComplexError, DefinitionError, PolyError
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
-from .NTLUtilities            import jsappend, jsint, jsitems, jskeys, jsmaxint, jsrange, jsupdate
+from .NTLUtilities            import jsappend, jsint, jsitems, jskeys, \
+                                     jsmaxint, jsrange, jsupdate, ispy3
 from .NTLValidations          import int_check, number_check, tuple_check
 
 
@@ -182,7 +182,7 @@ class Polynomial(PolyBase):
 
         else:
             int_check(key)
-            if sys.version_info[0] > 2:
+            if ispy3:
                 if key < 0:     key += len(self)
 
             if self._vflag:
@@ -212,7 +212,7 @@ class Polynomial(PolyBase):
 
         else:
             int_check(key);         number_check(value)
-            if sys.version_info[0] > 2:
+            if ispy3:
                     if key < 0:     key += len(self)
 
             if self._vflag:
@@ -430,7 +430,7 @@ class Polynomial(PolyBase):
 
     # 求取_quo = self / poly
     def _div(self, poly):
-        if sys.version_info[0] < 3 and self._iflag and poly._iflag:
+        if ispy3 and self._iflag and poly._iflag:
             _quo = self // poly
             return _quo
 
@@ -489,7 +489,7 @@ class Polynomial(PolyBase):
     __truediv__  = _div
     __rtruediv__ = rdiv
 
-    if sys.version_info[0] < 3:
+    if not ispy3:
         __div__  = _div
         __rdiv__ = rdiv
 
@@ -660,7 +660,7 @@ class Polynomial(PolyBase):
             for exp in self._vec[var]:
                 _exp = exp + 1
                 if exp:
-                    if sys.version_info[0] > 2:
+                    if ispy3:
                         _coe = self._vec[var][exp] / key
                     else:
                         _coe = 1.0 * self._vec[var][exp] / key
@@ -677,10 +677,7 @@ class Polynomial(PolyBase):
     # 返回self=poly的布爾值
     def __eq__(self, other):
         if isinstance(other, Polynomial):
-            if self._var == other._var and self._vec == other._vec:
-                return True
-            else:
-                return False
+            return (self._var == other._var and self._vec == other._vec)
         else:
             return (self == Polynomial(other))
 

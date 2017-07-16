@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import math
 import sys
 
 
@@ -16,25 +17,28 @@ __all__ =  [
 ]
 
 
+ispy3 = sys.version_info[0] > 2
+
+
 ##############################################################################
 # Overwritten session.
 ##############################################################################
 
 
 # Python 2.7 -- xrange | Python 3.6 -- range
-jsrange = range if sys.version_info[0] > 2 else xrange
+jsrange = range if ispy3 else xrange
 
 
 # Python 2.7 -- basestring | Python 3.6 -- str
-jsstring = str if sys.version_info[0] > 2 else basestring
+jsstring = str if ispy3 else basestring
 
 
 # Python 2.7 -- (int, long) | Python 3.6 -- int
-jsint = int if sys.version_info[0] > 2 else (int, long)
+jsint = int if ispy3 else (int, long)
 
 
 # Python 2.7 -- sys.maxint | Python 3.6 -- sys.maxsize
-jsmaxint = sys.maxsize if sys.version_info[0] > 2 else sys.maxint
+jsmaxint = sys.maxsize if ispy3 else sys.maxint
 
 
 ##############################################################################
@@ -43,35 +47,27 @@ jsmaxint = sys.maxsize if sys.version_info[0] > 2 else sys.maxint
 
 
 # Python 2.7 -- int(floor(num)) | Python 3.6 -- floor(num)
-def jsfloor(*args):
-    from math import floor
-    return floor(*args) if sys.version_info[0] > 2 else int(floor(*args))
+jsfloor = math.floor if ispy3 else lambda x: int(math.floor(x))
 
 
 # Python 2.7 -- int(ceil(num)) | Python 3.6 -- ceil(num)
-def jsceil(*args):
-    from math import ceil
-    return ceil(*args) if sys.version_info[0] > 2 else int(ceil(*args))
+jsceil = math.ceil if ispy3 else lambda x: int(math.ceil(x))
 
 
 # Python 2.7 -- int(round(num)) | Python 3.6 -- round(num)
-def jsround(*args):
-    return round(*args) if sys.version_info[0] > 2 else int(round(*args))
+jsround = round if ispy3 else lambda x: int(round(x))
 
 
 # Python 2.7 -- dict.keys() | Python 3.6 -- list(dict.keys())
-def jskeys(_dict):
-    return list(_dict.keys()) if sys.version_info[0] > 2 else _dict.keys()
+jskeys = lambda x: list(x.keys()) if ispy3 else x.keys()
 
 
 # Python 2.7 -- dict.values() | Python 3.6 -- list(dict.values())
-def jsvalues(_dict):
-    return list(_dict.values()) if sys.version_info[0] > 2 else _dict.values()
+jsvalues = lambda x: list(x.values()) if ispy3 else x.values()
 
 
 # Python 2.7 -- dict.items() | Python 3.6 -- list(dict.items())
-def jsitems(_dict):
-    return list(_dict.items()) if sys.version_info[0] > 2 else _dict.items()
+jsitems = lambda x: list(x.items()) if ispy3 else x.items()
 
 
 ##############################################################################

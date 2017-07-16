@@ -9,7 +9,7 @@ import traceback
 # 用於在NTL中反饋用戶異常信息
 
 
-from .NTLUtilities import jsrange
+from .NTLUtilities import jsrange, ispy3
 
 
 __all__  = [
@@ -34,13 +34,19 @@ class BaseError(Exception):
     * Turn off system-default traceback function by set `sys.tracebacklimit` to 0.
     * But bugs appear in Python 3.6, so we have to set `sys.tracebacklimit` to None.
     * In Python 2.7, `trace.print_stack(limit=None)` dose not support negative limit.
+
     '''
+
+    def __new__(cls, message):
+        self = super(Exception, cls).__new__(cls)
+        (self.traceback_3 if ispy3 else self.traceback_2)()
+        return self
 
     def tb_preparation(self):
         tb = traceback.extract_stack()
 
         for ptr in jsrange(len(tb)):
-            if 'NTLArchive' in tb[ptr][0]:
+            if 'jsntlib' in tb[ptr][0]:
                 index = ptr;    break
 
         return index
@@ -69,11 +75,6 @@ class BaseError(Exception):
 # The argument(s) must be (a) number(s).
 class DigitError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -81,11 +82,6 @@ class DigitError(BaseError):
 # The argument(s) must be integral.
 class IntError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -93,11 +89,6 @@ class IntError(BaseError):
 # The argument(s) must be dict type.
 class DictError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -105,11 +96,6 @@ class DictError(BaseError):
 # The argument(s) must be list type.
 class ListError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -117,11 +103,6 @@ class ListError(BaseError):
 # The argument(s) must be tuple type.
 class TupleError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -129,11 +110,6 @@ class TupleError(BaseError):
 # The argument(s) must be Polynomial type.
 class PolyError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -141,11 +117,6 @@ class PolyError(BaseError):
 # Function expected at most / least n arguments, got m.
 class ArgumentError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -153,11 +124,7 @@ class ArgumentError(BaseError):
 # The function is not defined for real number.
 class RealError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
+        (self.traceback_3 if ispy3 else self.traceback_2)()
         raise TypeError(message)
 
 
@@ -165,11 +132,6 @@ class RealError(BaseError):
 # The function is not defined for complex instance.
 class ComplexError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise TypeError(message)
 
 
@@ -182,11 +144,6 @@ class ComplexError(BaseError):
 # The argument(s) must be positive/negative.
 class PNError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise ValueError(message)
 
 
@@ -194,11 +151,6 @@ class PNError(BaseError):
 # The argument(s) must be odd/even.
 class OEError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise ValueError(message)
 
 
@@ -206,11 +158,6 @@ class OEError(BaseError):
 # The argument(s) must be prime/composit.
 class PCError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise ValueError(message)
 
 
@@ -218,11 +165,6 @@ class PCError(BaseError):
 # The argument(s) must be bool type.
 class BoolError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise ValueError(message)
 
 
@@ -230,11 +172,6 @@ class BoolError(BaseError):
 # The argument(s) must be (a) string(s).
 class StringError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise ValueError(message)
 
 
@@ -242,11 +179,6 @@ class StringError(BaseError):
 # The argument must match a specific patern.
 class DefinitionError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise ValueError(message)
 
 
@@ -259,11 +191,6 @@ class DefinitionError(BaseError):
 # The polynomial has no integral solution.
 class SolutionError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise RuntimeError(message)
 
 
@@ -276,11 +203,6 @@ class SolutionError(BaseError):
 # The coefficient of the univariate with greatest degree in divisor must be 1.
 class ExponentError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise KeyError(message)
 
 
@@ -293,11 +215,6 @@ class ExponentError(BaseError):
 # The modulo of residue should not be 0.
 class ResidueError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise ZeroDivisionError(message)
 
 
@@ -310,9 +227,4 @@ class ResidueError(BaseError):
 # Unknow attribute(s).
 class KeywordError(BaseError):
     def __init__(self, message):
-        if sys.version_info[0] > 2:
-            self.traceback_3()
-        else:
-            self.traceback_2()
-
         raise AttributeError(message)
