@@ -21,6 +21,7 @@ print('The solution of the equation x^2 + y^2 = 2017 is\n\tx=±%d, y=±%d' % (x,
 
 '''
 
+
 def quadraticEquation(p):
     prime_check(p)
 

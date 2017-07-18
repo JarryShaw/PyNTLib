@@ -12,6 +12,7 @@ from .NTLValidations        import int_check
 __all__  = ['bezoutEquation', 'coefficient_s', 'coefficient_t']
 nickname =  'bezout'
 
+
 '''Usage sample:
 
 print('%d*-179 + %d*-367 = (-179,-367)' % bezout(-179, -367))
