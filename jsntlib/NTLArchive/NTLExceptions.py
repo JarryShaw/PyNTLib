@@ -16,7 +16,7 @@ __all__  = [
     'BaseError',
     'DigitError', 'IntError', 'RealError', 'ComplexError',
     'BoolError', 'DictError', 'ListError', 'TupleError', 'StringError', 'PolyError',
-    'PNError', 'OEError', 'PCError',
+    'PNError', 'OEError', 'PCError', 'ZeroError',
     'DefinitionError', 'ArgumentError', 'KeywordError',
     'ExponentError', 'ResidueError', 'SolutionError'
 ]
@@ -157,6 +157,13 @@ class OEError(BaseError):
 # 素／合數參數異常
 # The argument(s) must be prime/composit.
 class PCError(BaseError):
+    def __init__(self, message):
+        raise ValueError(message)
+
+
+# 零值參數異常
+# The argument(s) must be not zero(0).
+class ZeroError(BaseError):
     def __init__(self, message):
         raise ValueError(message)
 

@@ -11,7 +11,7 @@ setup(
 
     name = 'jsntlib',
 
-    version = '1.1.3',
+    version = '1.3',
 
     description =
         'A number theory library adapted from mathematic fundamentals of information security homework codes.',
@@ -32,7 +32,7 @@ setup(
 
     url = 'https://github.com/JarryShaw/jsntlib/tree/release',
 
-    download_url = 'https://github.com/JarryShaw/jsntlib/archive/1.1.3.tar.gz',
+    download_url = 'https://github.com/JarryShaw/jsntlib/archive/1.3.tar.gz',
 
     packages = [
         'jsntlib',

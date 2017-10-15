@@ -6,7 +6,7 @@
 
 
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
-from .NTLValidations          import int_check, prime_check
+from .NTLValidations          import bool_check, int_check, prime_check
 
 
 __all__  = ['legendreSymbol']
@@ -20,8 +20,15 @@ print('(3 | 17) = %d' % legendre(3, 17))
 '''
 
 
-def legendreSymbol(a, p):
-    int_check(a);	prime_check(p)
+def legendreSymbol(a, p, **kwargs):
+    trust = False
+    for kw in kwargs:
+        if kw != 'trust':
+            raise KeywordError('Keyword \'%s\' is not defined.' % kw)
+        else:
+            trust = kwargs[kw];     bool_check(trust)
+
+    int_check(a);   prime_check(trust, p)
 
     a %= p
 

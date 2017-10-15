@@ -56,11 +56,18 @@ print('(mod %d)' % modulo)
 '''
 
 
-def polynomialCongruence(cgcExp, cgcCoe, modulo):
+def polynomialCongruence(cgcExp, cgcCoe, modulo, **kwargs):
     list_check(cgcExp, cgcCoe)
     int_check(modulo);  pos_check(modulo)
 
-    if trivialDivision(modulo):                     # 判斷模的素性
+    trust = False
+    for kw in kwargs:
+        if kw != 'trust':
+            raise KeywordError('Keyword \'%s\' is not defined.' % kw)
+        else:
+            trust = kwargs[kw];     bool_check(trust)
+
+    if trust or trivialDivision(modulo):            # 判斷模的素性
         remainder = prmMCS(cgcExp, cgcCoe, modulo)  # 如為素數模則調用prmMCS()函數
     else:
         remainder = cpsMCS(cgcExp, cgcCoe, modulo)  # 如為合數模則調用cpsMCS()函數

@@ -12,7 +12,7 @@ from .NTLExceptions         import DefinitionError
 from .NTLPrimeFactorisation import primeFactorisation
 from .NTLTrivialDivision    import trivialDivision
 from .NTLUtilities          import jsrange
-from .NTLValidations        import composit_check, int_check
+from .NTLValidations        import bool_check, composit_check, int_check
 
 
 __all__  = ['quadraticFactorisation', 'solve']
@@ -27,16 +27,20 @@ print('The solutions for N|a^2-b^2, N∤a+b and N∤a-b is\n\ta = %d\n\tb = %d' 
 '''
 
 
-def quadraticFactorisation(N):
+def quadraticFactorisation(N, **kwargs):
     int_check(N)
-
     if N <= 1:
         raise DefinitionError('The argument must be a composit number greater than 1.')
 
-    composit_check(N)
+    trust = False
+    for kw in kwargs:
+        if kw != 'trust':
+            raise KeywordError('Keyword \'%s\' is not defined.' % kw)
+        else:
+            trust = kwargs[kw];     bool_check(trust)
+    composit_check(trust, N)
 
     fct = primeFactorisation(N, wrap=True)                          # 獲取N的素因數分解
-
     for ptr0 in jsrange(len(fct[1])):                               # 將指數表中的奇數項化為偶數項
         if (fct[1][ptr0] % 2):    fct[1][ptr0] += 1
     if len(fct[0]):                                                 # 當因數表只有一個元素的情況

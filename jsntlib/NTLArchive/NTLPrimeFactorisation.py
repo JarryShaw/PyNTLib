@@ -86,6 +86,6 @@ def wrap(table):
 
     # 因數只有一個的特殊情況
     if len(table) == 1:
-            p.append(table[-1]);  q.append(1)
+        p.append(table[-1]);  q.append(1)
 
     return p, q

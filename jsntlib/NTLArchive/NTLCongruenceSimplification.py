@@ -5,8 +5,9 @@
 # 素數模的同餘式的簡化
 
 
+from .NTLExceptions                  import KeywordError
 from .NTLPolynomialEuclideanDivision import polyED
-from .NTLValidations                 import list_check, prime_check
+from .NTLValidations                 import bool_check, list_check, prime_check
 
 
 __all__  = ['congruenceSimplification']
@@ -38,8 +39,15 @@ print('≡ 0 (mod %d)' % modulo)
 '''
 
 
-def congruenceSimplification(cgcExp, cgcCoe, modulo):
-    list_check(cgcExp, cgcCoe);		prime_check(modulo)
+def congruenceSimplification(cgcExp, cgcCoe, modulo, **kwargs):
+    trust = False
+    for kw in kwargs:
+        if kw != 'trust':
+            raise KeywordError('Keyword \'%s\' is not defined.' % kw)
+        else:
+            trust = kwargs[kw];     bool_check(trust)
+            
+    list_check(cgcExp, cgcCoe);     prime_check(trust, modulo)
 
     dvsExp = [modulo, 1]
     dvsCoe = [1, -1]

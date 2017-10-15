@@ -10,9 +10,10 @@ import math
 
 from .NTLEratosthenesSieve import eratosthenesSieve
 from .NTLExceptions        import DefinitionError
-from .NTLPseudoPrime       import miller_rabinTest
-from .NTLUtilities         import jsfloor, jsrange
+from .NTLUtilities         import jsfloor, jsmaxint, jsrange
 from .NTLValidations       import int_check, pos_check
+
+# from .NTLPseudoPrime import miller_rabinTest
 
 
 __all__  = ['trivialDivision']
@@ -35,20 +36,21 @@ def trivialDivision(N):
     if N == 1 or N == 0:
         raise DefinitionError('The argument must be a natural number greater than 1.')
 
-    try:
-        # 若輸入的常數過大，則採用強偽素數判斷
-        if math.log(N, 10) > 4.0:
-            raise MemoryError
-
+    if math.log(N, 10)  <= 7.0:
         # 得出小於等於N的所有素數
         table = eratosthenesSieve(N+1)
 
         # 素性判斷，True為素數，False為合數
         return True if (N in table) else False
 
-    except (OverflowError, MemoryError):
-        byte = math.log(N, 2) - 1
-        para = 3**jsfloor(math.log(2**byte, 10) // 3)
+    # 若輸入的常數過大，則採用強偽素數檢驗
+    else:
+        try:
+            byte = math.log(N, 2) - 1
+            para = 3**jsfloor(math.log(2**byte, 10) // 3)
+        except (OverflowError, MemoryError):
+            para = jsmaxint
 
         # 素性判斷，True為素數，False為合數
+        from .NTLPseudoPrime import miller_rabinTest
         return True if miller_rabinTest(N, para) else False

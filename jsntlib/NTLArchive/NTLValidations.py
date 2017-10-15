@@ -10,15 +10,14 @@ import sys
 
 
 from .NTLExceptions import \
-    BoolError, ComplexError, DictError, DigitError, \
-    IntError, ListError, OEError, PCError, PNError, \
-    RealError, TupleError
+    BoolError, ComplexError, DictError, DigitError, IntError, ListError, \
+    OEError, PCError, PNError, ZeroError, RealError, TupleError
 
 
 __all__  = [
     'int_check', 'real_check', 'complex_check', 'number_check',
     'str_check', 'basestring_check', 'bool_check', 'list_check', 'tuple_check', 'dict_check',
-    'neg_check', 'pos_check', 'notneg_check', 'notpos_check',
+    'neg_check', 'pos_check', 'notneg_check', 'notpos_check', 'notzero_check',
     'odd_check', 'even_check', 'prime_check', 'composit_check'
 ]
 
@@ -76,7 +75,7 @@ def str_check(*args):
     func = inspect.stack()[2][3]
 
     for var in args:
-        if not isinstance(var, str):
+        if not isinstance(var, (str, bytes, unicode)):
             raise StringError('Function %s expected str, %s got instead.'
                 % (func,  type(var).__name__))
 
@@ -169,6 +168,14 @@ def notpos_check(*args):
             raise PNError('Function %s expected negative or zero, possitive got instead.' % func)
 
 
+def notzero_check(*args):
+    func = inspect.stack()[2][3]
+
+    for var in args:
+        if var == 0:
+            raise ZeroError('Function %s expected non-zero, zero got instead.' % func)
+
+
 def odd_check(*args):
     func = inspect.stack()[2][3]
 
@@ -185,7 +192,9 @@ def even_check(*args):
             raise OEError('Function %s expected even, odd got instead.' % func)
 
 
-def prime_check(*args):
+def prime_check(trust, *args):
+    if trust:   return
+    
     from .NTLTrivialDivision import trivialDivision
     func = inspect.stack()[2][3]
 
@@ -194,7 +203,9 @@ def prime_check(*args):
             raise PCError('Function %s expected prime, composit got instead.' % func)
 
 
-def composit_check(*args):
+def composit_check(trust, *args):
+    if trust:   return
+    
     from .NTLTrivialDivision import trivialDivision
     func = inspect.stack()[2][3]
 

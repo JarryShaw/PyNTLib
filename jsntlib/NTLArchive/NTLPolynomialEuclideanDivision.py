@@ -8,8 +8,8 @@ import copy
 # 求解多項式的廣義歐幾里德除法
 
 
-from .NTLValidations import int_check, list_check
 from .NTLUtilities   import jsrange
+from .NTLValidations import int_check, list_check
 
 
 __all__  = ['polyED', 'polyEDLoop']

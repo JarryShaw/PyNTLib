@@ -7,7 +7,7 @@
 
 from .NTLExceptions           import SolutionError
 from .NTLPolynomialCongruence import polynomialCongruence
-from .NTLValidations          import prime_check
+from .NTLValidations          import bool_check, prime_check
 
 
 __all__  = ['quadraticEquation(']
@@ -22,8 +22,15 @@ print('The solution of the equation x^2 + y^2 = 2017 is\n\tx=±%d, y=±%d' % (x,
 '''
 
 
-def quadraticEquation(p):
-    prime_check(p)
+def quadraticEquation(p, **kwargs):
+    trust = False
+    for kw in kwargs:
+        if kw != 'trust':
+            raise KeywordError('Keyword \'%s\' is not defined.' % kw)
+        else:
+            trust = kwargs[kw];     bool_check(trust)
+
+    prime_check(trust, p)
 
     if p % 4 != 1:
         raise SolutionError('The quadratic equation has no integral solution.')

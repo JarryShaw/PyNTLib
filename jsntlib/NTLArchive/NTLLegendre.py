@@ -13,7 +13,7 @@ from .NTLPrimeFactorisation   import primeFactorisation
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLTrivialDivision      import trivialDivision
 from .NTLUtilities            import jssign
-from .NTLValidations          import prime_check, str_check
+from .NTLValidations          import bool_check, prime_check, str_check
 
 # from .NTLJacobi import Jacobi
 
@@ -113,8 +113,15 @@ class Legendre(Symbol):
     # Data models.
     ##########################################################################
 
-    def __init__(self, numerator, denominator=None):
-        prime_check(self._denominator)
+    def __init__(self, numerator, denominator=None, **kwargs):
+        trust = False
+        for kw in kwargs:
+            if kw != 'trust':
+                raise KeywordError('Keyword \'%s\' is not defined.' % kw)
+            else:
+                trust = kwargs[kw];     bool_check(trust)
+
+        prime_check(trust, self._denominator)
 
     def __call__(self):
         a = self._numerator

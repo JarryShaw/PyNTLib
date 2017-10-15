@@ -20,8 +20,8 @@ __all__  = [
     'Congruence', 'Fraction', 'Index', 'Jacobi', 'Legendre', 'Polynomial', 'Quadratic',
     'bezout', 'binary', 'carmicheal', 'congsolve', 'coprime', 'crt', 'decomposit',
     'eealist', 'euler', 'factor', 'fraction', 'gcd', 'isdivisible', 'isprime',
-    'jacobi', 'lcm', 'legendre', 'modulo', 'ord', 'polydiv', 'prc', 'pseudo',
-    'quadratic', 'root', 'simplify'
+    'jacobi', 'lcm', 'legendre', 'modulo', 'ord', 'polydiv', 'prc', 'prime', 'primelist',
+    'pseudo', 'quadratic', 'root', 'simplify'
 ]
 
 
@@ -89,9 +89,9 @@ def carmicheal(N):
 
 
 # Returns the solutions of a polynomial congruence.
-def congsolve(cgcExp, cgcCoe, modulo):
+def congsolve(cgcExp, cgcCoe, modulo, **kwargs):
     from .NTLArchive import NTLPolynomialCongruence
-    return NTLPolynomialCongruence.polynomialCongruence(cgcExp, cgcCoe, modulo)
+    return NTLPolynomialCongruence.polynomialCongruence(cgcExp, cgcCoe, modulo, **kwargs)
 
 
 # Returns if a and b are coprime numbers.
@@ -107,9 +107,9 @@ def crt(*args):
 
 
 # Returns the solutions for N|a^2-b^2 while N∤a+b and N∤a-b.
-def decomposit(N):
+def decomposit(N, **kwargs):
     from .NTLArchive import NTLQuadraticFactorisation
-    return NTLQuadraticFactorisation.quadraticFactorisation(N)
+    return NTLQuadraticFactorisation.quadraticFactorisation(N, **kwargs)
 
 
 # Returns list of the quotients with extended Euclidean Algorithm.
@@ -167,9 +167,9 @@ def lcm(a, b):
 
 
 # Returns the result of Legendre symbol for (a | p).
-def legendre(a, p):
+def legendre(a, p, **kwargs):
     from .NTLArchive import NTLLegendreSymbol
-    return NTLLegendreSymbol.legendreSymbol(a, p)
+    return NTLLegendreSymbol.legendreSymbol(a, p, **kwargs)
 
 
 # Returns the result of b^e (mod m).
@@ -196,7 +196,13 @@ def prc(m):
     return NTLPrimitiveResidueClass.primitiveResidueClass(m)
 
 
-# Returns all prime numbers between lower and upper bound.
+# Retern iterator of prime numbers between lower and upper bound with steps.
+def prime(upper, lower=None, steps=None):
+    from .NTLArchive import NTLEratosthenesSieve
+    return NTLEratosthenesSieve.primerange(upper, lower, steps)
+
+
+# Returns all prime numbers between lower and upper bound with steps.
 def primelist(upper, lower=None):
     from .NTLArchive import NTLEratosthenesSieve
     return NTLEratosthenesSieve.eratosthenesSieve(upper, lower)
@@ -209,9 +215,9 @@ def pseudo(**kwargs):
 
 
 # Returns the solutions of a quadratic equation.
-def quadratic(p):
+def quadratic(p, **kwargs):
     from .NTLArchive import NTLQuadraticEquation
-    return NTLQuadraticEquation.quadraticEquation(p)
+    return NTLQuadraticEquation.quadraticEquation(p, **kwargs)
 
 
 # Returns the primitive root(s) of modulo (m).
@@ -221,6 +227,6 @@ def root(m):
 
 
 # Returns the result after congruence simplification.
-def simplify(cgcExp, cgcCoe, modulo):
+def simplify(cgcExp, cgcCoe, modulo, **kwargs):
     from .NTLArchive import NTLCongruenceSimplification
-    return NTLCongruenceSimplification.congruenceSimplification(cgcExp, cgcCoe, modulo)
+    return NTLCongruenceSimplification.congruenceSimplification(cgcExp, cgcCoe, modulo, **kwargs)

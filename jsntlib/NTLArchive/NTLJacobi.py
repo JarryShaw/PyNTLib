@@ -12,7 +12,7 @@ from .NTLExceptions           import DefinitionError, KeywordError
 from .NTLPrimeFactorisation   import primeFactorisation
 from .NTLTrivialDivision      import trivialDivision
 from .NTLUtilities            import jssign
-from .NTLValidations          import prime_check, str_check
+from .NTLValidations          import str_check
 
 # from .NTLLegendre import Legendre
 

@@ -8,14 +8,15 @@ import math
 # 返回upper以內正整數的所有素數列表
 
 
-from .NTLUtilities   import jsrange
-from .NTLValidations import int_check, pos_check
+from .NTLUtilities   import jsceil, jsfloor, jsrange
+from .NTLValidations import int_check
 
-# from NTLTrivialDivision import trivialDivision
+# from .NTLPseudoPrime import miller_rabinTest
+# from .NTLTrivialDivision import trivialDivision
 
 
-__all__  = ['eratosthenesSieve']
-nickname =  'primelist'
+__all__  = ['eratosthenesSieve', 'primerange']
+nickname =  'primelist' + 'prime'
 
 
 '''Usage sample:
@@ -131,6 +132,7 @@ _PRIME_LIST = [
 ]
 
 
+# 利用厄拉托塞師篩法或素性檢驗，生成素數數列
 def eratosthenesSieve(upper, lower=None):
     if lower is None:   lower = 2
     int_check(upper, lower)
@@ -138,21 +140,22 @@ def eratosthenesSieve(upper, lower=None):
     if upper < lower:
         upper, lower = lower, upper
 
+    if upper < 2:   return []
     if lower < 2:   lower = 2
-    pos_check(upper)
 
-    if upper <= 10100:
-        _llevel = lower // 100;  _ulevel = upper // 100
+    # 從上述素數表中獲取素數數列    
+    def _fromprimelist(lower, upper):
+        _llevel = lower // 100;     _ulevel = upper // 100
 
-        for ptr_1 in jsrange(len(_PRIME_LIST[_llevel])):
-            if _PRIME_LIST[_llevel][ptr_1] >= lower:
-                llevel = ptr_1;     break
+        for prm_1 in _PRIME_LIST[_llevel]:
+            if prm_1 >= lower:
+                llevel = _PRIME_LIST[_llevel].index(prm_1);     break
         else:
             _llevel += 1;   llevel = 0
 
-        for ptr_2 in jsrange(len(_PRIME_LIST[_ulevel])):
-            if _PRIME_LIST[_ulevel][ptr_2] >= upper:
-                ulevel = ptr_2;     break
+        for prm_2 in _PRIME_LIST[_ulevel]:
+            if prm_2 >= upper:
+                ulevel = _PRIME_LIST[_ulevel].index(prm_2);     break
         else:
             ulevel = None
 
@@ -164,16 +167,25 @@ def eratosthenesSieve(upper, lower=None):
         else:
             rst = _PRIME_LIST[_llevel][llevel:ulevel]
 
-    else:
-        from NTLTrivialDivision import trivialDivision
+        return rst
 
-        def _eratosthenesSieve(upper, lower):
+    # 若上邊界過小（<10100）則直接從素數表中獲取
+    if upper < 10100:
+        rst = _fromprimelist(lower, upper)
+
+    # 若上邊界較大（≥10100）則需分步求取
+    else:
+        # 厄拉托塞師篩法（獲取在上述素數表之外的素數列表）
+        def _eratosthenesSieve(lower, upper):
+            lower -= 10100;     upper -= 10100
+
             # 用於存儲upper個正整數的表格／狀態；其中，0表示篩去，1表示保留
             table = [1]*(upper+1)
 
             # 篩法（平凡除法）
-            for index in jsrange(2, int(math.sqrt(upper))+1):
-                tmp = index * 2
+            for index in jsrange(2, jsceil(math.sqrt(upper+10100))):
+                tmp = index * (jsceil(10100.0 / index))
+
                 if table[index] == 1:
                     while tmp <= upper:
                         # 將index的倍數篩去
@@ -183,24 +195,64 @@ def eratosthenesSieve(upper, lower=None):
             rst = []
             for ptr in jsrange(lower, upper+1):
                 if table[ptr] == 1:
-                    rst.append(ptr)
+                    rst.append(ptr+10100)
 
             return rst
 
-        if math.log(upper, 10) > 4.0:
-            if math.log(lower, 10) > 4.0:
+        # 若上邊界過大（>10,000,000）則分步求取
+        if math.log(upper, 10) > 7.0:
+            # 若下邊界較過大（>10,000,000）則直接素性檢驗
+            if math.log(lower, 10) > 7.0:
                 rst = []
-                start = lower if lower % 2 == 1 else lower + 1
 
             else:
-                rst = _eratosthenesSieve(10000, lower)
-                start = 10001
+                # 若下邊界過小（<10100）則需先從素數表中獲取
+                if lower < 10100:
+                    rst = _fromprimelist(lower, 10099)
+                    lower = 10101
 
-            for _int in jsrange(start, upper, 2):
-                if trivialDivision(_int):
+                # 若下邊界較小（≤10,000,000）則直接用篩法獲取
+                else:
+                    rst = []
+
+                # 較大部分（≥10100 & ≤10,000,000）用篩法獲取
+                rst += _eratosthenesSieve(lower, 10000000)
+                lower = 10000001
+
+            # 過大部分（>10,000,000）使用Miller-Rabin算法進行素性檢驗
+            try:
+                byte = math.log(upper, 2) - 1
+                para = 3**jsfloor(math.log(2**byte, 10) // 3)
+            except (OverflowError, MemoryError):
+                para = jsmaxint
+
+            from .NTLPseudoPrime import miller_rabinTest
+            for _int in jsrange(lower, upper, 2):
+                if miller_rabinTest(_int, para):
                     rst.append(_int)
 
+        # 若上邊界較小（≤10,000,000）則直接利用篩法求取
         else:
             rst = _eratosthenesSieve(upper, lower)
 
     return rst
+
+
+# 利用Miller-Rabin算法進行素性檢驗，並產生素數生成器
+def primerange(start, end=None, step=None):
+    if end  is None:    end, start = start, 2
+    if step is None:    step = 1
+    int_check(start, end, step)
+
+    try:
+        _max = max(start, end)
+        byte = math.log(upper, 2) - 1
+        para = 3**jsfloor(math.log(2**byte, 10) // 3)
+    except (OverflowError, MemoryError):
+        para = jsmaxint
+
+    from .NTLPseudoPrime import miller_rabinTest
+    for _int in jsrange(start, end, step):
+        if _int < 2:                        continue
+        if _int % 2 == 0:                   continue
+        if miller_rabinTest(_int, para):    yield _int

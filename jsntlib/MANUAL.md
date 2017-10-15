@@ -17,6 +17,13 @@ from jsntlib import ntl as jsntlib
 
 
 
+*   `prime(stop)`
+*   `prime(start, end[, step])`
+
+    Returns an `iterator` type generating prime numbers in an array range with `start`, `end` and `step`.
+
+
+
 *   `primelist(upper[, lower])`
 
     Returns `list` type containing **prime numbers** within integer `upper` and `lower` bound, if `lower` is given. When `lower` is omitted, all prime numbers **less than** (bound excluded) the `upper` bound.
@@ -494,14 +501,15 @@ from jsntlib import ntl as jsntlib
       ```
 
 
+* `modulo`
 
-    * `modulo`
+   Modulo of the Index.
 
-      Modulo of the Index.
 
-    * `root`
+* `root`
 
-      Primitive root of the Index.
+   Primitive root of the Index.
+
 
     * `phi`
 
@@ -557,16 +565,17 @@ from jsntlib import ntl as jsntlib
       >>> Legendre('-8/23')
       Legendre(-8, 23)
       ```
-
-
+      ​
 
     * `numerator`
 
-      Numerator of the Legendre symbol in lowest term.
+        Numerator of the Legendre symbol in lowest term.
+
 
     * `denominator`
 
       Denominator of the Legendre symbol.
+
 
     * `nickname`
 
@@ -574,11 +583,12 @@ from jsntlib import ntl as jsntlib
 
 
 
-    * `__call__()`
+​		* `__call__()`
 
-    * `eval()`
+​		* `eval()`
 
-      Returns final result of the Legendre symbol, which equals to 1, -1 or 0.
+​				Returns final result of the Legendre symbol, which equals to 1, -1 or 0.
+
 
     * `simplify()`
 

@@ -63,6 +63,11 @@ class Quadratic(Polynomial):
     ##########################################################################
 
     def __new__(cls, other=None, *items, **mods):
+        try:
+            trust = mods.pop('trust')
+        except KeyError:
+            trust = False
+
         if isinstance(other, Quadratic):
             # Handle construction from another Quadratic.
             self = copy.deepcopy(other)
@@ -88,14 +93,14 @@ class Quadratic(Polynomial):
             v_1, v_2 = _read_name(**mods)
             vec = {v_1: {2: 1}, v_2: {2: 1}}
             self = super(Quadratic, cls).__new__(cls, vec, **mods)
-            self._pflag = trivialDivision(other)
+            self._pflag = True if trust else trivialDivision(other)
             self._constant = other
             self._solution = None
             return self
 
         else:
             self = super(Quadratic, cls).__new__(cls, other, *items, **mods)
-            self._pflag = None
+            self._pflag = True if trust else None
             self._constant = None
             return self
 

@@ -65,23 +65,27 @@ class Congruence(Polynomial):
     ##########################################################################
 
     def __new__(cls, other=None, *items, **mods):
+        try:
+            trust = mods.pop('trust')
+        except KeyError:
+            trust = False
+
         if isinstance(other, Congruence):
             self = copy.deepcopy(other)
-            return self
 
         elif isinstance(other, Polynomial):
             self = copy.deepcopy(other)
             self._modulo = None
-            self._pflag = None
+            self._pflag = True if trust else None
             self._solution = None
-            return self
 
         else:
             self = super(Congruence, cls).__new__(cls, other, *items, **mods)
             self._modulo = None
-            self._pflag = None
+            self._pflag = True if trust else None
             self._solution = None
-            return self
+
+        return self
 
     def __init__(self, other=None, *items, **mods):
         self._update_state()

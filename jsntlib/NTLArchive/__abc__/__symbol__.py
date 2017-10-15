@@ -90,7 +90,7 @@ class ABCSymbol(object):
     # Data models.
     ##########################################################################
 
-    def __new__(cls, numerator, denominator=None):
+    def __new__(cls, numerator, denominator=None, **kwargs):
         self = super(ABCSymbol, cls).__new__(cls)
 
         if denominator is None:
