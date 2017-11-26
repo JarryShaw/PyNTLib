@@ -246,7 +246,7 @@ def primerange(start, end=None, step=None):
 
     try:
         _max = max(start, end)
-        byte = math.log(upper, 2) - 1
+        byte = math.log(_max, 2) - 1
         para = 3**jsfloor(math.log(2**byte, 10) // 3)
     except (OverflowError, MemoryError):
         para = jsmaxint

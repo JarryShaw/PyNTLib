@@ -6,6 +6,7 @@
 
 
 from .NTLExceptions  import DefinitionError
+from .NTLPolynomial  import Polynomial
 from .NTLValidations import int_check
 
 
@@ -21,17 +22,19 @@ print(eealist(3424, 13))
 
 
 def euclideanAlgorithm(dividend, divisor):
-    int_check(dividend, divisor)
+    if isinstance(dividend, Polynomial) or isinstance(divisor, Polynomial):
+        dividend = Polynomial(dividend);    divisor = Polynomial(divisor)
+    else:
+        int_check(dividend, divisor)
 
-    if divisor == 0:
-        raise DefinitionError('The divisor should never be zero.')
+        if divisor == 0:
+            raise DefinitionError('The divisor should never be zero.')
 
     return EEALoop(dividend, divisor, [])
 
 
 def EEALoop(a, b, qSet):
-    q = a // b
-    r = a %  b
+    q, r = divmod(a, b)
 
     if r == 0:  # (r,0) = r
         return qSet

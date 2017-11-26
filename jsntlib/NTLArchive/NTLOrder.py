@@ -7,8 +7,9 @@
 
 from .NTLCoprimalityTest import coprimalityTest
 from .NTLExceptions      import DefinitionError
+from .NTLPolynomial      import Polynomial
 from .NTLUtilities       import jsrange
-from .NTLValidations     import int_check
+from .NTLValidations     import int_check, prime_check
 
 
 __all__  = ['order']
@@ -23,11 +24,19 @@ print('The order of 2 mod 9 is\n\tord_9(2) = %d' % ord(9, 2))
 
 
 def order(m, a):
-    int_check(m, a)
+    if isinstance(m, Polynomial) or isinstance(a, Polynomial):
+        m = Polynomial(m);      prime_check(a)
 
-    if not coprimalityTest(a, m):
-        raise DefinitionError('The arguments must be coprime.')
+        deg = a**len(m);        a = Polynomial('x')
 
-    for e in jsrange(1, m):
+    else:
+        int_check(m, a)
+
+        if not coprimalityTest(a, m):
+            raise DefinitionError('The arguments must be coprime.')
+
+        deg = m
+
+    for e in jsrange(deg, 1, -1):
         if a**e % m == 1:
             return e

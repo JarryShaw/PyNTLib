@@ -368,7 +368,7 @@ class ABCPolynomial(object):
 
     def __str__(self):
         def str_ec(_ec, _var):
-            if _ec == {}:   return ''
+            if _ec == {} or _ec == {0:0}:   return ''
 
             _str = ''
             _exp = sorted(_ec, reverse=True)

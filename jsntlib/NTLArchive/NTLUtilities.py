@@ -10,7 +10,7 @@ import sys
 
 
 __all__ =  [
-    'jsrange', 'jsstring', 'jsint', 'jsmaxint',
+    'jsrange', 'jsstring', 'jsint', 'jsmaxint', 'jsbytes', 'jsstr'
     'jsfloor', 'jsceil', 'jsround',
     'jskeys', 'jsvalues', 'jsitems',
     'jssquare', 'jssign', 'jsappend', 'jsupdate'
@@ -39,6 +39,14 @@ jsint = int if ispy3 else (int, long)
 
 # Python 2.7 -- sys.maxint | Python 3.6 -- sys.maxsize
 jsmaxint = sys.maxsize if ispy3 else sys.maxint
+
+
+# Python 2.7 -- unicode | Python 3.6 -- str
+jsstr = str if ispy3 else unicode
+
+
+# Python 2.7 -- str | Python 3.6 -- bytes
+jsbytes = bytes if ispy3 else str
 
 
 ##############################################################################

@@ -11,7 +11,7 @@ import copy
 # 具備基本運算的複數域多項式實現
 
 
-from .NTLExceptions           import ComplexError, DefinitionError, PolyError
+from .NTLExceptions           import ComplexError, DefinitionError, ResidueError, PolyError
 from .NTLRepetiveSquareModulo import repetiveSquareModulo
 from .NTLUtilities            import jsappend, jsint, jsitems, jskeys, \
                                      jsmaxint, jsrange, jsupdate, ispy3
@@ -150,6 +150,9 @@ class Polynomial(PolyBase):
                     self._iflag = False;    break
             else:
                 self._iflag = True
+
+        self._var = self._var or [self._dfvar]
+        self._vec = self._vec or {self._dfvar: {0: 0}}
 
     ##########################################################################
     # Data models.
@@ -430,6 +433,11 @@ class Polynomial(PolyBase):
 
     # 求取_quo = self / poly
     def _div(self, poly):
+        if poly == 1:
+            return self
+        if poly == 0:
+            raise ResidueError('integer division or modulo by zero')
+        
         if ispy3 and self._iflag and poly._iflag:
             _quo = self // poly
             return _quo
@@ -499,6 +507,11 @@ class Polynomial(PolyBase):
             if self._vflag:
                 raise PolyError('Multi-variable polynomial does not support division & modulo.')
             else:
+                if poly == 1:
+                    return self, 0
+                if poly == 0:
+                    raise ResidueError('integer division or modulo by zero')
+                
                 if self._var == poly._var:
                     _var = self._var[0];    _vec = {_var: {}}
                     _did = copy.deepcopy(poly)
@@ -607,7 +620,7 @@ class Polynomial(PolyBase):
     # 求取_pow = pow(self, exp[, mod])
     def _pow(self, exp, mod=None):
         int_check(exp);     _pow = copy.deepcopy(self)
-        for ctr in jsrange(1, _exp):        _pow *= _pow
+        for ctr in jsrange(1, exp):        _pow *= _pow
         if mod is not None: int_check(mod); _pow %= _mod
         return _pow
 

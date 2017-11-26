@@ -6,6 +6,7 @@
 
 
 from .NTLEuclideanAlgorithm import euclideanAlgorithm
+from .NTLPolynomial         import Polynomial
 from .NTLValidations        import int_check
 
 
@@ -21,12 +22,15 @@ print('%d*-179 + %d*-367 = (-179,-367)' % bezout(-179, -367))
 
 
 def bezoutEquation(a, b):
-    int_check(a, b)
-
     exflag = pn_a = pn_b = False
-    if a < 0:   a *= -1;        pn_a = True
-    if b < 0:   b *= -1;        pn_b = True
-    if a < b:   a, b = b, a;    pn_a, pn_b = pn_b, pn_a;    exflag = True   # 交換a與b的次序，使得a≥b
+
+    if isinstance(a, Polynomial) or isinstance(b, Polynomial):
+        a = Polynomial(a);          b = Polynomial(b)
+    else:
+        int_check(a, b)
+        if a < 0:   a *= -1;        pn_a = True
+        if b < 0:   b *= -1;        pn_b = True
+        if a < b:   a, b = b, a;    pn_a, pn_b = pn_b, pn_a;    exflag = True   # 交換a與b的次序，使得a≥b
 
     q = [0] + euclideanAlgorithm(a, b)      # 廣義歐幾里德除法（輾轉相除法），求不完全商數組q
     s, t = coefficients(q)                  # 求係數s和t

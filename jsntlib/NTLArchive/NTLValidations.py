@@ -12,6 +12,7 @@ import sys
 from .NTLExceptions import \
     BoolError, ComplexError, DictError, DigitError, IntError, ListError, \
     OEError, PCError, PNError, ZeroError, RealError, TupleError
+from .NTLUtilities import jsbytes, jsstr
 
 
 __all__  = [
@@ -75,7 +76,7 @@ def str_check(*args):
     func = inspect.stack()[2][3]
 
     for var in args:
-        if not isinstance(var, (str, bytes, unicode)):
+        if not isinstance(var, (jsbytes, jsstr)):
             raise StringError('Function %s expected str, %s got instead.'
                 % (func,  type(var).__name__))
 
