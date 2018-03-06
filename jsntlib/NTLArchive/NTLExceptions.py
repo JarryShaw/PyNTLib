@@ -63,7 +63,7 @@ class BaseError(Exception):
 
         print('Traceback (most recent call last):')
         traceback.print_stack(limit=-index)
-        sys.tracebacklimit = None
+        sys.tracebacklimit = 0
 
 
 ##############################################################################

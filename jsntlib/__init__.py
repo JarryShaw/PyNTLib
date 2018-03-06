@@ -5,4 +5,4 @@
 For Python 2.7, `__init__.py` file in folders is nessary.
 '''
 
-from jsntlib import ntl as jsntlib
+from .ntl import *
