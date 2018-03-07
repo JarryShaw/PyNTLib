@@ -37,17 +37,19 @@ class BaseError(Exception):
 
     '''
 
-    def __new__(cls, message):
-        self = super(Exception, cls).__new__(cls)
+    def __init__(self, message):
         (self.traceback_3 if ispy3 else self.traceback_2)()
-        return self
+        super().__init__(message)
 
     def tb_preparation(self):
         tb = traceback.extract_stack()
 
-        for ptr in jsrange(len(tb)):
-            if 'jsntlib' in tb[ptr][0]:
-                index = ptr;    break
+        for tbitem in tb:
+            if '/jspcap/' in tbitem[0]:
+                index = tb.index(tbitem)
+                break
+        else:
+            index = len(tb)
 
         return index
 
@@ -73,66 +75,56 @@ class BaseError(Exception):
 
 # 數字參數異常
 # The argument(s) must be (a) number(s).
-class DigitError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class DigitError(BaseError, TypeError):
+    pass
 
 
 # 整數參數異常
 # The argument(s) must be integral.
-class IntError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class IntError(BaseError, TypeError):
+    pass
 
 
 # 字典參數異常
 # The argument(s) must be dict type.
-class DictError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class DictError(BaseError, TypeError):
+    pass
 
 
 # 列表參數異常
 # The argument(s) must be list type.
-class ListError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class ListError(BaseError, TypeError):
+    pass
 
 
 # 元組參數異常
 # The argument(s) must be tuple type.
-class TupleError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class TupleError(BaseError, TypeError):
+    pass
 
 
 # 多項式參數異常
 # The argument(s) must be Polynomial type.
-class PolyError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class PolyError(BaseError, TypeError):
+    pass
 
 
 # 參數異常
 # Function expected at most / least n arguments, got m.
-class ArgumentError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class ArgumentError(BaseError, TypeError):
+    pass
 
 
 # 實數功能異常
 # The function is not defined for real number.
-class RealError(BaseError):
-    def __init__(self, message):
-        (self.traceback_3 if ispy3 else self.traceback_2)()
-        raise TypeError(message)
+class RealError(BaseError, TypeError):
+    pass
 
 
 # 複數功能異常
 # The function is not defined for complex instance.
-class ComplexError(BaseError):
-    def __init__(self, message):
-        raise TypeError(message)
+class ComplexError(BaseError, TypeError):
+    pass
 
 
 ##############################################################################
@@ -142,51 +134,44 @@ class ComplexError(BaseError):
 
 # 正／負值參數異常
 # The argument(s) must be positive/negative.
-class PNError(BaseError):
-    def __init__(self, message):
-        raise ValueError(message)
+class PNError(BaseError, ValueError):
+    pass
 
 
 # 奇／偶數參數異常
 # The argument(s) must be odd/even.
-class OEError(BaseError):
-    def __init__(self, message):
-        raise ValueError(message)
+class OEError(BaseError, ValueError):
+    pass
 
 
 # 素／合數參數異常
 # The argument(s) must be prime/composit.
-class PCError(BaseError):
-    def __init__(self, message):
-        raise ValueError(message)
+class PCError(BaseError, ValueError):
+    pass
 
 
 # 零值參數異常
 # The argument(s) must be not zero(0).
-class ZeroError(BaseError):
-    def __init__(self, message):
-        raise ValueError(message)
+class ZeroError(BaseError, ValueError):
+    pass
 
 
 # 布爾參數異常
 # The argument(s) must be bool type.
-class BoolError(BaseError):
-    def __init__(self, message):
-        raise ValueError(message)
+class BoolError(BaseError, ValueError):
+    pass
 
 
 # 字符串參數異常
 # The argument(s) must be (a) string(s).
-class StringError(BaseError):
-    def __init__(self, message):
-        raise ValueError(message)
+class StringError(BaseError, ValueError):
+    pass
 
 
 # 參數定義異常
 # The argument must match a specific patern.
-class DefinitionError(BaseError):
-    def __init__(self, message):
-        raise ValueError(message)
+class DefinitionError(BaseError, ValueError):
+    pass
 
 
 ##############################################################################
@@ -196,9 +181,8 @@ class DefinitionError(BaseError):
 
 # 方程無解異常
 # The polynomial has no integral solution.
-class SolutionError(BaseError):
-    def __init__(self, message):
-        raise RuntimeError(message)
+class SolutionError(BaseError, RuntimeError):
+    pass
 
 
 ##############################################################################
@@ -208,9 +192,8 @@ class SolutionError(BaseError):
 
 # 係數參數異常
 # The coefficient of the univariate with greatest degree in divisor must be 1.
-class ExponentError(BaseError):
-    def __init__(self, message):
-        raise KeyError(message)
+class ExponentError(BaseError, KeyError):
+    pass
 
 
 ##############################################################################
@@ -220,9 +203,8 @@ class ExponentError(BaseError):
 
 # 取模參數異常
 # The modulo of residue should not be 0.
-class ResidueError(BaseError):
-    def __init__(self, message):
-        raise ZeroDivisionError(message)
+class ResidueError(BaseError, ZeroDivisionError):
+    pass
 
 
 ##############################################################################
@@ -232,6 +214,5 @@ class ResidueError(BaseError):
 
 # 關鍵詞參數異常
 # Unknow attribute(s).
-class KeywordError(BaseError):
-    def __init__(self, message):
-        raise AttributeError(message)
+class KeywordError(BaseError, AttributeError):
+    pass

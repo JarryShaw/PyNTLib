@@ -95,11 +95,14 @@ def fermatTest(n, t, flag):
 def solovay_stassenTest(n, t):
     exp = (n - 1) // 2
     for ctr in jsrange(0, t):
-        b = random.randrange(2, n-1)
-        r = repetiveSquareModulo(b, exp, n)
-        if r == n - 1:                  r = -1
-        if r != 1 and r != -1:          return False
-        if r != jacobiSymbol(b, n):     return False
+        try:
+            b = random.randrange(2, n-1)
+            r = repetiveSquareModulo(b, exp, n)
+            if r == n - 1:                  r = -1
+            if r != 1 and r != -1:          return False
+            if r != jacobiSymbol(b, n):     return False
+        except RecursionError:
+            continue
     return True
 
 

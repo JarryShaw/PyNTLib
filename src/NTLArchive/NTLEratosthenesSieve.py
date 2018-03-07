@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import itertools
 import math
 
 
@@ -132,6 +133,10 @@ _PRIME_LIST = [
 ]
 
 
+# alternative prime number list
+_PRIME_LIST_ALT = list(itertools.chain(*_PRIME_LIST))
+
+
 # 利用厄拉托塞師篩法或素性檢驗，生成素數數列
 def eratosthenesSieve(upper, lower=None):
     if lower is None:   lower = 2
@@ -254,5 +259,6 @@ def primerange(start, end=None, step=None):
     from .NTLPseudoPrime import miller_rabinTest
     for _int in jsrange(start, end, step):
         if _int < 2:                        continue
+        if _int in _PRIME_LIST_ALT:         yield _int;    continue
         if _int % 2 == 0:                   continue
         if miller_rabinTest(_int, para):    yield _int
