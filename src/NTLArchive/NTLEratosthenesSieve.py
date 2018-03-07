@@ -8,7 +8,7 @@ import math
 # 返回upper以內正整數的所有素數列表
 
 
-from .NTLUtilities   import jsceil, jsfloor, jsrange
+from .NTLUtilities   import jsceil, jsfloor, jsmaxint, jsrange
 from .NTLValidations import int_check
 
 # from .NTLPseudoPrime import miller_rabinTest
@@ -143,7 +143,7 @@ def eratosthenesSieve(upper, lower=None):
     if upper < 2:   return []
     if lower < 2:   lower = 2
 
-    # 從上述素數表中獲取素數數列    
+    # 從上述素數表中獲取素數數列
     def _fromprimelist(lower, upper):
         _llevel = lower // 100;     _ulevel = upper // 100
 
@@ -176,7 +176,7 @@ def eratosthenesSieve(upper, lower=None):
     # 若上邊界較大（≥10100）則需分步求取
     else:
         # 厄拉托塞師篩法（獲取在上述素數表之外的素數列表）
-        def _eratosthenesSieve(lower, upper):
+        def _eratosthenesSieve(upper, lower):
             lower -= 10100;     upper -= 10100
 
             # 用於存儲upper個正整數的表格／狀態；其中，0表示篩去，1表示保留
