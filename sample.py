@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-from jsntlib import ntl as jsntlib
+import jsntlib
 
 print()
 
