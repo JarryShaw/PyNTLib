@@ -11,7 +11,7 @@ setup(
 
     name = 'jsntlib',
 
-    version = '1.4.0',
+    version = '1.4.1',
 
     description =
         'A number theory library adapted from mathematic fundamentals of information security homework codes.',
