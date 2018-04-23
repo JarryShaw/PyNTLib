@@ -11,7 +11,7 @@ setup(
 
     name = 'jsntlib',
 
-    version = '1.4.2',
+    version = '1.4.2.post1',
 
     description =
         'A number theory library adapted from mathematic fundamentals of information security homework codes.',
@@ -25,6 +25,8 @@ setup(
         -  Usage sample has been attached as ``sample.py``.\n\n\
         -  Document can be found in ``MANUAL.md``.\n\n\
         -  Some tips on this repository will be present later.',
+
+    long_description_content_type = 'text/x-rst',
 
     author = 'Jarry Shaw',
 
@@ -88,7 +90,7 @@ setup(
         'Topic :: Utilities',
     ],
 
-    license = 'LICENSE.txt',
+    license = 'GPLv3',
 
     keywords = [
         'ntl',
