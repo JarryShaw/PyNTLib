@@ -11,20 +11,20 @@ setup(
 
     name = 'jsntlib',
 
-    version = '1.4.2.post1',
+    version = '1.4.3',
 
     description =
         'A number theory library adapted from mathematic fundamentals of information security homework codes.',
 
     long_description =
-        '       JSNTLIB Archive\n\
-        ================================\n\n\
-        The whole project is written in *Python*, with compatibility in both 2 & 3 versions.\n\n\
-        -  The ``jsntlib`` is an open sourse library for number theory.\n\n\
-        -  Header file is ``jsntlib.py``.\n\n\
-        -  Usage sample has been attached as ``sample.py``.\n\n\
-        -  Document can be found in ``MANUAL.md``.\n\n\
-        -  Some tips on this repository will be present later.',
+        '       JSNTLIB Archive\n'
+        '================================\n\n'
+        'The whole project is written in *Python*, with compatibility in both 2 & 3 versions.\n\n'
+        '-  The ``jsntlib`` is an open sourse library for number theory.\n\n'
+        '-  Header file is ``jsntlib.py``.\n\n'
+        '-  Usage sample has been attached as ``sample.py``.\n\n'
+        '-  Document can be found in ``MANUAL.md``.\n\n'
+        '-  Some tips on this repository will be present later.',
 
     long_description_content_type = 'text/x-rst',
 
@@ -32,7 +32,7 @@ setup(
 
     author_email = 'jarryshaw@icloud.com',
 
-    url = 'https://github.com/JarryShaw/jsntlib/tree/release',
+    url = 'https://github.com/JarryShaw/jsntlib/tree/release/src#jsntlib-manual',
 
     python_requires = '>=2.7',
 

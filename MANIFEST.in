@@ -1,3 +1,4 @@
+global-exclude .DS_Store
 global-include *.py
 exclude test.py
 prune Workplace

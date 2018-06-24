@@ -221,7 +221,7 @@ def eratosthenesSieve(upper, lower=None):
                     rst = []
 
                 # 較大部分（≥10100 & ≤10,000,000）用篩法獲取
-                rst += _eratosthenesSieve(lower, 10000000)
+                rst += _eratosthenesSieve(10000000, lower)
                 lower = 10000001
 
             # 過大部分（>10,000,000）使用Miller-Rabin算法進行素性檢驗
