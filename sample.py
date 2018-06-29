@@ -2,15 +2,15 @@
 
 from __future__ import print_function
 
-import src as jsntlib
+import src as ntlib
 
 print()
 
 # Create an instacne of Polynomial.
 print('Create Polynomial.')
-poly_0 = jsntlib.Polynomial(('b', (2, -1), (0, 1)), ('c', (7, 1), (1, -1)))
-poly_1 = jsntlib.Polynomial(('a', (1, 3), (3, 4), (2, 2), (34, (1+3j))))
-poly_2 = jsntlib.Polynomial(('a', (1, 0), (4, -4), (2, 3), (0, 1)))
+poly_0 = ntlib.Polynomial(('b', (2, -1), (0, 1)), ('c', (7, 1), (1, -1)))
+poly_1 = ntlib.Polynomial(('a', (1, 3), (3, 4), (2, 2), (34, (1+3j))))
+poly_2 = ntlib.Polynomial(('a', (1, 0), (4, -4), (2, 3), (0, 1)))
 poly_3 = poly_1 / poly_2
 print(poly_0)
 print(poly_1[::])
@@ -20,7 +20,7 @@ print()
 
 # Create an instacne of Congruence.
 print('Create Congruence.')
-_con = jsntlib.Congruence(('z', (2, 1), (0, -46)), mod=105)
+_con = ntlib.Congruence(('z', (2, 1), (0, -46)), mod=105)
 _ret = _con.solution
 
 print('The solution of %s is\n' % str(_con))
@@ -30,7 +30,7 @@ print()
 
 # Create an instacne of Quadratic.
 print('Create Quadratic.')
-_qua = jsntlib.Quadratic(8068, vars=('p', 'q'))
+_qua = ntlib.Quadratic(8068, vars=('p', 'q'))
 _rst = _qua.solution
 
 print('The solution of %s is\n' % str(_qua))
@@ -40,7 +40,7 @@ print()
 
 # Create an instacne of Index.
 print('Create Index.')
-index = jsntlib.Index(41)
+index = ntlib.Index(41)
 print(index)
 print()
 rst = index(4, 8)
@@ -50,9 +50,9 @@ print()
 
 # Create an instacne of Legendre.
 print('Create Legendre.')
-l1 = jsntlib.Legendre(3, 17)
-l2 = jsntlib.Legendre('3|17')
-l3 = jsntlib.Legendre(l1)
+l1 = ntlib.Legendre(3, 17)
+l2 = ntlib.Legendre('3|17')
+l3 = ntlib.Legendre(l1)
 
 print(l1, l1.eval())
 print(l2, l2.simplify())
@@ -62,9 +62,9 @@ print()
 
 # Create an instacne of Jacobi.
 print('Create Jacobi.')
-j1 = jsntlib.Jacobi(47, 359)
-j2 = jsntlib.Jacobi('47|359')
-j3 = jsntlib.Jacobi(l1)
+j1 = ntlib.Jacobi(47, 359)
+j2 = ntlib.Jacobi('47|359')
+j3 = ntlib.Jacobi(l1)
 
 print(j1, j1.eval())
 print(j2, j2.simplify())
@@ -75,21 +75,21 @@ print()
 # Create an instacne of Fraction.
 print('Create Fraction.')
 print('7700/2145 = ', end=' ')
-rst_ = jsntlib.Fraction('7699/2145')
-dst_ = jsntlib.Fraction(1, 2145)
+rst_ = ntlib.Fraction('7699/2145')
+dst_ = ntlib.Fraction(1, 2145)
 print(rst_ + dst_)
 
 print()
 
 # Print all primes numbers less than 97.
 print('Call primelist.')
-print(jsntlib.primelist(97, -1))
+print(ntlib.primelist(97, -1))
 
 print()
 
 # Check if 13 and 20 are divisible.
 print('Call isdivisible.')
-if jsntlib.isdivisible(13, 20):
+if ntlib.isdivisible(13, 20):
     print('The result is 13|20.')
 else:
     print('The result is 13∤20.')
@@ -98,7 +98,7 @@ print()
 
 # Check if 197 is prime.
 print('Call isprime.')
-if jsntlib.isprime(197):
+if ntlib.isprime(197):
     print('197 is a prime number.')
 else:
     print('197 is a composit number.')
@@ -107,13 +107,13 @@ print()
 
 # Print the GCD of 10 and 24.
 print('Call gcd.')
-print('(10,24) = %d' % jsntlib.gcd(10, 24))
+print('(10,24) = %d' % ntlib.gcd(10, 24))
 
 print()
 
 # Check if 157 and 673 are coprime numbers.
 print('Call coprime.')
-if jsntlib.coprime(157, 673):
+if ntlib.coprime(157, 673):
     print('157 and 673 are coprime.')
 else:
     print('157 and 673 are not coprime.')
@@ -122,7 +122,7 @@ print()
 
 # Print the Bézout Equation with parameters 179 and 367.
 print('Call bezout.')
-print('%d*179 + %d*367 = (179,367)' % jsntlib.bezout(179, 367))
+print('%d*179 + %d*367 = (179,367)' % ntlib.bezout(179, 367))
 
 print()
 
@@ -130,7 +130,7 @@ print()
 print('Call factor.')
 print('-100 =', end=' ')
 ctr = 0
-for prime in jsntlib.factor(-100):
+for prime in ntlib.factor(-100):
     if ctr > 0:
         print('*', end=' ')
     print(prime, end=' ')
@@ -142,20 +142,20 @@ print()
 # Print the solutions for N|a^2-b^2 while N∤a+b and N∤a-b.
 print('Call decomposit.')
 print('The solutions for N|a^2-b^2 while N∤a+b and N∤a-b\
-        is\n\ta = %d\n\tb = %d' % jsntlib.decomposit(100))
+        is\n\ta = %d\n\tb = %d' % ntlib.decomposit(100))
 
 print()
 
 # Return the special solutions for indefinite binary equation, 7*x + 24*y = -3.
 print('Call binary.')
 print('The general solutions for \'7*x + 24*y = -3\' is (t∈Z)\
-        \n\tx = %d + 24*t\n\ty = %d - 7*t' % jsntlib.binary(7, 24, -3))
+        \n\tx = %d + 24*t\n\ty = %d - 7*t' % ntlib.binary(7, 24, -3))
 
 print()
 
 # Print the result of 235^12235 (mod 9).
 print('Call modulo.')
-print('235 ^ 12235 ≡ %d (mod 9)\n' % jsntlib.modulo(235, 12235, 9))
+print('235 ^ 12235 ≡ %d (mod 9)\n' % ntlib.modulo(235, 12235, 9))
 
 print()
 
@@ -168,7 +168,7 @@ dvdCoe = [-2, 4, 3, 1]
 dvsExp = [7,  1]
 dvsCoe = [1, -1]
 
-(qttExp, qttCoe, rtoExp, rtoCoe) = jsntlib.polydiv(
+(qttExp, qttCoe, rtoExp, rtoCoe) = ntlib.polydiv(
                         dvdExp, dvdCoe, dvsExp, dvsCoe)
 
 print('\n\t')
@@ -203,7 +203,7 @@ cgcExp = [14, 13, 11,  9,  6,  3,  2,  1]
 cgcCoe = [3,  4,  2,  1,  1,  1, 12,  1]
 modulo = 5
 
-(rtoExp, rtoCoe) = jsntlib.simplify(cgcExp, cgcCoe, modulo)
+(rtoExp, rtoCoe) = ntlib.simplify(cgcExp, cgcCoe, modulo)
 
 print('The original polynomial congruence is\n\t', end=' ')
 for ptr in range(len(cgcExp)):
@@ -223,7 +223,7 @@ print()
 
 # Return the solutions of a naïve congruence set.
 print('Call crt')
-remainder = jsntlib.crt((3, [1, -1]), (5, [1, -1]), (7, [2, -2]))
+remainder = ntlib.crt((3, [1, -1]), (5, [1, -1]), (7, [2, -2]))
 
 print('x ≡ ±1 (mod 3)')
 print('x ≡ ±1 (mod 5)')
@@ -247,7 +247,7 @@ for ptr in range(len(cgcExp)):
         print('+', end=' ')
 print('≡ 0 (mod %d)' % modulo)
 
-remainder = jsntlib.congsolve(cgcExp, cgcCoe, modulo)
+remainder = ntlib.congsolve(cgcExp, cgcCoe, modulo)
 
 print('The solution of the above polynomial congruence is\n\tx ≡', end=' ')
 for rst in remainder:
@@ -259,26 +259,26 @@ print()
 # Return the solutions of quadratic equation x^2 + y^2 = 2017.
 print('Call quadratic.')
 print('The solution of the equation x^2 + y^2 = 2017 is\
-        \n\tx=±%d, y=±%d' % jsntlib.quadratic(2017))
+        \n\tx=±%d, y=±%d' % ntlib.quadratic(2017))
 
 print()
 
 # Return the order of 2 for modulo 9.
 print('Call ord.')
-print('The order of 2 mod 9 is\n\tord_9(2) = %d' % jsntlib.ord(9, 2))
+print('The order of 2 mod 9 is\n\tord_9(2) = %d' % ntlib.ord(9, 2))
 
 print()
 
 # Return Euler function φ(40)
 print('Call euler.')
-print('φ(40) = %d' % jsntlib.euler(40))
+print('φ(40) = %d' % ntlib.euler(40))
 
 print()
 
 # Return the primitive residue class of integer 40.
 print('Call prc')
 print('The primitive residue class of 40 is')
-for num in jsntlib.prc(40):
+for num in ntlib.prc(40):
     print(num, end=' ')
 print('.')
 
@@ -287,7 +287,7 @@ print()
 # Return the primitive root(s) of modulo 7.
 print('Call root.')
 print('The primtive root(s) of modulo 7 is/are', end=' ')
-for root in jsntlib.root(7):
+for root in ntlib.root(7):
     print(root, end=' ')
 print('.')
 
@@ -295,20 +295,20 @@ print()
 
 # Return the result of Legendre symbol for (3 | 17).
 print('Call legendre.')
-print('(3 | 17) = %d' % jsntlib.legendre(3, 17))
+print('(3 | 17) = %d' % ntlib.legendre(3, 17))
 
 print()
 
 # Return the result of jocabi symbol for (47 | 359).
 print('Call jacobi.')
-print('(47 | 359) = %d' % jsntlib.jacobi(47, 359))
+print('(47 | 359) = %d' % ntlib.jacobi(47, 359))
 
 print()
 
 # Return if an integer is a Carmicheal number.
 print('Call carmicheal.')
 print('3499', end=' ')
-if jsntlib.carmicheal(3499):
+if ntlib.carmicheal(3499):
     print('is', end=' ')
 else:
     print('isn\'t', end=' ')
@@ -319,18 +319,18 @@ print()
 # Return a pseudo-prime number with certain paterns.
 print('Call pseudo.')
 print('A pseudo-prime number with Fermat test (t=100000) is %d.'
-    % jsntlib.pseudo(byte=16, para=10000, mode='Fermat', flag=False))
+    % ntlib.pseudo(byte=16, para=10000, mode='Fermat', flag=False))
 print('An Euler pseudo-prime number with Solovay-Stassen test (t=100000) is %d.'
-    % jsntlib.pseudo(byte=16, para=10000, mode='Euler'))
+    % ntlib.pseudo(byte=16, para=10000, mode='Euler'))
 print('A strong pseudo-prime number with Miller-Rabin test (k=100000) is %d.'
-    % jsntlib.pseudo(byte=16, para=10000, mode='Strong'))
+    % ntlib.pseudo(byte=16, para=10000, mode='Strong'))
 
 print()
 
 # Return the continued fraction of a number.
 print('Call fraction.')
 fct_ = __import__('fractions').Fraction(7700, 2145)
-rst_ = jsntlib.fraction(fct_)
+rst_ = ntlib.fraction(fct_)
 print(fct_, '=', rst_)
 
 print()

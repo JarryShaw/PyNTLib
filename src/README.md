@@ -1,7 +1,7 @@
-# JSNTLIB Manual
+# PyNTLib Manual
 
 
-&emsp; `jsntlib` is an open sourse library for __number theory__ written in Python, with compatibility in both 2.7 and 3.6 versions. The following is a manual for this library. Usage instructions and samples attached.
+&emsp; `pyntlib` is an open sourse library for __number theory__ written in Python, with compatibility in both 2.7 and 3.6 versions. The following is a manual for this library. Usage instructions and samples attached.
 
 
  - [Functions](#functions)
@@ -68,7 +68,7 @@
 
 ```python
 # some preparations :)
->>> from jsntlib import *
+>>> from ntlib import *
 ```
 
 
