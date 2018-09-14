@@ -11,7 +11,7 @@ setup(
 
     name = 'pyntlib',
 
-    version = '1.5.0',
+    version = '1.5.0.post2',
 
     description =
         'A number theory library adapted from mathematic fundamentals of information security homework codes.',
@@ -34,7 +34,7 @@ setup(
 
     url = 'https://github.com/JarryShaw/pyntlib/tree/release/src#pyntlib-manual',
 
-    python_requires = '>=2.7',
+    python_requires = '>=2.6',
 
     py_modules = ['ntlib'],
 
@@ -75,6 +75,7 @@ setup(
         'Operating System :: Unix',
 
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.0',
@@ -84,6 +85,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
 
         'Topic :: Scientific/Engineering :: Mathematics',
         'Topic :: Security',
