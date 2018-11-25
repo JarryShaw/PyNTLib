@@ -11,7 +11,7 @@ setup(
 
     name = 'pyntlib',
 
-    version = '1.5.0.post2',
+    version = '1.5.0.post3',
 
     description =
         'A number theory library adapted from mathematic fundamentals of information security homework codes.',
@@ -53,7 +53,7 @@ setup(
     },
 
     classifiers = [
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 7 - Inactive',
 
         'Environment :: Console',
         'Environment :: MacOS X',
