@@ -1,5 +1,12 @@
 global-exclude .DS_Store
+
 global-include *.py
+
 exclude test.py
+
+include README.md
+include LICENSE
+include sample.py
+
 prune Workplace
 prune src

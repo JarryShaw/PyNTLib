@@ -11,7 +11,7 @@ setup(
 
     name = 'pyntlib',
 
-    version = '1.5.0.post3',
+    version = '1.5.0.post4',
 
     description =
         'A number theory library adapted from mathematic fundamentals of information security homework codes.',
